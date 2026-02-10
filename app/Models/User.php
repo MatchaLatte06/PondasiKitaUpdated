@@ -6,43 +6,52 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens; // Penting untuk Mobile App nanti
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $table = 'tb_user'; // Nama tabel Anda
+
+    // Kolom yang boleh diisi
     protected $fillable = [
-        'name',
+        'username',
+        'nama',
         'email',
         'password',
+        'no_telepon',
+        'jenis_kelamin',
+        'alamat',
+        'level', // admin, seller, customer
+        'status',
+        'is_verified'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    // Kolom yang disembunyikan saat data dikirim ke JSON/Mobile App
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id',
+        'reset_token'
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    // Casting tipe data otomatis
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_verified' => 'boolean',
+        'is_banned' => 'boolean',
+    ];
+
+    // Helper untuk cek Role (Memudahkan coding nanti)
+    public function isAdmin() { return $this->level === 'admin'; }
+    public function isSeller() { return $this->level === 'seller'; }
+    public function isCustomer() { return $this->level === 'customer'; }
+
+    // Relasi ke Toko (User Seller punya Toko)
+    public function toko()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasOne(Toko::class, 'user_id', 'id');
     }
 }
