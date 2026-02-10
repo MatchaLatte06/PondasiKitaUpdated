@@ -12,22 +12,21 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'tb_user'; // Nama tabel Anda
+    // WAJIB DITAMBAHKAN KARENA NAMA TABEL BUKAN 'users'
+    protected $table = 'tb_user'; 
 
-    // Kolom yang boleh diisi
     protected $fillable = [
-        'username',
         'nama',
+        'username',
         'email',
         'password',
         'no_telepon',
-        'jenis_kelamin',
-        'alamat',
-        'level', // admin, seller, customer
+        'level',
         'status',
-        'is_verified'
+        'is_verified',
+        'is_banned',
+        'last_activity_at'
     ];
-
     // Kolom yang disembunyikan saat data dikirim ke JSON/Mobile App
     protected $hidden = [
         'password',

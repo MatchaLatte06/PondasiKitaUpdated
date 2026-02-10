@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PageController;
-// use App\Http\Controllers\AuthController; // Uncomment nanti jika sudah buat AuthController
+use App\Http\Controllers\AuthController; // Wajib di-import
 
 /*
 |--------------------------------------------------------------------------
@@ -14,60 +14,72 @@ use App\Http\Controllers\PageController;
 // =================================================================
 // 1. HALAMAN UTAMA (LANDING PAGE)
 // =================================================================
-// Memanggil LandingController function index()
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
 
 // =================================================================
-// 2. HALAMAN USER (PRODUK, TOKO, DLL)
+// 2. HALAMAN USER (PRODUK, TOKO, KERANJANG)
 // =================================================================
-// Menggunakan Grouping Controller agar lebih rapi
 Route::controller(PageController::class)->group(function () {
     
-    // Link: website.com/pages/produk
+    // Halaman List Produk
     Route::get('/pages/produk', 'produk');
 
-    // Link: website.com/pages/semua_toko
+    // Halaman List Semua Toko
     Route::get('/pages/semua_toko', 'semuaToko');
 
-    // Link: website.com/pages/detail_produk?id=1
+    // Halaman Detail Produk (Link: /pages/detail_produk?id=1)
     Route::get('/pages/detail_produk', 'detailProduk');
 
-    // Link: website.com/pages/toko?slug=nama-toko
+    // Halaman Profil Toko (Link: /pages/toko?slug=nama-toko)
     Route::get('/pages/toko', 'detailToko');
 
-    // Link: website.com/pages/keranjang (Dari Navbar)
+    // Halaman Keranjang Belanja
     Route::get('/pages/keranjang', 'keranjang');
 
-    // Link: website.com/pages/search (Dari Search Bar)
+    // Halaman Pencarian
     Route::get('/pages/search', 'search');
 
 });
 
 
 // =================================================================
-// 3. AUTHENTICATION (LOGIN/REGISTER)
+// 3. AUTHENTICATION (LOGIN / REGISTER / LOGOUT)
 // =================================================================
-// Ini route sementara agar Navbar tidak error saat diklik.
-// Nanti ganti dengan AuthController buatan Anda.
+Route::controller(AuthController::class)->group(function () {
+    
+    // --- LOGIN ---
+    // Menampilkan Form Login
+    Route::get('/login', 'showLogin')->name('login');
+    // Memproses Data Login (POST)
+    Route::post('/login', 'login')->name('login.process');
 
-Route::get('/login', function () {
-    return "Halaman Login (Belum Dibuat)";
-})->name('login');
+    // --- REGISTER ---
+    // Menampilkan Form Register (Pastikan view 'auth.register_customer' ada)
+    // Jika method showRegister belum ada di controller, pakai Route::view
+    Route::view('/register', 'auth.register_customer')->name('register'); 
+    // Memproses Data Register (POST)
+    Route::post('/register', 'register')->name('register.process');
 
-Route::get('/register', function () {
-    return "Halaman Register (Belum Dibuat)";
-})->name('register');
+    // --- LOGOUT ---
+    // Logout wajib POST demi keamanan
+    Route::post('/logout', 'logout')->name('logout');
 
-// Route Logout wajib POST demi keamanan (sesuai form di navbar)
-Route::post('/logout', function () {
-    // Auth::logout();
-    return redirect('/');
-})->name('logout');
+});
 
 
 // =================================================================
-// 4. API ROUTES (Opsional jika error 404 API Chat)
+// 4. ROUTE LAINNYA (CHATBOT & SOCIALITE)
 // =================================================================
-// Jika Fetch Chatbot di blade error 404, Anda bisa daftarkan routenya disini juga
-// Route::post('/api/chat', [App\Http\Controllers\ChatController::class, 'sendMessage']);
+
+// Route Chatbot POTA (Agar tidak 404 di Landing Page)
+// Nanti ganti dengan ChatController jika sudah siap
+Route::post('/api/chat', function() {
+    return response()->json([
+        'reply' => 'Halo! Saya POTA. Sistem otak saya sedang diperbarui, silakan coba lagi nanti ya!'
+    ]);
+})->name('api.chat');
+
+// Placeholder untuk Login Google & Lupa Password
+Route::get('/auth/google', function() { return "Fitur Login Google (Coming Soon)"; });
+Route::get('/lupa-password', function() { return "Halaman Lupa Password (Coming Soon)"; });

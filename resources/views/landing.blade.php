@@ -49,7 +49,6 @@
         .store-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; bottom: -30px; left: 20px; z-index: 2; background: white; }
         .store-logo-initial { width: 60px; height: 60px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; text-transform: uppercase; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; bottom: -30px; left: 20px; z-index: 2; }
         
-        /* Animations */
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         @keyframes pulse-white { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); transform: scale(1); } 70% { box-shadow: 0 0 0 20px rgba(255,255,255,0); transform: scale(1.1); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); transform: scale(1); } }
         @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(79,172,254,0.7); transform: scale(1); } 70% { box-shadow: 0 0 0 20px rgba(79,172,254,0); transform: scale(1.1); } 100% { box-shadow: 0 0 0 0 rgba(79,172,254,0); transform: scale(1); } }
@@ -57,7 +56,7 @@
 </head>
 <body>
     
-    {{-- Include Navbar --}}
+    {{-- Navbar (Menggunakan @include) --}}
     @include('partials.navbar')
 
     {{-- Hero Section --}}
@@ -80,7 +79,8 @@
             <section class="categories">
                 <h2 class="section-title"><span>Kategori Populer</span></h2>
                 <div class="category-grid">
-                    @forelse($categories as $cat)
+                    {{-- GUNAKAN ?? [] AGAR TIDAK ERROR 500 --}}
+                    @forelse($categories ?? [] as $cat)
                         <a href="{{ url('pages/produk?kategori=' . $cat->id) }}" class="category-item">
                             <div class="category-icon">
                                 <i class="{{ $cat->icon_class ?? 'fas fa-tools' }}"></i>
@@ -96,38 +96,52 @@
             {{-- TOKO POPULER --}}
             <section class="featured-stores">
                 <div class="section-header">
-                    <h2 class="section-title"><span>{{ $tokoSectionTitle }}</span></h2>
+                    <h2 class="section-title"><span>{{ $tokoSectionTitle ?? 'Toko Populer' }}</span></h2>
                     <a href="{{ url('pages/semua_toko') }}" class="see-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="store-grid">
-                    @forelse($listToko as $toko)
-                        {{-- Logic Gambar Toko (Dipindah ke sini agar aman tanpa ubah Model dulu) --}}
+                    @forelse($listToko ?? [] as $toko)
                         @php
-                            $bannerPath = 'assets/uploads/banners/' . $toko->banner_toko;
+                            // LOGIC AMAN UNTUK GAMBAR
+                            $bannerPath = 'assets/uploads/banners/' . ($toko->banner_toko ?? '');
                             $hasBanner = !empty($toko->banner_toko) && file_exists(public_path($bannerPath));
+                            
+                            $colors = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00acc1', '#00897b', '#43a047', '#7cb342', '#c0ca33', '#fdd835', '#ffb300', '#fb8c00', '#f4511e'];
+                            // Pastikan nama_toko ada sebelum di-crc32
+                            $storeColor = $colors[crc32($toko->nama_toko ?? 'Toko') % count($colors)];
+                            
+                            if (empty($toko->initials)) {
+                                $words = explode(" ", $toko->nama_toko ?? 'Toko Kami');
+                                $acronym = "";
+                                foreach ($words as $w) { $acronym .= mb_substr($w, 0, 1); }
+                                $initials = strtoupper(substr($acronym, 0, 2));
+                            } else {
+                                $initials = $toko->initials;
+                            }
+
                             $bgStyle = $hasBanner 
                                 ? "background-image: url(" . asset($bannerPath) . ");" 
-                                : "background-color: " . $toko->color . "; opacity: 0.8;";
+                                : "background-color: " . $storeColor . "; opacity: 0.8;";
 
-                            $logoPath = 'assets/uploads/logos/' . $toko->logo_toko;
+                            $logoPath = 'assets/uploads/logos/' . ($toko->logo_toko ?? '');
                             $hasLogo = !empty($toko->logo_toko) && file_exists(public_path($logoPath));
                         @endphp
 
-                        <a href="{{ url('pages/toko?slug=' . $toko->slug) }}" class="store-card">
+                        <a href="{{ url('pages/toko?slug=' . ($toko->slug ?? '#')) }}" class="store-card">
                             <div class="store-banner" style="{{ $bgStyle }}">
                                 @if($hasLogo)
                                     <img src="{{ asset($logoPath) }}" class="store-logo" alt="Logo">
                                 @else
-                                    <div class="store-logo-initial" style="background-color: {{ $toko->color }};">
-                                        {{ $toko->initials }}
+                                    <div class="store-logo-initial" style="background-color: {{ $storeColor }};">
+                                        {{ $initials }}
                                     </div>
                                 @endif
                             </div>
 
                             <div class="store-info">
-                                <h4>{{ $toko->nama_toko }}</h4>
-                                <p><i class="fas fa-map-marker-alt"></i> {{ $toko->kota }}</p>
-                                <p class="product-count">{{ $toko->jumlah_produk_aktif }} Produk</p>
+                                <h4>{{ $toko->nama_toko ?? 'Nama Toko' }}</h4>
+                                <p><i class="fas fa-map-marker-alt"></i> {{ $toko->kota ?? 'Indonesia' }}</p>
+                                <p class="product-count">{{ $toko->jumlah_produk_aktif ?? 0 }} Produk</p>
                             </div>
                         </a>
                     @empty
@@ -137,7 +151,7 @@
             </section>
 
             {{-- PRODUK LOKAL (Jika Ada) --}}
-            @if(count($listProdukLokal) > 0)
+            @if(isset($listProdukLokal) && count($listProdukLokal) > 0)
             <section class="products">
                 <div class="section-header">
                     <h2 class="section-title"><span>Produk Terlaris di Wilayah Anda</span></h2>
@@ -172,11 +186,11 @@
                     <a href="{{ url('pages/produk') }}" class="see-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="product-grid">
-                    @forelse($listProdukNasional as $p)
+                    @forelse($listProdukNasional ?? [] as $p)
                         @php
                             $img = !empty($p->gambar_utama) ? 'assets/uploads/products/'.$p->gambar_utama : 'assets/uploads/products/default.jpg';
                         @endphp
-                        <a href="{{ url('pages/detail_produk?id=' . $p->id . '&toko_slug=' . $p->slug_toko) }}" class="product-link">
+                        <a href="{{ url('pages/detail_produk?id=' . $p->id . '&toko_slug=' . ($p->slug_toko ?? '#')) }}" class="product-link">
                             <div class="product-card">
                                 <div class="product-image">
                                     <img src="{{ asset($img) }}" onerror="this.onerror=null; this.src='{{ asset('assets/uploads/products/default.jpg') }}';">
@@ -423,8 +437,7 @@
             }
 
             try {
-                // PENTING: Pastikan Anda sudah membuat Route API untuk Chatbot di routes/api.php
-                // atau gunakan URL sementara ini
+                // Fetch URL disesuaikan dengan route API Anda
                 const res = await fetch('{{ url("/api/chat") }}', { 
                     method: 'POST',
                     headers: {
