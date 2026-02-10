@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 
 class Toko extends Model
 {
@@ -35,4 +36,24 @@ class Toko extends Model
     {
         return $this->hasMany(Barang::class, 'toko_id', 'id');
     }
+    // 1. Accessor untuk URL Banner
+public function getBannerUrlAttribute()
+{
+    $path = 'assets/uploads/banners/' . $this->banner_toko;
+    // Cek apakah file ada & tidak kosong
+    if ($this->banner_toko && File::exists(public_path($path))) {
+        return asset($path);
+    }
+    return null; // Nanti di blade kita ganti jadi warna
+}
+
+// 2. Accessor untuk URL Logo
+public function getLogoUrlAttribute()
+{
+    $path = 'assets/uploads/logos/' . $this->logo_toko;
+    if ($this->logo_toko && File::exists(public_path($path))) {
+        return asset($path);
+    }
+    return null;
+}
 }
