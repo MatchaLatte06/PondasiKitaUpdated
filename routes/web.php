@@ -1,7 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LandingController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Ganti route '/' yang tadi kita buat test, menjadi ini:
+Route::get('/', [LandingController::class, 'index'])->name('home');
