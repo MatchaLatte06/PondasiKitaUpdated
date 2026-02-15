@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PageController;
-// use App\Http\Controllers\AuthController; // Uncomment nanti jika sudah buat AuthController
+use App\Http\Controllers\AuthController; 
+use App\Http\Controllers\SellerController;
+use App\Http\Controllers\Seller\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -11,63 +13,55 @@ use App\Http\Controllers\PageController;
 |--------------------------------------------------------------------------
 */
 
-// =================================================================
-// 1. HALAMAN UTAMA (LANDING PAGE)
-// =================================================================
-// Memanggil LandingController function index()
+// --- 1. HALAMAN UTAMA ---
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
-
-// =================================================================
-// 2. HALAMAN USER (PRODUK, TOKO, DLL)
-// =================================================================
-// Menggunakan Grouping Controller agar lebih rapi
+// --- 2. HALAMAN USER UMUM (PRODUK, TOKO, DLL) ---
 Route::controller(PageController::class)->group(function () {
-    
-    // Link: website.com/pages/produk
     Route::get('/pages/produk', 'produk');
-
-    // Link: website.com/pages/semua_toko
     Route::get('/pages/semua_toko', 'semuaToko');
-
-    // Link: website.com/pages/detail_produk?id=1
     Route::get('/pages/detail_produk', 'detailProduk');
-
-    // Link: website.com/pages/toko?slug=nama-toko
     Route::get('/pages/toko', 'detailToko');
-
-    // Link: website.com/pages/keranjang (Dari Navbar)
     Route::get('/pages/keranjang', 'keranjang');
-
-    // Link: website.com/pages/search (Dari Search Bar)
     Route::get('/pages/search', 'search');
-
 });
 
+// --- 3. AUTHENTICATION (Pemisahan Customer & Seller) ---
+Route::controller(AuthController::class)->group(function () {
+    
+    // AUTH CUSTOMER
+    Route::get('/login', 'showLogin')->name('login'); // Menampilkan login customer
+    Route::post('/login', 'login')->name('login.process');
+    Route::get('/register', 'showRegister')->name('register'); // Menampilkan register customer
+    Route::post('/register', 'register')->name('register.process');
 
-// =================================================================
-// 3. AUTHENTICATION (LOGIN/REGISTER)
-// =================================================================
-// Ini route sementara agar Navbar tidak error saat diklik.
-// Nanti ganti dengan AuthController buatan Anda.
+    // AUTH SELLER (Entitas Berbeda)
+    Route::get('/seller/login', 'showLoginSeller')->name('seller.login'); // Menampilkan login seller
+    Route::post('/seller/login', 'login')->name('seller.login.process');
+    Route::get('/seller/register', 'showRegisterSeller')->name('seller.register'); // Load data provinsi
+    Route::post('/seller/register', 'registerSeller')->name('seller.register.process');
 
-Route::get('/login', function () {
-    return "Halaman Login (Belum Dibuat)";
-})->name('login');
+    // LOGOUT GLOBAL
+    Route::post('/logout', 'logout')->name('logout');
+});
 
-Route::get('/register', function () {
-    return "Halaman Register (Belum Dibuat)";
-})->name('register');
+// --- 4. AREA SELLER (WAJIB LOGIN & LEVEL SELLER) ---
+Route::middleware(['auth'])->prefix('seller')->name('seller.')->group(function () {
+    Route::get('/dashboard', [SellerController::class, 'index'])->name('dashboard');
+    // Tambahkan route management produk/toko seller di sini
+});
 
-// Route Logout wajib POST demi keamanan (sesuai form di navbar)
-Route::post('/logout', function () {
-    // Auth::logout();
-    return redirect('/');
-})->name('logout');
+// --- 5. API & AJAX ---
+Route::get('/api/cities/{province_id}', [AuthController::class, 'getCities']);
+Route::get('/api/districts/{city_id}', [AuthController::class, 'getDistricts']);
+Route::post('/api/chat', function() {
+    return response()->json(['reply' => 'Halo! Saya POTA (Versi Laravel).']);
+})->name('api.chat');
 
+// --- 6. PLACEHOLDER ---
+Route::get('/auth/google', function() { return "Fitur Login Google (Coming Soon)"; });
+Route::get('/lupa-password', function() { return "Halaman Lupa Password (Coming Soon)"; });
 
-// =================================================================
-// 4. API ROUTES (Opsional jika error 404 API Chat)
-// =================================================================
-// Jika Fetch Chatbot di blade error 404, Anda bisa daftarkan routenya disini juga
-// Route::post('/api/chat', [App\Http\Controllers\ChatController::class, 'sendMessage']);
+Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
