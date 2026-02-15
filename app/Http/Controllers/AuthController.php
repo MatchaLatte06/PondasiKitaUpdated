@@ -101,6 +101,13 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect('/login');
     }
+    public function logoutSeller(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/seller/login');
+    }
 
     // ==========================================================
     // 5. REGISTER CUSTOMER (VIEW & PROCESS)

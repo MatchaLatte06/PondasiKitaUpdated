@@ -32,7 +32,7 @@
         </li>
         
         <li style="padding: 15px 25px; margin-top: 30px; border-top: 1px solid #333;">
-            <form action="{{ route('logout') }}" method="POST">
+            <form action="{{ route('seller.logout') }}" method="POST">
                 @csrf
                 <button type="submit" style="background: none; border: none; color: #ff5252; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 0; font-size: 15px; font-weight: 500;">
                     <i class="mdi mdi-logout" style="font-size: 20px;"></i> Keluar

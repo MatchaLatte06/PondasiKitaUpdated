@@ -43,6 +43,7 @@ Route::controller(AuthController::class)->group(function () {
 
     // LOGOUT GLOBAL
     Route::post('/logout', 'logout')->name('logout');
+    Route::post('/seller/logout', 'logoutSeller')->name('seller.logout');
 });
 
 // --- 4. AREA SELLER (WAJIB LOGIN & LEVEL SELLER) ---
