@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PageController;
-use App\Http\Controllers\AuthController; // Wajib di-import
+use App\Http\Controllers\AuthController; 
+use App\Http\Controllers\SellerController;
+use App\Http\Controllers\Seller\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -11,33 +13,16 @@ use App\Http\Controllers\AuthController; // Wajib di-import
 |--------------------------------------------------------------------------
 */
 
-// =================================================================
-// 1. HALAMAN UTAMA (LANDING PAGE)
-// =================================================================
+// --- 1. HALAMAN UTAMA ---
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
-
-// =================================================================
-// 2. HALAMAN USER (PRODUK, TOKO, KERANJANG)
-// =================================================================
+// --- 2. HALAMAN USER UMUM (PRODUK, TOKO, DLL) ---
 Route::controller(PageController::class)->group(function () {
-    
-    // Halaman List Produk
     Route::get('/pages/produk', 'produk');
-
-    // Halaman List Semua Toko
     Route::get('/pages/semua_toko', 'semuaToko');
-
-    // Halaman Detail Produk (Link: /pages/detail_produk?id=1)
     Route::get('/pages/detail_produk', 'detailProduk');
-
-    // Halaman Profil Toko (Link: /pages/toko?slug=nama-toko)
     Route::get('/pages/toko', 'detailToko');
-
-    // Halaman Keranjang Belanja
     Route::get('/pages/keranjang', 'keranjang');
-
-    // Halaman Pencarian
     Route::get('/pages/search', 'search');
 });
 
@@ -50,29 +35,29 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/register', 'showRegister')->name('register'); // Menampilkan register customer
     Route::post('/register', 'register')->name('register.process');
 
-// =================================================================
-// 3. AUTHENTICATION (LOGIN / REGISTER / LOGOUT)
-// =================================================================
-Route::controller(AuthController::class)->group(function () {
-    
-    // --- LOGIN ---
-    // Menampilkan Form Login
-    Route::get('/login', 'showLogin')->name('login');
-    // Memproses Data Login (POST)
-    Route::post('/login', 'login')->name('login.process');
+    // AUTH SELLER (Entitas Berbeda)
+    Route::get('/seller/login', 'showLoginSeller')->name('seller.login'); // Menampilkan login seller
+    Route::post('/seller/login', 'login')->name('seller.login.process');
+    Route::get('/seller/register', 'showRegisterSeller')->name('seller.register'); // Load data provinsi
+    Route::post('/seller/register', 'registerSeller')->name('seller.register.process');
 
-    // --- REGISTER ---
-    // Menampilkan Form Register (Pastikan view 'auth.register_customer' ada)
-    // Jika method showRegister belum ada di controller, pakai Route::view
-    Route::view('/register', 'auth.register_customer')->name('register'); 
-    // Memproses Data Register (POST)
-    Route::post('/register', 'register')->name('register.process');
-
-    // --- LOGOUT ---
-    // Logout wajib POST demi keamanan
+    // LOGOUT GLOBAL
     Route::post('/logout', 'logout')->name('logout');
-
+    Route::post('/seller/logout', 'logoutSeller')->name('seller.logout');
 });
+
+// --- 4. AREA SELLER (WAJIB LOGIN & LEVEL SELLER) ---
+Route::middleware(['auth'])->prefix('seller')->name('seller.')->group(function () {
+    Route::get('/dashboard', [SellerController::class, 'index'])->name('dashboard');
+    // Tambahkan route management produk/toko seller di sini
+});
+
+// --- 5. API & AJAX ---
+Route::get('/api/cities/{province_id}', [AuthController::class, 'getCities']);
+Route::get('/api/districts/{city_id}', [AuthController::class, 'getDistricts']);
+Route::post('/api/chat', function() {
+    return response()->json(['reply' => 'Halo! Saya POTA (Versi Laravel).']);
+})->name('api.chat');
 
 // --- 6. PLACEHOLDER ---
 Route::get('/auth/google', function() { return "Fitur Login Google (Coming Soon)"; });
