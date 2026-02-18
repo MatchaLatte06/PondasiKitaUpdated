@@ -1,43 +1,54 @@
-<aside class="sidebar" style="
-    background: #1a1a1a; 
-    width: 250px; 
-    height: calc(100vh - 60px); 
-    position: fixed; 
-    top: 60px;        /* Mulai tepat di bawah navbar */
-    left: 0;
-    z-index: 1000;
-    overflow-y: auto; /* Agar menu bisa di-scroll jika panjang */
-">
+<aside class="sidebar">
+    <div class="sidebar-brand-logo">
+        <a href="{{ route('home') }}" class="brand-link">PONDASIKITA</a>
+        <span class="brand-subtext">Seller Center</span>
+    </div>
 
-    <ul style="list-style: none; padding: 0; margin: 0;">
-        <li style="padding: 15px 25px; border-left: 4px solid #ffffff; background: #262626;">
-            <a href="{{ route('seller.dashboard') }}" style="color: #fff; text-decoration: none; display: flex; align-items: center; gap: 12px; font-weight: 500;">
-                <i class="mdi mdi-view-dashboard" style="font-size: 20px;"></i> Dashboard
+    <div class="sidebar-profile">
+        <div class="profile-card">
+            <div class="profile-avatar">
+                {{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}
+            </div>
+            <div class="profile-info">
+                <p class="profile-welcome">Selamat datang,</p>
+                <p class="profile-name">{{ Auth::user()->nama }}</p>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav">
+        <li class="nav-item-header">Menu Utama</li>
+        <li class="nav-item {{ Request::is('seller/dashboard') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('seller.dashboard') }}">
+                <i class="mdi mdi-view-dashboard menu-icon"></i>
+                <span class="menu-title">Dashboard</span>
             </a>
         </li>
-        <li style="padding: 15px 25px;">
-            <a href="#" style="color: #bbb; text-decoration: none; display: flex; align-items: center; gap: 12px; transition: 0.3s;">
-                <i class="mdi mdi-archive" style="font-size: 20px;"></i> Produk Saya
+
+        <li class="nav-item-header">Manajemen Produk</li>
+        <li class="nav-item {{ Request::is('seller/products*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('seller.products.index') }}">
+                <i class="mdi mdi-archive menu-icon"></i>
+                <span class="menu-title">Produk Saya</span>
             </a>
         </li>
-        <li style="padding: 15px 25px;">
-            <a href="#" style="color: #bbb; text-decoration: none; display: flex; align-items: center; gap: 12px; transition: 0.3s;">
-                <i class="mdi mdi-cart" style="font-size: 20px;"></i> Pesanan
+
+        <li class="nav-item-header">Manajemen Penjualan</li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="mdi mdi-cart menu-icon"></i>
+                <span class="menu-title">Pesanan</span>
             </a>
-        </li>
-        <li style="padding: 15px 25px;">
-            <a href="#" style="color: #bbb; text-decoration: none; display: flex; align-items: center; gap: 12px; transition: 0.3s;">
-                <i class="mdi mdi-chart-bar" style="font-size: 20px;"></i> Statistik
-            </a>
-        </li>
-        
-        <li style="padding: 15px 25px; margin-top: 30px; border-top: 1px solid #333;">
-            <form action="{{ route('seller.logout') }}" method="POST">
-                @csrf
-                <button type="submit" style="background: none; border: none; color: #ff5252; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 0; font-size: 15px; font-weight: 500;">
-                    <i class="mdi mdi-logout" style="font-size: 20px;"></i> Keluar
-                </button>
-            </form>
         </li>
     </ul>
+
+    <div class="sidebar-footer">
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="nav-link" style="border:none; cursor:pointer;">
+                <i class="mdi mdi-logout menu-icon"></i>
+                <span class="menu-title">Keluar Akun</span>
+            </button>
+        </form>
+    </div>
 </aside>

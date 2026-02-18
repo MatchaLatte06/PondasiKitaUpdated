@@ -78,20 +78,11 @@ Route::controller(AuthController::class)->group(function () {
 Route::get('/auth/google', function() { return "Fitur Login Google (Coming Soon)"; });
 Route::get('/lupa-password', function() { return "Halaman Lupa Password (Coming Soon)"; });
 
-// =================================================================
-// 4. ROUTE LAINNYA (CHATBOT & SOCIALITE)
-// =================================================================
+Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
 
-// Route Chatbot POTA (Agar tidak 404 di Landing Page)
-// Nanti ganti dengan ChatController jika sudah siap
-Route::post('/api/chat', function() {
-    return response()->json([
-        'reply' => 'Halo! Saya POTA. Sistem otak saya sedang diperbarui, silakan coba lagi nanti ya!'
-    ]);
-})->name('api.chat');
-
-// Placeholder untuk Login Google & Lupa Password
-Route::get('/auth/google', function() { return "Fitur Login Google (Coming Soon)"; });
-Route::get('/lupa-password', function() { return "Halaman Lupa Password (Coming Soon)"; });
-
+// routes/web.php
+Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
+Route::resource('products', App\Http\Controllers\Seller\ProductController::class);
 });
