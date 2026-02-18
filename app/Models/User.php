@@ -12,39 +12,20 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-<<<<<<< HEAD
     // WAJIB DITAMBAHKAN KARENA NAMA TABEL BUKAN 'users'
     protected $table = 'tb_user'; 
 
-=======
-    protected $table = 'tb_user'; // Benar, sesuai SQL Dump
-
-    // === PERBAIKAN DI SINI ===
-    // Tambahkan kolom yang akan sering di-update lewat Controller
->>>>>>> a08b632c2aa9fe6bcb487ef64029fa6676633682
     protected $fillable = [
         'nama',
         'username',
         'email',
         'password',
         'no_telepon',
-<<<<<<< HEAD
         'level',
         'status',
         'is_verified',
         'is_banned',
         'last_activity_at'
-=======
-        'jenis_kelamin',
-        'alamat',
-        'level', // admin, seller, customer
-        'status', // online, offline, typing
-        'is_verified',
-        'is_banned',          // Tambahan: Agar admin bisa ban user
-        'last_activity_at',   // Tambahan: Untuk fitur "Online Status" di Chat
-        'profile_picture_url', // Tambahan: Untuk update foto profil
-        'google_id'           // Tambahan: Untuk Login Google nanti
->>>>>>> a08b632c2aa9fe6bcb487ef64029fa6676633682
     ];
     // Kolom yang disembunyikan saat data dikirim ke JSON/Mobile App
     protected $hidden = [

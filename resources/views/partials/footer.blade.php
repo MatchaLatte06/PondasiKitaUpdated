@@ -25,9 +25,11 @@
                     <li><a href="#">Kebijakan Privasi</a></li>
                 </ul>
             </div>
+            <div class="footer-col">
+            </div>
         </div>
         <div class="copyright">
-            <p>&copy; {{ date('Y') }} Pondasikita. Hak Cipta Dilindungi.</p>
+            <p>&copy; 2025 Pondasikita. Hak Cipta Dilindungi.</p>
         </div>
     </div>
 </footer>

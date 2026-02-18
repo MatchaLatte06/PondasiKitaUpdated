@@ -1,10 +1,11 @@
 <header class="navbar-fixed">
     <div class="navbar-container">
         <div class="navbar-left">
+            {{-- Menggunakan route() atau url() --}}
             <a href="{{ url('/') }}" class="navbar-logo">
                 <h3>Pondasikita</h3>
             </a>
-            <form action="{{ url('pages/search') }}" method="GET" class="search-bar">
+            <form action="{{ route('search') }}" method="GET" class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" name="query" placeholder="Cari produk, toko, atau merek...">
             </form>
@@ -12,19 +13,20 @@
 
         <nav class="navbar-right">
             <ul class="nav-links js-nav-links">
-                <li><a href="{{ url('pages/produk') }}" class="nav-link">Produk</a></li>
-                <li><a href="{{ url('pages/semua_toko') }}" class="nav-link">Toko</a></li>
+                <li><a href="{{ route('produk.index') }}" class="nav-link">Produk</a></li>
+                <li><a href="{{ route('toko.index') }}" class="nav-link">Toko</a></li>
             </ul>
 
             <div class="nav-actions">
-                <a href="{{ url('pages/keranjang') }}" class="action-btn cart-btn">
+                <a href="{{ route('keranjang.index') }}" class="action-btn cart-btn">
                     <i class="fas fa-shopping-cart"></i>
-                    {{-- Variabel $total_item_keranjang ini otomatis dikirim dari AppServiceProvider --}}
-                    @if ($total_item_keranjang > 0)
+                    {{-- Variabel $total_item_keranjang dikirim otomatis dari AppServiceProvider --}}
+                    @if(isset($total_item_keranjang) && $total_item_keranjang > 0)
                         <span class="cart-badge">{{ $total_item_keranjang }}</span>
                     @endif
                 </a>
 
+                {{-- Cek Login menggunakan Auth Laravel --}}
                 @auth
                     <div class="dropdown js-dropdown">
                         <button class="action-btn profile-btn">
@@ -36,26 +38,32 @@
                                 <small>{{ ucfirst(Auth::user()->level) }}</small>
                             </div>
 
-                            @if (Auth::user()->level === 'admin')
-                                <a href="{{ url('admin/dashboard') }}">Admin Dashboard</a>
-                            @elseif (Auth::user()->level === 'seller')
-                                <a href="{{ url('seller/dashboard') }}">Dashboard Toko</a>
+                            @if(Auth::user()->level === 'admin')
+                                <a href="{{ url('/app_admin/dashboard_mimin.php') }}">Admin Dashboard</a>
+                                <a href="{{ url('/app_admin/kelola_toko.php') }}">Verifikasi Toko</a>
+                            @elseif(Auth::user()->level === 'seller')
+                                <a href="{{ url('/app_seller/dashboard.php') }}">Dashboard Toko</a>
+                                <a href="{{ url('/app_seller/produk.php') }}">Produk Saya</a>
+                                <a href="{{ url('/app_seller/pesanan.php') }}">Pesanan Masuk</a>
                             @else
-                                <a href="{{ url('customer/profil') }}">Profil Saya</a>
-                                <a href="{{ url('customer/pesanan') }}">Pesanan Saya</a>
+                                {{-- Customer --}}
+                                <a href="{{ route('profil.index') }}">Profil Saya</a>
+                                <a href="{{ route('pesanan.index') }}">Pesanan Saya</a>
                             @endif
                             
-                            {{-- Logout Form --}}
-                            <form action="{{ url('logout') }}" method="POST" style="display:inline;">
+                            {{-- Logout butuh Form POST di Laravel untuk keamanan --}}
+                            <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                                 @csrf
-                                <button type="submit" class="logout-link" style="background:none; border:none; width:100%; text-align:left; cursor:pointer; padding: 10px 15px;">Keluar</button>
+                                <button type="submit" class="logout-link" style="background:none; border:none; width:100%; text-align:left; cursor:pointer;">Keluar</button>
                             </form>
                         </div>
                     </div>
-                @else
-                    <a href="{{ url('login') }}" class="btn btn-secondary">Masuk</a>
-                    <a href="{{ url('register') }}" class="btn btn-primary">Daftar</a>
                 @endauth
+
+                @guest
+                    <a href="{{ route('login') }}" class="btn btn-secondary">Masuk</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary">Daftar</a>
+                @endguest
             </div>
 
             <div class="hamburger-menu js-hamburger">
@@ -64,3 +72,22 @@
         </nav>
     </div>
 </header>
+
+<script>
+    // Script JS tetap sama, sebaiknya dipindah ke file .js terpisah
+    document.addEventListener('DOMContentLoaded', function () {
+        const profileBtn = document.querySelector('.profile-btn');
+        const dropdown = document.querySelector('.js-dropdown-content');
+
+        if (profileBtn && dropdown) {
+            profileBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('show-dropdown');
+            });
+
+            document.addEventListener('click', function () {
+                dropdown.classList.remove('show-dropdown');
+            });
+        }
+    });
+</script>

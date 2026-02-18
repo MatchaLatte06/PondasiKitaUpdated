@@ -12,4 +12,4 @@
             <p>Kategori kosong.</p>
         @endforelse
     </div>
-</section>
+</section
