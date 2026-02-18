@@ -66,3 +66,8 @@ Route::get('/lupa-password', function() { return "Halaman Lupa Password (Coming 
 Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
+
+// routes/web.php
+Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
+Route::resource('products', App\Http\Controllers\Seller\ProductController::class);
+});
