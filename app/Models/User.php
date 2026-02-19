@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+// use Laravel\Sanctum\HasApiTokens; // <--- BARIS INI DIHAPUS AGAR TIDAK ERROR
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    // HAPUS 'HasApiTokens' DARI SINI
+    use HasFactory, Notifiable; 
 
     // WAJIB DITAMBAHKAN KARENA NAMA TABEL BUKAN 'users'
     protected $table = 'tb_user'; 
@@ -27,6 +28,7 @@ class User extends Authenticatable
         'is_banned',
         'last_activity_at'
     ];
+
     // Kolom yang disembunyikan saat data dikirim ke JSON/Mobile App
     protected $hidden = [
         'password',
@@ -41,7 +43,7 @@ class User extends Authenticatable
         'password'          => 'hashed',
         'is_verified'       => 'boolean',
         'is_banned'         => 'boolean',
-        'last_activity_at'  => 'datetime', // Tambahan: Agar terbaca sebagai objek Tanggal
+        'last_activity_at'  => 'datetime', 
     ];
 
     // Helper untuk cek Role
