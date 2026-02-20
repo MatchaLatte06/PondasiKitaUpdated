@@ -31,32 +31,6 @@
                 <h2>Login Penjual</h2>
                 {{-- Menggunakan route() untuk link yang dinamis --}}
                 <p>Ingin mulai berjualan? <a href="{{ route('seller.register') }}">Daftar sebagai Penjual</a></p>
-                
-                {{-- PENGGANTI include '_auth_messages.php' --}}
-                {{-- Menampilkan pesan error dari Controller --}}
-                @if(session('error'))
-                    <div class="alert alert-danger" style="color: white; background-color: red; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
-                        {{ session('error') }}
-                    </div>
-                @endif
-                
-                @if(session('success'))
-                    <div class="alert alert-success" style="color: white; background-color: green; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                
-                @if(session('success'))
-                    <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
-                        <strong>Selamat!</strong> {{ session('success') }}
-                    </div>
-                @endif
-
-                @if(session('error'))
-                    <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
-                        {{ session('error') }}
-                    </div>
-                @endif
 
                 {{-- Form Action mengarah ke Route Laravel --}}
                 <form action="{{ route('login.process') }}" method="POST">
@@ -82,5 +56,29 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Tangkap alert dari Controller
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: '{{ session('error') }}',
+                confirmButtonColor: '#ff6f00'
+            });
+        @endif
+    </script>
+</body>
 </body>
 </html>

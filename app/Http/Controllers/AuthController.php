@@ -43,6 +43,59 @@ class AuthController extends Controller
         return view('auth.login_seller', compact('sisaDetik'));
     }
 
+// ==========================================================
+    // LOGIN ADMIN
+    // ==========================================================
+
+    // 1. Menampilkan Halaman Login Admin
+    public function showLoginAdmin()
+    {
+        // Jika sudah login dan levelnya admin, langsung ke dashboard
+        if (Auth::check() && Auth::user()->level === 'admin') {
+            return redirect('/admin/dashboard');
+        }
+
+        return view('auth.login_admin');
+    }
+
+    // 2. Memproses Data Login Admin
+    public function loginAdmin(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        // Cek apakah input berupa email atau username
+        $loginType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        // Syarat login: Kredensial benar DAN levelnya harus admin
+        $credentials = [
+            $loginType => $request->username,
+            'password' => $request->password,
+            'level'    => 'admin' 
+        ];
+
+        // Ambil nilai checkbox 'Ingat Saya'
+        $remember = $request->has('remember');
+
+        // Eksekusi Login
+        if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/admin/dashboard');
+        }
+
+        // Jika Gagal (Cek apakah dia user biasa yang salah kamar)
+        $userExists = User::where($loginType, $request->username)->first();
+        if ($userExists && $userExists->level !== 'admin') {
+            return back()->with('error', 'Akses ditolak! Akun ini bukan akun Admin.')->withInput();
+        }
+
+        // Jika username/password memang salah
+        return back()->with('error', 'Username atau Password salah.')->withInput();
+    }
+
     // ==========================================================
     // 3. PROSES LOGIN (UMUM: CUSTOMER & SELLER)
     // ==========================================================

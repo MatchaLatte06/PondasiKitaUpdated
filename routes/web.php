@@ -57,6 +57,10 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/seller/register', 'showRegisterSeller')->name('seller.register');
     Route::post('/seller/register', 'registerSeller')->name('seller.register.process');
 
+    // --- ADMIN LOGIN ---
+    Route::get('/admin/login', 'showLoginAdmin')->name('admin.login');
+    Route::post('/admin/login', 'loginAdmin')->name('admin.login.process');
+
     // --- LOGOUT ---
     Route::post('/logout', 'logout')->name('logout');
 });
@@ -116,6 +120,17 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::get('/settings', function() { return "Halaman Pengaturan Toko (Coming Soon)"; })->name('settings');
     });
 
+});
+
+
+// Contoh Route Dashboard Admin (Akan diproteksi agar hanya admin yang bisa masuk)
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', function () {
+            // Nanti diganti memanggil AdminController
+            return "Selamat datang di Dashboard Admin!"; 
+        })->name('dashboard');
+    });
 });
 
 

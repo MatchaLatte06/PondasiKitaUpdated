@@ -230,5 +230,47 @@ $(document).ready(function() {
     });
 });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // 1. Tangkap pesan Sukses/Error dari Controller (Jika ada)
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Pendaftaran Berhasil!',
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#ff6f00'
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Pendaftaran Gagal!',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#ff6f00'
+        });
+    @endif
+
+    // 2. Tangkap pesan Error Validasi dengan cara yang AMAN (json_encode)
+    @if($errors->any())
+        // Mengubah array error dari PHP menjadi format JSON yang aman untuk Javascript
+        let errorMessages = {!! json_encode($errors->all()) !!};
+        
+        Swal.fire({
+            icon: 'warning',
+            title: 'Periksa Input Anda',
+            // Gabungkan semua pesan dengan baris baru (Enter)
+            text: errorMessages.join('\n'), 
+            confirmButtonColor: '#ff6f00'
+        });
+    @endif
+</script>
+
+</body>
+</html>
+</body>
 </body>
 </html>
