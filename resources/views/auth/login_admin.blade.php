@@ -17,6 +17,12 @@
                 <p>Silakan masuk untuk mengelola website.</p>
             </div>
 
+            {{-- Info Kredensial (Bisa dihapus saat rilis ke publik) --}}
+            <div style="background-color: #e2e3e5; color: #383d41; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 13px; text-align: center;">
+                <strong>Hint Login (Dari Seeder):</strong><br>
+                User: <code>superadmin</code> | Pass: <code>rahasiaAdmin123</code>
+            </div>
+
             {{-- Menampilkan Alert Error dari Controller Laravel --}}
             @if(session('error'))
                 <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
@@ -31,12 +37,14 @@
                 
                 <div class="form-group">
                     <i class="mdi mdi-account-outline input-icon"></i>
-                    <input type="text" name="username" class="form-control with-icon" placeholder="Username atau Email" value="{{ old('username') }}" required>
+                    {{-- Default value di-set ke 'superadmin' sesuai seeder --}}
+                    <input type="text" name="username" class="form-control with-icon" placeholder="Username atau Email" value="{{ old('username', 'superadmin') }}" required>
                 </div>
                 
                 <div class="form-group">
                     <i class="mdi mdi-lock-outline input-icon"></i>
-                    <input type="password" name="password" id="password-field" class="form-control with-icon" placeholder="Password" required>
+                    {{-- Default value di-set ke 'rahasiaAdmin123' --}}
+                    <input type="password" name="password" id="password-field" class="form-control with-icon" placeholder="Password" value="rahasiaAdmin123" required>
                     <button type="button" id="password-toggle-btn" class="password-toggle">
                         <i class="mdi mdi-eye-outline"></i>
                     </button>
