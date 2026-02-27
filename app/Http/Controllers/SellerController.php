@@ -495,4 +495,262 @@ class SellerController extends Controller
 
         return response()->json(['status' => 'success', 'message' => 'Transaksi berhasil!', 'invoice' => $invoice]);
     }
+
+    // =========================================================================
+    // 9. PENILAIAN TOKO (REVIEWS)
+    // =========================================================================
+    
+    public function reviews(Request $request)
+    {
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        if (!$toko) {
+            return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
+        }
+
+        // 1. Ambil data ringkasan rating
+        $summary = DB::table('tb_toko_review')
+            ->where('toko_id', $toko->id)
+            ->selectRaw('AVG(rating) as avg_rating, COUNT(id) as total_reviews')
+            ->first();
+
+        // Placeholder data performa
+        $performa = [
+            'chat_response_rate' => "95%",
+            'chat_response_time' => "≈ 1 jam",
+            'cancellation_rate' => "0.5%",
+            'late_shipment_rate' => "1.2%"
+        ];
+
+        // 2. Query Detail Review (Sama seperti native, tapi pakai query builder Laravel)
+        // Ambil filter bintang dari request (contoh: ?star=5)
+        $starFilter = $request->query('star', 'all');
+
+        $query = DB::table('tb_toko_review as r')
+            ->join('tb_user as u', 'r.user_id', '=', 'u.id')
+            ->leftJoin('tb_detail_transaksi as dt', function($join) {
+                $join->on('r.transaksi_id', '=', 'dt.transaksi_id')
+                     ->on('r.toko_id', '=', 'dt.toko_id');
+            })
+            ->leftJoin('tb_barang as b', 'dt.barang_id', '=', 'b.id')
+            ->where('r.toko_id', $toko->id)
+            ->select(
+                'r.id', 'r.rating', 'r.ulasan', 'r.balasan_penjual', 'r.created_at',
+                'u.nama as nama_user',
+                DB::raw('ANY_VALUE(b.nama_barang) as nama_barang'),
+                DB::raw('ANY_VALUE(b.gambar_utama) as gambar_barang')
+            )
+            ->groupBy('r.id', 'r.rating', 'r.ulasan', 'r.balasan_penjual', 'r.created_at', 'u.nama')
+            ->orderBy('r.created_at', 'desc');
+
+        // Jika ada filter bintang
+        if ($starFilter !== 'all' && is_numeric($starFilter)) {
+            $query->where('r.rating', $starFilter);
+        }
+
+        $reviews = $query->get();
+
+        return view('seller.reviews', compact('summary', 'performa', 'reviews', 'starFilter'));
+    }
+
+    // Proses membalas ulasan
+    public function replyReview(Request $request)
+    {
+        $request->validate([
+            'review_id' => 'required|integer',
+            'balasan' => 'required|string|max:500'
+        ]);
+
+        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
+
+        // Pastikan review yang dibalas benar-benar milik toko ini
+        DB::table('tb_toko_review')
+            ->where('id', $request->review_id)
+            ->where('toko_id', $toko->id)
+            ->update([
+                'balasan_penjual' => $request->balasan,
+                'updated_at' => now() // Opsional jika Anda punya kolom ini
+            ]);
+
+        return redirect()->route('seller.service.reviews')->with('success', 'Balasan berhasil dikirim.');
+    }
+
+    // =========================================================================
+    // 10. PENGHASILAN TOKO (FINANCE)
+    // =========================================================================
+    
+    public function income()
+    {
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        
+        if (!$toko) {
+            return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
+        }
+
+        // TODO: Ganti dengan Query Database Asli Anda
+        // Data Placeholder
+        $penghasilan_pending = 0;
+        $penghasilan_dilepas = 52459320;
+        $dilepas_minggu_ini = 4500000;
+        $dilepas_bulan_ini = 15230000;
+
+        // Placeholder untuk daftar transaksi
+        $transaksi_dilepas = []; // Nanti diisi query tabel transaksi
+
+        return view('seller.income', compact(
+            'penghasilan_pending', 
+            'penghasilan_dilepas', 
+            'dilepas_minggu_ini', 
+            'dilepas_bulan_ini', 
+            'transaksi_dilepas'
+        ));
+    }
+
+    // =========================================================================
+    // 11. REKENING BANK
+    // =========================================================================
+    
+    public function bank()
+    {
+        $user = Auth::user();
+        
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        if (!$toko) {
+            return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
+        }
+
+        // TODO: Ganti dengan Query Database Asli (Tabel Rekening Toko)
+        // Data Placeholder rekening yang sudah tersimpan
+        $rekening_tersimpan = [
+            (object)[
+                'id' => 1,
+                'nama_bank' => 'BCA',
+                'no_rekening' => '**** **** **** 1234',
+                'nama_pemilik' => 'Prabu A. T. S.',
+                'logo' => 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia_logo.svg'
+            ]
+        ];
+
+        // Daftar bank untuk dropdown TomSelect
+        $daftar_bank = ['SeaBank', 'BCA', 'BRI', 'BNI', 'Bank Mandiri', 'Bank Raya Indonesia', 'CIMB Niaga', 'Bank Syariah Indonesia'];
+
+        return view('seller.bank', compact('rekening_tersimpan', 'daftar_bank'));
+    }
+    
+    // =========================================================================
+    // 12. DATA PERFORMA TOKO (STATISTIK GRAFIK)
+    // =========================================================================
+    
+    public function performance()
+    {
+        $user = Auth::user();
+        
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        if (!$toko) {
+            return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
+        }
+
+        // TODO: Ganti dengan Query Database Asli (Tabel Transaksi, dll)
+        // Data Placeholder untuk Grafik & Analitik
+        $kriteria = [
+            'penjualan' => ['nilai' => 8500000, 'perbandingan' => 15.2],
+            'pesanan' => ['nilai' => 120, 'perbandingan' => 5.1],
+            'tingkat_konversi' => ['nilai' => 1.75, 'perbandingan' => 0.2],
+            'pengunjung' => ['nilai' => 6857, 'perbandingan' => 12.8]
+        ];
+
+        $chart_labels = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+        
+        $chart_data = [
+            'penjualan' => [150000, 200000, 180000, 500000, 1200000, 2500000, 3500000, 8500000],
+            'pesanan' => [5, 8, 7, 15, 30, 40, 80, 120],
+            'pengunjung' => [200, 250, 230, 800, 1500, 2500, 4500, 6857]
+        ];
+
+        $saluran = [
+            'halaman_produk' => ['nilai' => 7500000, 'perbandingan' => 12.1],
+            'live' => ['nilai' => 850000, 'perbandingan' => -5.5],
+            'video' => ['nilai' => 150000, 'perbandingan' => 20.3]
+        ];
+
+        $pembeli = [
+            'pembeli_saat_ini_persen' => 68,
+            'total_pembeli' => 85,
+            'pembeli_baru' => 58,
+            'potensi_pembeli' => 1205,
+            'tingkat_pembeli_berulang' => 31.7
+        ];
+        
+        $pembeli_donut_chart = ['baru' => 58, 'berulang' => 27];
+
+        return view('seller.performance', compact(
+            'kriteria', 
+            'chart_labels', 
+            'chart_data', 
+            'saluran', 
+            'pembeli', 
+            'pembeli_donut_chart'
+        ));
+    }
+
+    // =========================================================================
+    // 13. KESEHATAN TOKO
+    // =========================================================================
+    
+    public function health()
+    {
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        
+        if (!$toko) {
+            return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
+        }
+
+        // TODO: Ganti dengan Query Database Asli (Tabel Penalti/Performa)
+        $status_kesehatan = "Sangat baik";
+        
+        $top_summary = [
+            'pesanan_terselesaikan' => 0,
+            'produk_dilarang' => 0,
+            'pelayanan_pembeli' => 0
+        ];
+
+        $metrics = [
+            'Pesanan Terselesaikan' => [
+                ['nama' => 'Tingkat Pesanan Tidak Terselesaikan', 'sekarang' => '0.00%', 'target' => '<10.00%', 'sebelumnya' => '0.00%'],
+                ['nama' => 'Tingkat Keterlambatan Pengiriman', 'sekarang' => '0.00%', 'target' => '<10.00%', 'sebelumnya' => '0.00%'],
+                ['nama' => 'Masa Pengemasan', 'sekarang' => '0.00 hari', 'target' => '<2.00 hari', 'sebelumnya' => '0.00 hari'],
+            ],
+            'Produk yang Dilarang' => [
+                ['nama' => 'Pelanggaran Produk Berat', 'sekarang' => 0, 'target' => 0, 'sebelumnya' => 0],
+                ['nama' => 'Produk Pre-order', 'sekarang' => '0.00%', 'target' => '<20.00%', 'sebelumnya' => '0.00%'],
+            ],
+            'Pelayanan Pembeli' => [
+                ['nama' => 'Persentase Chat Dibalas', 'sekarang' => '0.00%', 'target' => '≥70.00%', 'sebelumnya' => '0.00%'],
+            ]
+        ];
+
+        $poin_penalti_kuartal_ini = 0;
+        $pelanggaran_penalti = [
+            'Pesanan Tidak Terpenuhi' => 0,
+            'Pengiriman Terlambat' => 0,
+            'Produk yang Dilarang' => 0,
+            'Pelanggaran Lainnya' => 0,
+        ];
+
+        $masalah_perlu_diselesaikan = [
+            'produk_bermasalah' => 0,
+            'keterlambatan_pengiriman' => 0,
+        ];
+
+        return view('seller.health', compact(
+            'status_kesehatan', 
+            'top_summary', 
+            'metrics', 
+            'poin_penalti_kuartal_ini', 
+            'pelanggaran_penalti', 
+            'masalah_perlu_diselesaikan'
+        ));
+    }
 }

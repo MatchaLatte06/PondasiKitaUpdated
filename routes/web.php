@@ -112,19 +112,20 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::get('/chat/list', [SellerController::class, 'getChatList'])->name('chat.list');
         Route::get('/chat/messages/{chatId}', [SellerController::class, 'getMessages'])->name('chat.messages');
         Route::post('/chat/send', [SellerController::class, 'sendMessage'])->name('chat.send');
-        Route::get('/reviews', function() { return "Halaman Penilaian Toko (Coming Soon)"; })->name('reviews');
+        Route::get('/reviews', [\App\Http\Controllers\SellerController::class, 'reviews'])->name('reviews');
+        Route::post('/reviews/reply', [\App\Http\Controllers\SellerController::class, 'replyReview'])->name('reviews.reply');
     });
 
     // --- G. KEUANGAN ---
     Route::prefix('finance')->name('finance.')->group(function() {
-        Route::get('/income', function() { return "Halaman Penghasilan Toko (Coming Soon)"; })->name('income');
-        Route::get('/bank', function() { return "Halaman Rekening Bank (Coming Soon)"; })->name('bank');
+        Route::get('/income', [\App\Http\Controllers\SellerController::class, 'income'])->name('income');
+        Route::get('/bank', [\App\Http\Controllers\SellerController::class, 'bank'])->name('bank');
     });
 
-    // --- H. DATA / STATISTIK ---
+   // --- H. DATA / STATISTIK ---
     Route::prefix('data')->name('data.')->group(function() {
-        Route::get('/performance', function() { return "Halaman Performa Toko (Coming Soon)"; })->name('performance');
-        Route::get('/health', function() { return "Halaman Kesehatan Toko (Coming Soon)"; })->name('health');
+        Route::get('/performance', [\App\Http\Controllers\SellerController::class, 'performance'])->name('performance');
+        Route::get('/health', [\App\Http\Controllers\SellerController::class, 'health'])->name('health');
     });
 
     // --- I. PENGATURAN TOKO UMUM ---
