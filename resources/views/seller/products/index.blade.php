@@ -3,20 +3,18 @@
 @section('title', 'Manajemen Produk')
 
 @section('content')
-<div class="content-wrapper">
-    <div class="page-header">
-        <h3 class="page-title">
-            <span class="page-title-icon bg-gradient-primary text-white me-2">
-                <i class="mdi mdi-cube"></i>
-            </span> Produk Saya
-        </h3>
-        <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('seller.dashboard') }}">Seller</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Produk</li>
-            </ul>
-        </nav>
-    </div>
+<div class="page-header mb-4">
+    <h3 class="page-title d-flex align-items-center m-0">
+        <div class="page-title-icon-mono me-3">
+            <i class="mdi mdi-package"></i>
+        </div> 
+        <div class="d-flex align-items-center" style="font-size: 1.6rem;">
+            <a href="{{ route('seller.dashboard') }}" class="header-path-link">Dashboard</a>
+            <i class="mdi mdi-chevron-right header-path-separator"></i>
+            <span class="header-path-current">Produk Saya</span>
+        </div>
+    </h3>
+</div>
 
     <div class="row">
         <div class="col-lg-12 grid-margin stretch-card">

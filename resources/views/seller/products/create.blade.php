@@ -182,13 +182,31 @@
     <form id="productForm" action="{{ isset($product) ? route('seller.products.update', $product->id) : route('seller.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if(isset($product)) @method('PUT') @endif
+        @if ($errors->any())
+            <div class="alert alert-danger" style="background:#ffebee; color:#c62828; padding:15px; border-radius:8px; margin-bottom:20px;">
+                <strong>Gagal Menyimpan!</strong> Periksa kembali isian Anda:
+                <ul style="margin:10px 0 0 0; padding-left:20px;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 0;">{{ isset($product) ? 'Edit Produk' : 'Tambah Produk Baru' }}</h3>
-                <p class="text-muted" style="margin-bottom: 0; font-size: 14px;">Pastikan deskripsi produk lengkap dan menarik.</p>
-            </div>
+            <div class="page-header mb-4">
+    <h3 class="page-title d-flex align-items-center m-0">
+        <div class="page-title-icon-mono me-3">
+            <i class="mdi mdi-package"></i>
+        </div> 
+        <div class="d-flex align-items-center" style="font-size: 1.6rem;">
+            <a href="{{ route('seller.dashboard') }}" class="header-path-link">Dashboard</a>
+            <i class="mdi mdi-chevron-right header-path-separator"></i>
+            <span class="header-path-current">Tambah Produk Baru</span>
+        </div>
+    </h3>
+</div>
             <div class="d-flex gap-2">
                 <a href="{{ route('seller.products.index') }}" class="btn-cancel">Batal</a>
                 <button type="submit" class="btn-save"><i class="mdi mdi-check"></i> Simpan Produk</button>

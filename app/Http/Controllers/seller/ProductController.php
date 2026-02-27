@@ -72,18 +72,20 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input Lengkap
+        // 1. Validasi Input yang sudah diperbaiki
         $request->validate([
-            'nama_barang' => 'required|string|min:25|max:255',
+            'nama_barang' => 'required|string|min:5|max:255', // Diubah min 5
             'kategori_id' => 'required|exists:tb_kategori,id',
             'harga'       => 'required|numeric|min:0',
             'stok'        => 'required|integer|min:0',
             'berat_kg'    => 'required|numeric|min:0.01',
-            'satuan_unit' => 'required|string',
-            'deskripsi'   => 'required|string|min:100',
-            'gambar'      => 'required|image|mimes:jpeg,png,jpg|max:2048', // Wajib saat tambah
+            // 'satuan_unit' dihapus dari required karena tidak ada di form
+            'deskripsi'   => 'required|string|min:20', // Diubah min 20
             
-            // Validasi Opsional
+            // Perbaikan Validasi Array Gambar
+            'gambar'      => 'required|array', 
+            'gambar.*'    => 'image|mimes:jpeg,png,jpg|max:2048', 
+            
             'merk_barang' => 'nullable|string|max:100',
             'kode_barang' => 'nullable|string|max:50',
             'tipe_diskon' => 'nullable|in:NOMINAL,PERSEN',
@@ -92,11 +94,12 @@ class ProductController extends Controller
             'diskon_berakhir' => 'nullable|date|after_or_equal:diskon_mulai',
         ]);
 
-        // 2. Proses Upload Gambar
+        // 2. Proses Upload Gambar (Ambil gambar pertama dari array)
         $gambarName = 'default.jpg';
         if ($request->hasFile('gambar')) {
-            $gambarName = time() . '.' . $request->gambar->extension();
-            $request->gambar->move(public_path('assets/uploads/products'), $gambarName);
+            $file = $request->file('gambar')[0]; // Ambil file index ke-0
+            $gambarName = time() . '.' . $file->extension();
+            $file->move(public_path('assets/uploads/products'), $gambarName);
         }
 
         // 3. Ambil ID Toko
@@ -107,21 +110,17 @@ class ProductController extends Controller
             'toko_id'         => $toko->id,
             'kategori_id'     => $request->kategori_id,
             'nama_barang'     => $request->nama_barang,
-            'merk_barang'     => $request->merk_barang, // Menyimpan Merek
-            'kode_barang'     => $request->kode_barang, // Menyimpan SKU
-            
+            'merk_barang'     => $request->merk_barang, 
+            'kode_barang'     => $request->kode_barang, 
             'harga'           => $request->harga,
             'stok'            => $request->stok,
             'berat_kg'        => $request->berat_kg,
-            'satuan_unit'     => $request->satuan_unit,
+            'satuan_unit'     => $request->satuan_unit ?? 'pcs', // Beri default pcs
             'deskripsi'       => $request->deskripsi,
-            
-            // Menyimpan Data Diskon
             'tipe_diskon'     => $request->tipe_diskon,
             'nilai_diskon'    => $request->nilai_diskon,
             'diskon_mulai'    => $request->diskon_mulai,
             'diskon_berakhir' => $request->diskon_berakhir,
-
             'gambar_utama'    => $gambarName,
             'status_moderasi' => 'pending',
             'is_active'       => 1,

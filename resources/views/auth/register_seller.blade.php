@@ -25,8 +25,8 @@
         }
         .form-wrapper { max-width: 700px; margin: 0 auto; }
         .section-title {
-            color: #ff6f00; 
-            border-bottom: 2px solid #ff6f00; 
+            color: #1a1a1a; 
+            border-bottom: 2px solid #1a1a1a; 
             padding-bottom: 5px; 
             margin-bottom: 15px; 
             margin-top: 25px;

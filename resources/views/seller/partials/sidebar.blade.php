@@ -30,31 +30,49 @@
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
+
+        <li class="nav-item {{ request()->routeIs('seller.pos.index') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('seller.pos.index') }}">
+                <i class="mdi mdi-point-of-sale menu-icon"></i>
+                <span class="menu-title">Point of sale</span>
+            </a>
+        </li>
         
         {{-- MANAJEMEN PENJUALAN (DROPDOWN) --}}
         <li class="nav-item-header">Manajemen Penjualan</li>
         
         {{-- Cek apakah salah satu child route aktif --}}
-        @php $isOrderActive = request()->routeIs('seller.orders.*'); @endphp
+        @php 
+            // Cek rute pesanan dan pengembalian (grup orders)
+            $isOrderActive = request()->routeIs('seller.orders.*'); 
+            // Cek rute pengaturan pengiriman (grup pengaturan)
+            $isShippingActive = request()->routeIs('seller.pengaturan.pengiriman');
+            
+            // Buka dropdown jika salah satu dari mereka aktif
+            $isPenjualanMenuOpen = $isOrderActive || $isShippingActive;
+        @endphp
         
-        <li class="nav-item {{ $isOrderActive ? 'active' : '' }}">
+        <li class="nav-item {{ $isPenjualanMenuOpen ? 'active' : '' }}">
             <a class="nav-link" data-bs-toggle="collapse" href="#pesanan-menu" 
-               aria-expanded="{{ $isOrderActive ? 'true' : 'false' }}" 
+               aria-expanded="{{ $isPenjualanMenuOpen ? 'true' : 'false' }}" 
                aria-controls="pesanan-menu">
-                <i class="mdi mdi-receipt menu-icon"></i>
+               <i class="mdi mdi-package menu-icon"></i>
+               
                 <span class="menu-title">Pesanan</span>
                 <i class="mdi mdi-chevron-right menu-arrow"></i>
             </a>
-            <div class="collapse {{ $isOrderActive ? 'show' : '' }}" id="pesanan-menu">
+            <div class="collapse {{ $isPenjualanMenuOpen ? 'show' : '' }}" id="pesanan-menu">
                 <ul class="nav flex-column sub-menu">
+                    {{-- Diperbarui: Menggunakan route seller.orders.index --}}
                     <li class="nav-item {{ request()->routeIs('seller.orders.index') ? 'active' : '' }}"> 
-                        <a class="nav-link" href="{{ route('seller.orders.index') }}">Pesanan Saya</a>
+                        <a class="nav-link" href="{{ route('seller.orders.index') }}">Daftar Pesanan</a>
                     </li>
                     <li class="nav-item {{ request()->routeIs('seller.orders.return') ? 'active' : '' }}"> 
                         <a class="nav-link" href="{{ route('seller.orders.return') }}">Pengembalian</a>
                     </li>
-                    <li class="nav-item {{ request()->routeIs('seller.orders.shipping') ? 'active' : '' }}"> 
-                        <a class="nav-link" href="{{ route('seller.orders.shipping') }}">Pengaturan Pengiriman</a>
+                    {{-- Diperbarui: Menggunakan route seller.pengaturan.pengiriman --}}
+                    <li class="nav-item {{ request()->routeIs('seller.pengaturan.pengiriman') ? 'active' : '' }}"> 
+                        <a class="nav-link" href="{{ route('seller.pengaturan.pengiriman') }}">Pengaturan Pengiriman</a>
                     </li>
                 </ul>
             </div>
@@ -119,7 +137,7 @@
                 <i class="mdi mdi-chevron-right menu-arrow"></i>
             </a>
             <div class="collapse {{ $isServiceActive ? 'show' : '' }}" id="layanan-pembeli-menu">
-                <ul class="nav flex-column sub-menu">
+                <ul class="nav flex-column sub-menu">   
                     <li class="nav-item {{ request()->routeIs('seller.service.chat') ? 'active' : '' }}"> 
                         <a class="nav-link" href="{{ route('seller.service.chat') }}">Manajemen Chat</a>
                     </li>
@@ -210,8 +228,8 @@
                 <form action="{{ route('logout') }}" method="POST" id="sidebar-logout-form">
                     @csrf
                     <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();">
-                        <i class="mdi mdi-logout menu-icon"></i>
-                        <span class="menu-title">Keluar</span>
+                        <i class="mdi mdi-logout menu-icon" style="color: #ef4444;"></i>
+                        <span class="menu-title" style="color: #ef4444;">Keluar</span>
                     </a>
                 </form>
             </li>

@@ -14,6 +14,11 @@
     --sb-width: 260px;
 }
 
+body .bg-seller-primary {
+    --bs-bg-opacity: 1;
+    background-color: rgb(0 0 0) !important;
+}
+
 /* === Container Sidebar Utama === */
 .sidebar {
     width: var(--sb-width);
@@ -609,6 +614,7 @@ body {
     justify-content: center;
     text-align: center;
     padding: 2rem 1rem;
+    min-height: 50vh !important;
     color: var(--text-secondary);
     border: 1px dashed var(--border-color);
     border-radius: 8px;
@@ -665,172 +671,283 @@ body {
 }
 
 /* ========================================= */
-/* ==      STYLE HALAMAN PESANAN          == */
+/* ==      CSS BREADCRUMB / PATH HEADER   == */
 /* ========================================= */
-.order-filter-tabs {
-    display: flex;
-    gap: 10px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 1.5rem;
-    overflow-x: auto;
+.page-title-icon-mono {
+    background-color: #111827;
+    border-radius: 8px;
+    width: 40px; 
+    height: 40px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    flex-shrink: 0;
 }
-.filter-tab {
-    padding: 8px 15px;
+.page-title-icon-mono i { 
+    color: #ffffff; 
+    font-size: 1.5rem; 
+    line-height: 1; 
+}
+.header-path-link {
+    color: #6b7280; 
     text-decoration: none;
-    color: var(--text-secondary);
-    font-weight: 500;
-    white-space: nowrap;
-    border-radius: 8px 8px 0 0;
-    transition: all 0.2s ease;
-    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    transition: color 0.2s ease;
 }
-.filter-tab:hover {
-    color: var(--accent-color);
+.header-path-link:hover {
+    color: #111827; 
 }
-.filter-tab.active {
-    color: var(--shopee-orange);
-    border-bottom-color: var(--shopee-orange);
-    background-color: var(--surface-color);
+.header-path-separator {
+    color: #d1d5db;
+    font-size: 1.8rem;
+    margin: 0 0.2rem;
+    line-height: 1;
+}
+.header-path-current {
+    color: #111827;
+    font-weight: 800;
 }
 
+/* ========================================= */
+/* ==      STYLE HALAMAN PESANAN (MONO)   == */
+/* ========================================= */
+
+/* --- ENHANCED TABLE MONO --- */
+/* Pastikan header tabel sejajar dengan isinya */
+.table-mono th {
+    vertical-align: middle;
+}
+/* Memberikan ruang bernapas yang lebih baik untuk baris pesanan */
+.order-item-row td {
+    padding: 20px;
+}
+/* Menyeragamkan tampilan dropdown (select) aksi pesanan */
+.action-cell select.form-select-mono {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+    font-weight: 500;
+}
+/* Membuat label total pesanan lebih jelas */
+.total-pesanan-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* Filter Tabs (Modern Pill Style) */
+.order-filter-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 12px;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    /* Menyembunyikan scrollbar tapi tetap bisa di-scroll */
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+}
+.order-filter-tabs::-webkit-scrollbar {
+    display: none; 
+}
+
+.filter-tab {
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+.filter-tab:hover {
+    color: #111827;
+    background-color: #f3f4f6;
+}
+.filter-tab.active {
+    color: #ffffff;
+    background-color: #111827;
+    border-color: #111827;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+}
+
+/* Search Bar (Clean Design) */
 .search-bar {
     display: flex;
     flex-grow: 1;
-    align-items: center;
+    align-items: stretch;
+    max-width: 400px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
 }
 .search-bar .form-control {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
     padding: 10px 15px;
     font-size: 0.9rem;
     width: 100%;
-    box-sizing: border-box;
+    color: #111827;
+    transition: border-color 0.2s;
+}
+.search-bar .form-control:focus {
+    border-color: #374151;
+    outline: none;
+    box-shadow: none;
 }
 .search-bar .btn-secondary {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    padding: 10px 15px;
-    border-radius: 8px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-left: none;
+    color: #6b7280;
+    padding: 10px 18px;
+    border-radius: 0 8px 8px 0;
     cursor: pointer;
     transition: all 0.2s ease;
-    flex-shrink: 0;
 }
 .search-bar .btn-secondary:hover {
-    background-color: var(--main-bg);
-    color: var(--text-primary);
+    color: #111827;
+    background-color: #f3f4f6;
+}
+.search-bar .form-control:focus + .btn-secondary {
+     border-color: #374151;
 }
 
-/* Table Styles */
+/* Table Styles (Card Layout) */
 .table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px;
-    margin-top: 1.5rem;
+    border-spacing: 0 16px;
+    margin-top: 1rem;
 }
 .table thead th {
-    background-color: var(--main-bg);
-    padding: 12px 15px;
+    background-color: transparent;
+    padding: 10px 20px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #6b7280;
     text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
     border: none;
-    border-bottom: 1px solid var(--border-color);
-}
-.table thead th:first-child {
-    border-top-left-radius: 8px;
-}
-.table thead th:last-child {
-    border-top-right-radius: 8px;
+    border-bottom: 1px solid #e5e7eb;
 }
 
+/* Header Grup Invoice */
 .table .order-group-header td {
-    background-color: #f0f2f5;
-    padding: 10px 15px;
-    font-weight: 600;
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-    font-size: 0.9rem;
-    color: var(--text-primary);
+    background-color: #fafafa;
+    padding: 14px 20px;
+    border-top: 2px solid #111827;
+    border-bottom: 1px solid #e5e7eb;
+    border-left: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
 }
-.table .order-group-header td:first-child {
-    border-left: 1px solid var(--border-color);
-    border-top-left-radius: 8px;
-}
-.table .order-group-header td:last-child {
-    border-right: 1px solid var(--border-color);
-    border-top-right-radius: 8px;
-}
+.table .order-group-header td:first-child { border-top-left-radius: 12px; }
+.table .order-group-header td:last-child { border-top-right-radius: 12px; }
 
 .order-header-info {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
+    font-size: 0.9rem;
 }
 .invoice-number {
-    color: var(--accent-color);
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    color: #111827;
+    font-size: 1.05rem;
 }
 .order-date,
 .customer-name {
-    color: var(--text-secondary);
-    font-weight: 400;
-}
-
-.table .order-item-row td {
-    background-color: var(--surface-color);
-    padding: 12px 15px;
-    border: 1px solid var(--border-color);
-    border-top: none;
-    vertical-align: middle;
-}
-.table .order-item-row:last-child td {
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    border-bottom: 1px solid var(--border-color);
-}
-.table .order-item-row td:first-child {
-    border-left: 1px solid var(--border-color);
-}
-.table .order-item-row td:last-child {
-    border-right: 1px solid var(--border-color);
-}
-
-.product-info-cell {
+    color: #6b7280;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
+}
+
+/* Baris Item Produk */
+.table .order-item-row td {
+    background-color: #ffffff;
+    padding: 16px 20px;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    vertical-align: top;
+}
+.table .order-item-row:last-child td {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    box-shadow: 0 4px 6px -4px rgba(0,0,0,0.05);
+}
+
+/* Info Produk */
+.product-info-cell {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
 }
 .product-thumb {
-    width: 50px;
-    height: 50px;
+    width: 65px;
+    height: 65px;
     object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
-    flex-shrink: 0;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    padding: 2px;
 }
 .product-details {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 .product-name {
-    font-weight: 500;
-    color: var(--text-primary);
+    font-weight: 600;
+    color: #111827;
     font-size: 0.95rem;
+    line-height: 1.3;
 }
 .product-qty {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: #374151;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
 }
 
+/* Kolom Sel Sejajar */
 .total-invoice-cell,
 .status-cell,
 .action-cell {
     text-align: center;
-    vertical-align: middle;
+    vertical-align: middle !important;
+}
+.total-invoice-cell {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #111827;
 }
 
+/* Badges */
+.badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border: 1px solid transparent;
+}
+.badge-primary { background: #ffffff; color: #111827; border-color: #111827; }
+.badge-warning { background: #111827; color: #ffffff; border-color: #111827; }
+.badge-gradient-info { background: #f3f4f6; color: #374151; border-color: #6b7280; }
+.badge-success { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+.badge-danger { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+
+/* Form & Tombol Aksi */
 .action-cell form {
     display: flex;
     flex-direction: column;
@@ -840,76 +957,86 @@ body {
 }
 .action-cell .form-control {
     width: 100%;
-    z-index: 1;
-    position: relative;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    border-color: #e5e7eb;
+    color: #374151;
     cursor: pointer;
+    padding: 6px 10px;
+}
+.action-cell .form-control:focus {
+    border-color: #111827;
+    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1);
 }
 .action-cell .btn {
-    width: auto;
-    min-width: 80px;
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
 }
-.btn-outline-secondary {
+.action-cell .btn-primary {
+    background-color: #111827;
+    border: 1px solid #111827;
+    color: #ffffff;
+}
+.action-cell .btn-primary:hover {
+    background-color: #374151;
+}
+.action-cell .btn-outline-secondary {
     background-color: transparent;
-    border: 1px solid var(--text-secondary);
-    color: var(--text-secondary);
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
+    color: #6b7280;
 }
-.btn-outline-secondary:hover {
-    background-color: var(--text-secondary);
-    color: white;
+.action-cell .btn-outline-secondary:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+    border-color: #6b7280;
 }
 
-/* DataTables Basic Styles */
-.dataTables_wrapper {
-    padding: 1rem 0;
-}
+/* DataTables Override */
+.dataTables_wrapper { padding: 1rem 0; }
 .dataTables_wrapper .dataTables_filter,
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_info,
 .dataTables_wrapper .dataTables_paginate {
-    margin-bottom: 1rem;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+    color: #6b7280;
+    font-size: 0.85rem;
 }
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_length select {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 6px 12px;
     margin-left: 0.5em;
-    background-color: var(--surface-color);
-    color: var(--text-primary);
+    color: #111827;
+}
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #111827;
+    outline: none;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button {
-    padding: 0.5em 1em;
-    margin-left: 2px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    background-color: var(--surface-color);
-    color: var(--text-primary) !important;
+    padding: 5px 12px;
+    margin-left: 4px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #6b7280 !important;
     text-decoration: none;
     transition: all 0.2s ease;
+    font-weight: 500;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current,
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-    background-color: var(--accent-color);
-    color: white !important;
-    border-color: var(--accent-color);
+    background-color: #111827;
+    color: #ffffff !important;
+    border-color: #111827;
 }
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background-color: var(--accent-hover);
-    color: white !important;
-    border-color: var(--accent-hover);
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.current) {
+    background-color: #f3f4f6;
+    color: #111827 !important;
+    border-color: #6b7280;
 }
-.dataTables_wrapper .dataTables_length label,
-.dataTables_wrapper .dataTables_filter label {
-    margin-bottom: 0;
-}
-
 /* ========================================= */
 /* ==      STYLE HALAMAN PENGEMBALIAN     == */
 /* ========================================= */
@@ -1582,6 +1709,149 @@ input:checked + .toggle-slider:before {
     color: var(--text-secondary);
     cursor: help;
 }
+
+/* ========================================= */
+/* ==   STYLE MANAJEMEN CHAT (MONOCHROME) == */
+/* ========================================= */
+
+.chat-container { 
+    display: flex; 
+    height: 75vh; 
+    border: 1px solid #e5e7eb; 
+    background: #ffffff; 
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Panel Kiri (Daftar Chat) */
+.chat-list-pane { 
+    width: 35%; 
+    border-right: 1px solid #e5e7eb; 
+    overflow-y: auto; 
+    background-color: #f9fafb;
+}
+.chat-list-pane::-webkit-scrollbar { width: 4px; }
+.chat-list-pane::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 10px; }
+
+.chat-list-item { 
+    padding: 16px 20px; 
+    cursor: pointer; 
+    border-bottom: 1px solid #e5e7eb; 
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.chat-list-item:hover { background-color: #f3f4f6; }
+.chat-list-item.active { 
+    background-color: #ffffff; 
+    border-left: 4px solid #111827; 
+}
+.chat-avatar {
+    width: 40px; height: 40px;
+    background-color: #e5e7eb;
+    color: #6b7280;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; flex-shrink: 0;
+}
+.chat-list-item h6 { margin: 0 0 4px 0; font-weight: 600; color: #111827; font-size: 0.95rem; }
+.chat-list-item p { margin: 0; font-size: 0.85rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Panel Kanan (Jendela Chat) */
+.chat-window-pane { 
+    width: 65%; 
+    display: flex; 
+    flex-direction: column; 
+    background-color: #ffffff;
+}
+
+.chat-header { 
+    padding: 16px 20px; 
+    border-bottom: 1px solid #e5e7eb; 
+    font-weight: 700; 
+    color: #111827;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.message-container { 
+    flex: 1; 
+    padding: 20px; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column-reverse; /* Pesan terbaru di bawah */
+    background-color: #fafafa;
+}
+
+/* Balon Pesan */
+.message { 
+    max-width: 75%; 
+    padding: 10px 16px; 
+    border-radius: 16px; 
+    margin-bottom: 12px; 
+    font-size: 0.95rem;
+    line-height: 1.4;
+    position: relative;
+}
+.message.customer { 
+    background-color: #ffffff; 
+    color: #374151;
+    align-self: flex-start; 
+    border: 1px solid #e5e7eb;
+    border-bottom-left-radius: 4px;
+}
+.message.seller { 
+    background-color: #111827; 
+    color: #ffffff;
+    align-self: flex-end; 
+    border-bottom-right-radius: 4px;
+}
+
+/* Form Input Chat */
+.chat-input-form { 
+    padding: 16px 20px; 
+    border-top: 1px solid #e5e7eb; 
+    display: flex; 
+    gap: 12px; 
+    background-color: #ffffff;
+}
+.chat-input-form .form-control {
+    border-radius: 50px;
+    padding: 10px 20px;
+    border: 1px solid #d1d5db;
+}
+.chat-input-form .form-control:focus {
+    border-color: #111827;
+    box-shadow: none;
+}
+.chat-input-form .btn-mono {
+    background-color: #111827;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px; height: 45px;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+}
+.chat-input-form .btn-mono:hover { background-color: #374151; }
+
+/* Placeholder (Saat belum milih chat) */
+.chat-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; color: #9ca3af; background-color: #fafafa;
+}
+.chat-placeholder i { font-size: 4rem; margin-bottom: 10px; color: #d1d5db; }
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+    .chat-container { flex-direction: column; height: calc(100vh - 100px); }
+    .chat-list-pane { width: 100%; height: 40%; border-right: none; border-bottom: 1px solid #e5e7eb; }
+    .chat-window-pane { width: 100%; height: 60%; }
+}   
 
 /* ========================================= */
 /* ==      STYLE HALAMAN VOUCHER          == */

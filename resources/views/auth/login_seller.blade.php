@@ -12,7 +12,7 @@
     
     <style>
         /* Tambahan style khusus seller jika diperlukan */
-        .seller-theme .auth-sidebar { background-color: #ff9800; /* Contoh warna oranye */ }
+        .seller-theme .auth-sidebar { background-color: #000000; /* Contoh warna oranye */ }
     </style>
 </head>
 <body>
