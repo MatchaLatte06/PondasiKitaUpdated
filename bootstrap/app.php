@@ -12,8 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
-    ]);
+            // Middleware bawaan Anda sebelumnya
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            
+            // Middleware khusus Admin (Ghost System) yang baru dibuat
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -12,6 +12,13 @@ use App\Http\Controllers\SellerController;
 use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\ProductController;
 
+// --- IMPORT CONTROLLER ADMIN ---
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\StoreController as AdminStoreController;
+use App\Http\Controllers\Admin\ProductModerationController as AdminProductModerationController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,11 +65,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/seller/register', 'showRegisterSeller')->name('seller.register');
     Route::post('/seller/register', 'registerSeller')->name('seller.register.process');
 
-    // --- ADMIN LOGIN ---
-    Route::get('/admin/login', 'showLoginAdmin')->name('admin.login');
-    Route::post('/admin/login', 'loginAdmin')->name('admin.login.process');
-
-    // --- LOGOUT ---
+    // --- LOGOUT UMUM ---
     Route::post('/logout', 'logout')->name('logout');
 });
 
@@ -70,7 +73,6 @@ Route::controller(AuthController::class)->group(function () {
 // =================================================================
 // 4. AREA SELLER (DASHBOARD, PRODUK, PESANAN & SIDEBAR MENU)
 // =================================================================
-// Menggunakan middleware 'auth' (dan 'role:seller' jika Anda sudah membuat middleware tersebut)
 Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
     
     // --- A. DASHBOARD ---
@@ -78,16 +80,12 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
 
     // --- B. MANAJEMEN PRODUK ---
     Route::resource('products', ProductController::class);
-    // Route Khusus AJAX Toggle Status Produk
     Route::post('/products/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle');
 
     // --- C. MANAJEMEN PESANAN ---
     Route::prefix('orders')->name('orders.')->group(function() {
-        // 1. Daftar Pesanan Masuk
         Route::get('/', [SellerController::class, 'pesanan'])->name('index');
-        // 2. Pengembalian & Pembatalan
         Route::get('/return', [SellerController::class, 'pengembalian'])->name('return');
-        // 3. Aksi Update Status
         Route::post('/update-status', [SellerController::class, 'updateOrderStatus'])->name('updateStatus');
         Route::post('/mass-update', [SellerController::class, 'massUpdateOrderStatus'])->name('massUpdate');
     });
@@ -112,20 +110,20 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::get('/chat/list', [SellerController::class, 'getChatList'])->name('chat.list');
         Route::get('/chat/messages/{chatId}', [SellerController::class, 'getMessages'])->name('chat.messages');
         Route::post('/chat/send', [SellerController::class, 'sendMessage'])->name('chat.send');
-        Route::get('/reviews', [\App\Http\Controllers\SellerController::class, 'reviews'])->name('reviews');
-        Route::post('/reviews/reply', [\App\Http\Controllers\SellerController::class, 'replyReview'])->name('reviews.reply');
+        Route::get('/reviews', [SellerController::class, 'reviews'])->name('reviews');
+        Route::post('/reviews/reply', [SellerController::class, 'replyReview'])->name('reviews.reply');
     });
 
     // --- G. KEUANGAN ---
     Route::prefix('finance')->name('finance.')->group(function() {
-        Route::get('/income', [\App\Http\Controllers\SellerController::class, 'income'])->name('income');
-        Route::get('/bank', [\App\Http\Controllers\SellerController::class, 'bank'])->name('bank');
+        Route::get('/income', [SellerController::class, 'income'])->name('income');
+        Route::get('/bank', [SellerController::class, 'bank'])->name('bank');
     });
 
    // --- H. DATA / STATISTIK ---
-    Route::prefix('data')->name('data.')->group(function() {
-        Route::get('/performance', [\App\Http\Controllers\SellerController::class, 'performance'])->name('performance');
-        Route::get('/health', [\App\Http\Controllers\SellerController::class, 'health'])->name('health');
+   Route::prefix('data')->name('data.')->group(function() {
+       Route::get('/performance', [SellerController::class, 'performance'])->name('performance');
+       Route::get('/health', [SellerController::class, 'health'])->name('health');
     });
 
     // --- I. PENGATURAN TOKO UMUM ---
@@ -137,26 +135,50 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
 
     // --- J. POINT OF SALE (KASIR) ---
     Route::prefix('pos')->name('pos.')->group(function() {
-        Route::get('/', [\App\Http\Controllers\SellerController::class, 'pos'])->name('index');
-        
-        // API untuk AJAX POS
-        Route::get('/api/products', [\App\Http\Controllers\SellerController::class, 'getPosProducts'])->name('api.products');
-        Route::get('/api/categories', [\App\Http\Controllers\SellerController::class, 'getPosCategories'])->name('api.categories');
-        Route::post('/api/checkout', [\App\Http\Controllers\SellerController::class, 'processPosCheckout'])->name('api.checkout');
+        Route::get('/', [SellerController::class, 'pos'])->name('index');
+        Route::get('/api/products', [SellerController::class, 'getPosProducts'])->name('api.products');
+        Route::get('/api/categories', [SellerController::class, 'getPosCategories'])->name('api.categories');
+        Route::post('/api/checkout', [SellerController::class, 'processPosCheckout'])->name('api.checkout');
     });
 });
 
 
 // =================================================================
-// 5. AREA ADMIN (DASHBOARD)
+// 5. AREA ADMIN (GHOST SYSTEM)
 // =================================================================
-Route::middleware(['auth'])->group(function () {
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', function () {
-            // Nanti diganti memanggil AdminController
-            return "Selamat datang di Dashboard Admin!"; 
-        })->name('dashboard');
-    });
+
+// 5A. PINTU BELAKANG ADMIN (SECRET LOGIN)
+Route::get('/kunci-brankas-pks', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/kunci-brankas-pks', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+
+// 5B. ROUTE ADMIN TERLINDUNGI
+Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->group(function () {
+    
+    // Dashboard Utama Admin
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    
+    // Kelola Pengguna (Admin, Seller, Customer)
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::post('/users/{id}/toggle-ban', [AdminUserController::class, 'toggleBan'])->name('users.toggleBan');
+    
+    // Kelola Toko
+    Route::get('/stores', [AdminStoreController::class, 'index'])->name('stores.index');
+    Route::post('/stores/{id}/verify', [AdminStoreController::class, 'verify'])->name('stores.verify');
+
+    // Moderasi Produk (Material)
+    Route::get('/products', [AdminProductModerationController::class, 'index'])->name('products.index');
+    Route::get('/products/{id}', [AdminProductModerationController::class, 'show'])->name('products.show');
+    Route::post('/products/{id}/process', [AdminProductModerationController::class, 'process'])->name('products.process');
+    
+    // Placeholder Route untuk Sidebar
+    Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/payouts', [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');
+    Route::post('/payouts/{id}/process', [\App\Http\Controllers\Admin\PayoutController::class, 'process'])->name('payouts.process');
+
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings/update', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    Route::post('/settings/sync-komerce', [\App\Http\Controllers\Admin\SettingController::class, 'syncKomerce'])->name('settings.syncKomerce');
+    
 });
 
 
