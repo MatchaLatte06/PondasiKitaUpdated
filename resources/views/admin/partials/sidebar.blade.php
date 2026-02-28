@@ -42,6 +42,19 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                    <i class="mdi mdi-monitor-dashboard nav-icon"></i>
+                    <span class="nav-text">Pesanan Global</span>
+                </a>
+            </li>
+            <li class="nav-item">
+    <a href="{{ route('admin.disputes.index') }}" class="nav-link {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
+        <i class="mdi mdi-gavel nav-icon text-danger"></i>
+        <span class="nav-text text-danger fw-bold">Pusat Resolusi</span>
+    </a>
+</li>
+
             @php 
                 $isStoreActive = request()->routeIs('admin.stores.*') || request()->routeIs('admin.products.*'); 
             @endphp
@@ -87,9 +100,16 @@
             <li class="nav-header">SISTEM</li>
             
             <li class="nav-item">
+                <a href="{{ route('admin.logistics.index') }}" class="nav-link {{ request()->routeIs('admin.logistics.*') ? 'active' : '' }}">
+                    <i class="mdi mdi-truck-delivery-outline nav-icon"></i>
+                    <span class="nav-text">Logistik & Distribusi</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                     <i class="mdi mdi-cog-outline nav-icon"></i>
-                    <span class="nav-text">Pengaturan</span>
+                    <span class="nav-text">Pengaturan Umum</span>
                 </a>
             </li>
         </ul>

@@ -4,190 +4,232 @@
 
 @push('styles')
 <style>
-    /* UTILS */
-    .bg-soft-orange { background: #fff7ed; color: #ea580c; }
-    .bg-soft-green { background: #f0fdf4; color: #16a34a; }
-    .bg-soft-red { background: #fef2f2; color: #dc2626; }
-    .bg-soft-blue { background: #eff6ff; color: #2563eb; }
-
-    /* STORE CARDS */
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .stat-card-premium {
-        background: white; border-radius: 20px; padding: 1.5rem;
-        border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 1.25rem;
-        transition: all 0.3s ease;
+    :root {
+        --tier-official: #8b5cf6; /* Purple */
+        --tier-power: #10b981;    /* Emerald Green */
+        --tier-regular: #64748b;  /* Slate Gray */
+        --sm-border: #e2e8f0;
     }
-    .stat-card-premium:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-    .icon-box-lg { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; }
 
-    /* TABLE UI */
-    .main-table-card { background: white; border-radius: 24px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-    .store-identity { display: flex; align-items: center; gap: 12px; }
-    .store-logo-box { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; display:flex; align-items:center; justify-content:center; }
-    .store-logo-box img { width: 100%; height: 100%; object-fit: cover; }
+    /* STATS HEADER */
+    .tier-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .t-card { background: white; border-radius: 16px; padding: 20px; border: 1px solid var(--sm-border); display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .t-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; }
+    .t-info h4 { margin: 0; font-size: 24px; font-weight: 800; color: #1e293b; }
+    .t-info span { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
+
+    /* BADGES DESIGNS */
+    .badge-tier { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+    .badge-tier i { font-size: 14px; }
     
-    .table thead th { background: #f8fafc; text-transform: uppercase; font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; padding: 1.25rem 1.5rem; border: none; }
-    .table tbody td { padding: 1.25rem 1.5rem; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+    .tier-official { background: #ede9fe; color: var(--tier-official); border: 1px solid #ddd6fe; }
+    .tier-power { background: #ecfdf5; color: var(--tier-power); border: 1px solid #a7f3d0; }
+    .tier-regular { background: #f8fafc; color: var(--tier-regular); border: 1px solid var(--sm-border); }
 
-    /* BADGE STATUS */
-    .badge-status { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
-    .badge-pending { background: #fef3c7; color: #d97706; }
-    .badge-active { background: #dcfce7; color: #15803d; }
-    .badge-suspended { background: #fee2e2; color: #b91c1c; }
+    /* TABLE MODERN */
+    .store-table-wrapper { background: white; border-radius: 20px; border: 1px solid var(--sm-border); overflow: hidden; }
+    .table-modern { width: 100%; border-collapse: collapse; }
+    .table-modern th { background: #fcfcfd; padding: 16px 20px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; border-bottom: 1px solid var(--sm-border); text-align: left; }
+    .table-modern td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .table-modern tr:hover { background: #f8fafc; }
 
-    /* ACTION BUTTONS */
-    .btn-verify-group { display: flex; gap: 8px; }
-    .btn-action-circle { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: 0.2s; border: 1px solid #e2e8f0; background: white; color: #64748b; }
-    .btn-action-circle:hover { background: #f1f5f9; color: var(--admin-primary); }
+    .store-logo { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1px solid var(--sm-border); background: #f8fafc; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #94a3b8; }
+    
+    /* MODAL RADIO BUTTONS */
+    .tier-radio { display: none; }
+    .tier-label { display: flex; align-items: center; gap: 16px; padding: 16px; border: 2px solid var(--sm-border); border-radius: 12px; cursor: pointer; transition: 0.2s; margin-bottom: 12px; background: white; }
+    .tier-label:hover { border-color: #cbd5e1; background: #f8fafc; }
+    .tier-radio:checked + .tier-label { border-color: var(--tier-official); background: #ede9fe; }
+    .tier-radio:checked + .tier-label.power { border-color: var(--tier-power); background: #ecfdf5; }
+    .tier-radio:checked + .tier-label.regular { border-color: var(--tier-regular); background: #f1f5f9; }
+    
+    .tier-label i { font-size: 28px; }
+    .tier-label strong { display: block; font-size: 15px; color: #1e293b; margin-bottom: 2px; }
+    .tier-label span { font-size: 12px; color: #64748b; }
 </style>
 @endpush
 
 @section('content')
 <div class="dashboard-header mb-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">Mitra Toko Bangunan</h2>
-            <p class="text-muted small">Kelola pendaftaran, verifikasi berkas, dan status operasional merchant.</p>
-        </div>
-        <div class="date-badge">
-            <i class="mdi mdi-store-cog-outline me-2"></i> Store Management
-        </div>
+    <h2 class="fw-bold text-dark mb-1">Manajemen Mitra Toko</h2>
+    <p class="text-muted small">Kelola kasta (tier) vendor untuk membedakan distributor resmi dan toko reguler.</p>
+</div>
+
+{{-- 1. STATS CARDS --}}
+<div class="tier-stats">
+    <div class="t-card">
+        <div class="t-icon bg-dark"><i class="mdi mdi-storefront-outline"></i></div>
+        <div class="t-info"><span>Total Mitra</span><h4>{{ number_format($stats['total']) }}</h4></div>
+    </div>
+    <div class="t-card" style="border-color: #ddd6fe;">
+        <div class="t-icon" style="background: var(--tier-official);"><i class="mdi mdi-check-decagram"></i></div>
+        <div class="t-info"><span class="text-purple">Official Store</span><h4 style="color: var(--tier-official);">{{ number_format($stats['official']) }}</h4></div>
+    </div>
+    <div class="t-card" style="border-color: #a7f3d0;">
+        <div class="t-icon" style="background: var(--tier-power);"><i class="mdi mdi-lightning-bolt"></i></div>
+        <div class="t-info"><span class="text-success">Power Merchant</span><h4 style="color: var(--tier-power);">{{ number_format($stats['power']) }}</h4></div>
     </div>
 </div>
 
-<div class="stat-grid">
-    <div class="stat-card-premium">
-        <div class="icon-box-lg bg-soft-blue"><i class="mdi mdi-store"></i></div>
-        <div>
-            <div class="text-muted small fw-bold">Total Mitra</div>
-            <div class="h3 fw-bold mb-0">{{ number_format($stats['total']) }}</div>
-        </div>
-    </div>
-    <div class="stat-card-premium">
-        <div class="icon-box-lg bg-soft-orange"><i class="mdi mdi-progress-clock"></i></div>
-        <div>
-            <div class="text-muted small fw-bold">Perlu Verifikasi</div>
-            <div class="h3 fw-bold mb-0 text-warning">{{ number_format($stats['pending']) }}</div>
-        </div>
-    </div>
-    <div class="stat-card-premium">
-        <div class="icon-box-lg bg-soft-green"><i class="mdi mdi-store-check"></i></div>
-        <div>
-            <div class="text-muted small fw-bold">Toko Aktif</div>
-            <div class="h3 fw-bold mb-0 text-success">{{ number_format($stats['active']) }}</div>
-        </div>
-    </div>
-    <div class="stat-card-premium">
-        <div class="icon-box-lg bg-soft-red"><i class="mdi mdi-store-remove"></i></div>
-        <div>
-            <div class="text-muted small fw-bold">Ditangguhkan</div>
-            <div class="h3 fw-bold mb-0 text-danger">{{ number_format($stats['suspended']) }}</div>
-        </div>
-    </div>
-</div>
+@if(session('success'))
+    <div class="alert alert-success fw-bold border-0 shadow-sm rounded-3 mb-4"><i class="mdi mdi-check-circle me-2"></i> {{ session('success') }}</div>
+@endif
 
-<div class="main-table-card">
-    <div class="px-4 py-4 border-bottom bg-white">
-        <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
-            {{-- Tabs Modern --}}
-            <div class="btn-group p-1 bg-light rounded-3 shadow-inner" style="width: fit-content;">
-                @foreach(['semua', 'pending', 'active', 'suspended'] as $st)
-                    <a href="{{ route('admin.stores.index', ['status' => $st, 'search' => $search]) }}" 
-                       class="btn btn-sm border-0 {{ $status_filter == $st ? 'bg-white shadow-sm fw-bold text-primary' : 'text-muted' }} px-4">
-                        {{ $st == 'pending' ? 'Perlu Verifikasi' : ucfirst($st) }}
-                    </a>
-                @endforeach
+{{-- 2. TABEL MITRA --}}
+<div class="store-table-wrapper shadow-sm">
+    <div class="d-flex flex-wrap justify-content-between align-items-center p-4 border-bottom bg-white gap-3">
+        <div class="btn-group p-1 bg-light rounded-3 shadow-sm">
+            <a href="{{ route('admin.stores.index', ['tier' => 'semua']) }}" class="btn btn-sm border-0 {{ $tier_filter == 'semua' ? 'bg-white fw-bold shadow-sm' : 'text-muted' }} px-3">Semua</a>
+            <a href="{{ route('admin.stores.index', ['tier' => 'official_store']) }}" class="btn btn-sm border-0 {{ $tier_filter == 'official_store' ? 'bg-white fw-bold shadow-sm text-purple' : 'text-muted' }} px-3"><i class="mdi mdi-check-decagram"></i> Official</a>
+            <a href="{{ route('admin.stores.index', ['tier' => 'power_merchant']) }}" class="btn btn-sm border-0 {{ $tier_filter == 'power_merchant' ? 'bg-white fw-bold shadow-sm text-success' : 'text-muted' }} px-3"><i class="mdi mdi-lightning-bolt"></i> Power</a>
+            <a href="{{ route('admin.stores.index', ['tier' => 'regular']) }}" class="btn btn-sm border-0 {{ $tier_filter == 'regular' ? 'bg-white fw-bold shadow-sm' : 'text-muted' }} px-3">Reguler</a>
+        </div>
+
+        <form action="{{ route('admin.stores.index') }}" method="GET">
+            <input type="hidden" name="tier" value="{{ $tier_filter }}">
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="mdi mdi-magnify"></i></span>
+                <input type="text" name="search" class="form-control" placeholder="Cari nama toko / pemilik..." value="{{ $search }}">
             </div>
-
-            {{-- Search --}}
-            <form action="{{ route('admin.stores.index') }}" method="GET" style="min-width: 300px;">
-                <input type="hidden" name="status" value="{{ $status_filter }}">
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-0"><i class="mdi mdi-magnify"></i></span>
-                    <input type="text" name="search" class="form-control bg-light border-0" placeholder="Cari nama toko atau pemilik..." value="{{ $search }}">
-                </div>
-            </form>
-        </div>
+        </form>
     </div>
 
     <div class="table-responsive">
-        <table class="table mb-0">
+        <table class="table-modern">
             <thead>
                 <tr>
-                    <th>Identitas Toko</th>
+                    <th>Informasi Toko</th>
                     <th>Pemilik & Kontak</th>
-                    <th>Lokasi (Kota)</th>
-                    <th>Tgl Daftar</th>
-                    <th>Status</th>
+                    <th>Kasta / Tier Saat Ini</th>
                     <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($stores as $toko)
+                @forelse($stores as $s)
                 <tr>
                     <td>
-                        <div class="store-identity">
-                            <div class="store-logo-box">
-                                @if($toko->logo_toko)
-                                    <img src="{{ asset('assets/uploads/toko/'.$toko->logo_toko) }}">
-                                @else
-                                    <i class="mdi mdi-store-outline text-muted fs-4"></i>
-                                @endif
-                            </div>
-                            <div>
-                                <span class="fw-bold text-dark d-block">{{ $toko->nama_toko }}</span>
-                                <small class="text-muted">Slug: {{ $toko->slug }}</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-dark">{{ $toko->nama_pemilik }}</div>
-                        <div class="small text-muted">{{ $toko->email_pemilik }}</div>
-                    </td>
-                    <td><span class="text-dark"><i class="mdi mdi-map-marker-outline me-1"></i>{{ $toko->nama_kota ?? '-' }}</span></td>
-                    <td class="small text-muted">{{ date('d M Y', strtotime($toko->created_at)) }}</td>
-                    <td>
-                        <span class="badge-status badge-{{ $toko->status }}">
-                            <i class="mdi mdi-circle-medium"></i> {{ strtoupper($toko->status) }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="d-flex justify-content-center gap-2">
-                            @if($toko->status == 'pending')
-                                <form action="{{ route('admin.stores.verify', $toko->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <input type="hidden" name="action" value="setujui">
-                                    <button type="submit" class="btn btn-success btn-sm px-3 rounded-3 shadow-sm" onclick="return confirm('Aktifkan toko ini?')">Setujui</button>
-                                </form>
-                                <form action="{{ route('admin.stores.verify', $toko->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <input type="hidden" name="action" value="tolak">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-3" onclick="return confirm('Tolak pendaftaran ini?')">Tolak</button>
-                                </form>
+                        <div class="d-flex align-items-center gap-3">
+                            @if($s->logo_toko)
+                                <img src="{{ asset('storage/'.$s->logo_toko) }}" class="store-logo" alt="Logo">
                             @else
-                                <a href="#" class="btn-action-circle" title="Lihat Profil"><i class="mdi mdi-eye"></i></a>
-                                <a href="#" class="btn-action-circle" title="Edit Data"><i class="mdi mdi-pencil-outline"></i></a>
+                                <div class="store-logo">{{ substr($s->nama_toko, 0, 1) }}</div>
                             @endif
+                            <div>
+                                <strong class="d-block text-dark fs-6">{{ $s->nama_toko }}</strong>
+                                <span class="text-muted small"><i class="mdi mdi-map-marker-outline"></i> {{ $s->kota_kabupaten ?? 'Kota belum diatur' }}</span>
+                            </div>
                         </div>
+                    </td>
+                    <td>
+                        <strong class="d-block text-dark">{{ $s->nama_pemilik }}</strong>
+                        <span class="text-muted small"><i class="mdi mdi-phone-outline"></i> {{ $s->telepon_pemilik ?? '-' }}</span>
+                    </td>
+                    <td>
+                        @if($s->tier_toko == 'official_store')
+                            <span class="badge-tier tier-official"><i class="mdi mdi-check-decagram"></i> Official Store</span>
+                        @elseif($s->tier_toko == 'power_merchant')
+                            <span class="badge-tier tier-power"><i class="mdi mdi-lightning-bolt"></i> Power Merchant</span>
+                        @else
+                            <span class="badge-tier tier-regular"><i class="mdi mdi-storefront-outline"></i> Regular</span>
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-dark px-3 fw-bold rounded-3 btn-upgrade"
+                            data-bs-toggle="modal" data-bs-target="#modalTier"
+                            data-id="{{ $s->id }}"
+                            data-nama="{{ $s->nama_toko }}"
+                            data-tier="{{ $s->tier_toko }}">
+                            <i class="mdi mdi-star-circle-outline me-1"></i> Ubah Kasta
+                        </button>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-5">
-                        <div class="py-4">
-                            <i class="mdi mdi-store-remove-outline text-muted" style="font-size: 5rem;"></i>
-                            <p class="text-muted fw-bold mt-3">Tidak ada toko dengan kriteria ini.</p>
-                        </div>
+                    <td colspan="4" class="text-center py-5">
+                        <i class="mdi mdi-store-off-outline text-muted" style="font-size: 4rem;"></i>
+                        <p class="text-muted fw-bold mt-2">Tidak ada data toko ditemukan.</p>
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-
-    <div class="px-4 py-3 bg-light d-flex justify-content-between align-items-center">
-        <small class="text-muted">Menampilkan {{ $stores->count() }} toko dari total {{ $stores->total() }}</small>
+    <div class="p-3 bg-light border-top">
         {{ $stores->links('pagination::bootstrap-5') }}
     </div>
 </div>
+
+{{-- 3. MODAL UBAH TIER --}}
+<div class="modal fade" id="modalTier" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <form id="formTier" method="POST" action="">
+                @csrf
+                <div class="modal-header border-bottom bg-light rounded-top-4 p-4">
+                    <h5 class="modal-title fw-bold text-dark"><i class="mdi mdi-star-circle text-warning me-2"></i> Pengaturan Kasta Mitra</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-4">Pilih tingkatan baru untuk toko <strong id="mdl-nama-toko" class="text-dark"></strong>. Perubahan ini akan memengaruhi badge toko di sisi pembeli.</p>
+
+                    <input type="radio" name="tier_toko" value="official_store" id="t_official" class="tier-radio">
+                    <label class="tier-label" for="t_official">
+                        <i class="mdi mdi-check-decagram" style="color: var(--tier-official);"></i>
+                        <div>
+                            <strong>Official Store (Distributor Resmi)</strong>
+                            <span>Dikhususkan untuk principal merk atau distributor besar berbadan hukum (PT/CV).</span>
+                        </div>
+                    </label>
+
+                    <input type="radio" name="tier_toko" value="power_merchant" id="t_power" class="tier-radio">
+                    <label class="tier-label power" for="t_power">
+                        <i class="mdi mdi-lightning-bolt" style="color: var(--tier-power);"></i>
+                        <div>
+                            <strong>Power Merchant</strong>
+                            <span>Toko dengan reputasi sangat baik, penjualan tinggi, dan pelayanan responsif.</span>
+                        </div>
+                    </label>
+
+                    <input type="radio" name="tier_toko" value="regular" id="t_regular" class="tier-radio">
+                    <label class="tier-label regular" for="t_regular">
+                        <i class="mdi mdi-storefront-outline" style="color: var(--tier-regular);"></i>
+                        <div>
+                            <strong>Toko Reguler</strong>
+                            <span>Tingkat standar untuk semua penjual baru yang mendaftar di platform.</span>
+                        </div>
+                    </label>
+                </div>
+                <div class="modal-footer border-top p-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-dark px-4 fw-bold">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-upgrade').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const nama = this.getAttribute('data-nama');
+                const currentTier = this.getAttribute('data-tier');
+                
+                // Set nama toko di modal
+                document.getElementById('mdl-nama-toko').innerText = nama;
+                
+                // Set form action
+                document.getElementById('formTier').action = `/portal-rahasia-pks/stores/${id}/tier`;
+
+                // Centang radio button sesuai tier saat ini
+                if(currentTier === 'official_store') document.getElementById('t_official').checked = true;
+                else if(currentTier === 'power_merchant') document.getElementById('t_power').checked = true;
+                else document.getElementById('t_regular').checked = true;
+            });
+        });
+    });
+</script>
+@endpush

@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\StoreController as AdminStoreController;
 use App\Http\Controllers\Admin\ProductModerationController as AdminProductModerationController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\DisputeController as AdminDisputeController;
 
 
 /*
@@ -164,21 +166,32 @@ Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->grou
     // Kelola Toko
     Route::get('/stores', [AdminStoreController::class, 'index'])->name('stores.index');
     Route::post('/stores/{id}/verify', [AdminStoreController::class, 'verify'])->name('stores.verify');
+    Route::post('/stores/{id}/tier', [AdminStoreController::class, 'updateTier'])->name('stores.updateTier');
 
     // Moderasi Produk (Material)
     Route::get('/products', [AdminProductModerationController::class, 'index'])->name('products.index');
     Route::get('/products/{id}', [AdminProductModerationController::class, 'show'])->name('products.show');
     Route::post('/products/{id}/process', [AdminProductModerationController::class, 'process'])->name('products.process');
     
-    // Placeholder Route untuk Sidebar
+    // Laporan & Keuangan
     Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
     Route::get('/payouts', [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');
     Route::post('/payouts/{id}/process', [\App\Http\Controllers\Admin\PayoutController::class, 'process'])->name('payouts.process');
 
+    // Pengaturan Sistem
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/update', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/sync-komerce', [\App\Http\Controllers\Admin\SettingController::class, 'syncKomerce'])->name('settings.syncKomerce');
     
+    // Logistik
+    Route::get('/logistics', [\App\Http\Controllers\Admin\LogisticSettingController::class, 'index'])->name('logistics.index');
+    Route::post('/logistics/update', [\App\Http\Controllers\Admin\LogisticSettingController::class, 'update'])->name('logistics.update');
+
+    // Pemantauan Pesanan & Pusat Resolusi
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
+    Route::get('/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
+    Route::post('/disputes/{id}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
 });
 
 

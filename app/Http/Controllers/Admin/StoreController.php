@@ -8,20 +8,27 @@ use Illuminate\Support\Facades\DB;
 
 class StoreController extends Controller
 {
+    /**
+     * Menampilkan Daftar Toko dengan Filter Status & Kasta (Tier)
+     */
     public function index(Request $request)
     {
-        $status_filter = $request->get('status', 'pending');
+        $status_filter = $request->get('status', 'semua');
+        $tier_filter = $request->get('tier', 'semua');
         $search = $request->get('search');
 
-        // Statistik Cepat untuk Top Cards
+        // Statistik Komprehensif (Status Operasional & Kasta Toko)
         $stats = [
             'total' => DB::table('tb_toko')->count(),
             'pending' => DB::table('tb_toko')->where('status', 'pending')->count(),
             'active' => DB::table('tb_toko')->where('status', 'active')->count(),
             'suspended' => DB::table('tb_toko')->where('status', 'suspended')->count(),
+            'official' => DB::table('tb_toko')->where('tier_toko', 'official_store')->count(),
+            'power' => DB::table('tb_toko')->where('tier_toko', 'power_merchant')->count(),
+            'regular' => DB::table('tb_toko')->where('tier_toko', 'regular')->count(),
         ];
 
-        // Query Utama
+        // Query Utama (Join User dan Tabel Cities Komerce)
         $query = DB::table('tb_toko as t')
             ->join('tb_user as u', 't.user_id', '=', 'u.id')
             ->leftJoin('cities as c', 't.city_id', '=', 'c.id')
@@ -29,13 +36,21 @@ class StoreController extends Controller
                 't.*', 
                 'u.nama as nama_pemilik', 
                 'u.email as email_pemilik',
+                'u.no_telepon as telepon_pemilik',
                 'c.name as nama_kota'
             );
 
+        // Filter Berdasarkan Status (Pending/Active/Suspended)
         if ($status_filter !== 'semua') {
             $query->where('t.status', $status_filter);
         }
 
+        // Filter Berdasarkan Kasta Toko (Official/Power/Regular)
+        if ($tier_filter !== 'semua') {
+            $query->where('t.tier_toko', $tier_filter);
+        }
+
+        // Filter Pencarian (Nama Toko atau Nama Pemilik)
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('t.nama_toko', 'LIKE', "%$search%")
@@ -43,14 +58,18 @@ class StoreController extends Controller
             });
         }
 
-        $stores = $query->latest('t.created_at')->paginate(10)->withQueryString();
+        // Tampilkan 12 toko per halaman
+        $stores = $query->latest('t.created_at')->paginate(12)->withQueryString();
 
-        return view('admin.stores.index', compact('stores', 'status_filter', 'search', 'stats'));
+        return view('admin.stores.index', compact('stores', 'status_filter', 'tier_filter', 'search', 'stats'));
     }
 
+    /**
+     * Memproses Verifikasi Pendaftaran Toko Baru (Approve / Reject / Suspend)
+     */
     public function verify(Request $request, $id)
     {
-        $action = $request->action; // 'setujui' atau 'tolak'
+        $action = $request->action; // 'setujui' atau 'tolak'/'suspend'
         $status = ($action === 'setujui') ? 'active' : 'suspended';
 
         DB::table('tb_toko')->where('id', $id)->update([
@@ -58,7 +77,33 @@ class StoreController extends Controller
             'updated_at' => now()
         ]);
 
-        $msg = ($action === 'setujui') ? 'Toko berhasil diaktifkan!' : 'Pendaftaran toko telah ditolak.';
+        $msg = ($action === 'setujui') 
+            ? 'Toko berhasil diverifikasi dan diaktifkan!' 
+            : 'Toko telah dibekukan / ditolak.';
+            
         return back()->with('success', $msg);
+    }
+
+    /**
+     * Memproses Perubahan Kasta / Tier Toko (Regular -> Power Merchant -> Official Store)
+     */
+    public function updateTier(Request $request, $id)
+    {
+        $request->validate([
+            'tier_toko' => 'required|in:regular,power_merchant,official_store'
+        ]);
+
+        DB::table('tb_toko')->where('id', $id)->update([
+            'tier_toko' => $request->tier_toko,
+            'updated_at' => now()
+        ]);
+
+        $tierNames = [
+            'regular' => 'Toko Reguler',
+            'power_merchant' => 'Power Merchant',
+            'official_store' => 'Official Store'
+        ];
+
+        return back()->with('success', 'Kasta mitra berhasil diubah menjadi ' . $tierNames[$request->tier_toko] . '!');
     }
 }
