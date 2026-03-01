@@ -146,7 +146,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
 
 
 // =================================================================
-// 5. AREA ADMIN (GHOST SYSTEM)
+// 5. AREA ADMIN (GHOST SYSTEM) DENGAN ROLE-BASED ACCESS CONTROL
 // =================================================================
 
 // 5A. PINTU BELAKANG ADMIN (SECRET LOGIN)
@@ -156,42 +156,56 @@ Route::post('/kunci-brankas-pks', [AdminAuthController::class, 'login'])->name('
 // 5B. ROUTE ADMIN TERLINDUNGI
 Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->group(function () {
     
-    // Dashboard Utama Admin
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
-    // Kelola Pengguna (Admin, Seller, Customer)
-    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
-    Route::post('/users/{id}/toggle-ban', [AdminUserController::class, 'toggleBan'])->name('users.toggleBan');
-    
-    // Kelola Toko
-    Route::get('/stores', [AdminStoreController::class, 'index'])->name('stores.index');
-    Route::post('/stores/{id}/verify', [AdminStoreController::class, 'verify'])->name('stores.verify');
-    Route::post('/stores/{id}/tier', [AdminStoreController::class, 'updateTier'])->name('stores.updateTier');
+    // --- BISA DIAKSES OLEH SEMUA KASTA ADMIN ---
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('admin.role:super,finance,cs');
 
-    // Moderasi Produk (Material)
-    Route::get('/products', [AdminProductModerationController::class, 'index'])->name('products.index');
-    Route::get('/products/{id}', [AdminProductModerationController::class, 'show'])->name('products.show');
-    Route::post('/products/{id}/process', [AdminProductModerationController::class, 'process'])->name('products.process');
-    
-    // Laporan & Keuangan
-    Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
-    Route::get('/payouts', [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');
-    Route::post('/payouts/{id}/process', [\App\Http\Controllers\Admin\PayoutController::class, 'process'])->name('payouts.process');
+    // --- GRUP KHUSUS SUPER ADMIN & ADMIN CS (Customer Service) ---
+    Route::middleware(['admin.role:super,cs'])->group(function () {
+        
+        // Kelola Pengguna (Directory)
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/export', [AdminUserController::class, 'exportCsv'])->name('users.export');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::post('/users/{id}/update', [AdminUserController::class, 'update'])->name('users.update'); 
+        Route::post('/users/{id}/toggle-ban', [AdminUserController::class, 'toggleBan'])->name('users.toggleBan');
+        
+        // Kelola Toko
+        Route::get('/stores', [AdminStoreController::class, 'index'])->name('stores.index');
+        Route::post('/stores/{id}/verify', [AdminStoreController::class, 'verify'])->name('stores.verify');
+        Route::post('/stores/{id}/tier', [AdminStoreController::class, 'updateTier'])->name('stores.updateTier');
 
-    // Pengaturan Sistem
-    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings/update', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
-    Route::post('/settings/sync-komerce', [\App\Http\Controllers\Admin\SettingController::class, 'syncKomerce'])->name('settings.syncKomerce');
-    
-    // Logistik
-    Route::get('/logistics', [\App\Http\Controllers\Admin\LogisticSettingController::class, 'index'])->name('logistics.index');
-    Route::post('/logistics/update', [\App\Http\Controllers\Admin\LogisticSettingController::class, 'update'])->name('logistics.update');
+        // Moderasi Produk (Material)
+        Route::get('/products', [AdminProductModerationController::class, 'index'])->name('products.index');
+        Route::get('/products/{id}', [AdminProductModerationController::class, 'show'])->name('products.show');
+        Route::post('/products/{id}/process', [AdminProductModerationController::class, 'process'])->name('products.process');
+        
+        // Pemantauan Pesanan & Pusat Resolusi
+        Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
+        Route::get('/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
+        Route::post('/disputes/{id}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
+    });
 
-    // Pemantauan Pesanan & Pusat Resolusi
-    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
-    Route::get('/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
-    Route::post('/disputes/{id}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
+    // --- GRUP KHUSUS SUPER ADMIN & ADMIN FINANCE ---
+    Route::middleware(['admin.role:super,finance'])->group(function () {
+        
+        // Laporan & Keuangan (Payouts)
+        Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+        Route::get('/payouts', [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');
+        Route::post('/payouts/{id}/process', [\App\Http\Controllers\Admin\PayoutController::class, 'process'])->name('payouts.process');
+
+        // Pengaturan Sistem
+        Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings/update', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/sync-komerce', [\App\Http\Controllers\Admin\SettingController::class, 'syncKomerce'])->name('settings.syncKomerce');
+        
+        // Logistik
+        Route::get('/logistics', [\App\Http\Controllers\Admin\LogisticSettingController::class, 'index'])->name('logistics.index');
+        Route::post('/logistics/update', [\App\Http\Controllers\Admin\LogisticSettingController::class, 'update'])->name('logistics.update');
+    });
+
 });
 
 

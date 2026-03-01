@@ -16,53 +16,66 @@ class ReportController extends Controller
         $end_date = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
         // 2. Query KPI (Key Performance Indicators)
-        // Menghitung GMV (Total Penjualan Kotor) dari transaksi yang berhasil dibayar
+        
+        // GMV: Total uang kotor yang masuk dari transaksi lunas
         $gmv = DB::table('tb_transaksi')
             ->whereBetween(DB::raw('DATE(tanggal_transaksi)'), [$start_date, $end_date])
-            ->whereIn('status_pembayaran', ['paid'])
+            ->whereIn('status_pembayaran', ['paid', 'dp_paid'])
             ->sum('total_final');
 
-        // Menghitung Total Pendapatan Platform (Komisi)
-        $revenue = DB::table('tb_komisi')
+        // TOTAL POTONGAN MIDTRANS: Mengambil data asli dari kolom midtrans_fee
+        $midtrans_costs = DB::table('tb_transaksi')
+            ->whereBetween(DB::raw('DATE(tanggal_transaksi)'), [$start_date, $end_date])
+            ->whereIn('status_pembayaran', ['paid', 'dp_paid'])
+            ->sum('midtrans_fee');
+
+        // PENDAPATAN KOMISI: Total komisi yang ditarik dari seller
+        $gross_commission = DB::table('tb_komisi')
             ->whereBetween(DB::raw('DATE(created_at)'), [$start_date, $end_date])
             ->where('status', 'paid')
             ->sum('jumlah_komisi');
 
-        // Total Transaksi Berhasil
+        // TOTAL BIAYA LAYANAN: Biaya admin yang dibebankan ke customer
+        $service_fees = DB::table('tb_transaksi')
+            ->whereBetween(DB::raw('DATE(tanggal_transaksi)'), [$start_date, $end_date])
+            ->whereIn('status_pembayaran', ['paid', 'dp_paid'])
+            ->sum(DB::raw('customer_service_fee + customer_handling_fee'));
+
+        // NET REVENUE (PENDAPATAN BERSIH PLATFORM): 
+        // (Komisi Seller + Biaya Layanan User) - Potongan Gateway Midtrans
+        $net_revenue = ($gross_commission + $service_fees) - $midtrans_costs;
+
+        // Statistik Tambahan
         $total_orders = DB::table('tb_transaksi')
             ->whereBetween(DB::raw('DATE(tanggal_transaksi)'), [$start_date, $end_date])
-            ->whereIn('status_pembayaran', ['paid'])
+            ->whereIn('status_pembayaran', ['paid', 'dp_paid'])
             ->count();
-
-        // Rata-rata Nilai Pesanan (AOV - Average Order Value)
-        $aov = $total_orders > 0 ? $gmv / $total_orders : 0;
 
         $stats = [
             'gmv' => $gmv,
-            'revenue' => $revenue,
+            'midtrans_costs' => $midtrans_costs,
+            'revenue' => $net_revenue,
             'total_orders' => $total_orders,
-            'aov' => $aov
+            'aov' => $total_orders > 0 ? $gmv / $total_orders : 0
         ];
 
         // 3. Persiapkan Data Grafik (Tren Penjualan Harian)
         $chart_data = DB::table('tb_transaksi')
             ->select(DB::raw('DATE(tanggal_transaksi) as date'), DB::raw('SUM(total_final) as total_sales'))
             ->whereBetween(DB::raw('DATE(tanggal_transaksi)'), [$start_date, $end_date])
-            ->where('status_pembayaran', 'paid')
+            ->whereIn('status_pembayaran', ['paid', 'dp_paid'])
             ->groupBy('date')
             ->orderBy('date', 'ASC')
             ->get();
 
         $chart_labels = [];
         $chart_values = [];
-        
-        // Mengisi array untuk Chart.js
         foreach ($chart_data as $data) {
             $chart_labels[] = Carbon::parse($data->date)->format('d M');
             $chart_values[] = $data->total_sales;
         }
 
-        // 4. Ambil Daftar Transaksi Terbaru (High-Density Table)
+        // 4. Daftar Transaksi Terbaru
         $recent_transactions = DB::table('tb_transaksi as t')
             ->join('tb_user as u', 't.user_id', '=', 'u.id')
             ->select('t.*', 'u.nama as nama_pembeli')

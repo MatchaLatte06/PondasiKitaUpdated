@@ -15,8 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
             // Middleware bawaan Anda sebelumnya
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             
-            // Middleware khusus Admin (Ghost System) yang baru dibuat
+            // Middleware khusus Admin (Ghost System)
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            
+            // Middleware Kasta/Role Admin (BARU)
+            'admin.role' => \App\Http\Middleware\CheckAdminRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

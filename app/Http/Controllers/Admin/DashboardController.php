@@ -11,44 +11,52 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // --- 1. TUGAS ADMIN (Perlu Tindakan) ---
+        // 1. Ambil Tugas Moderasi / Antrean
         $tugas = [
-            'toko_pending'   => DB::table('tb_toko')->where('status', 'pending')->count(),
+            'toko_pending' => DB::table('tb_toko')->where('status', 'pending')->count(),
             'produk_pending' => DB::table('tb_barang')->where('status_moderasi', 'pending')->count(),
-            'payout_pending' => DB::table('tb_payouts')->where('status', 'pending')->count(), 
+            // 'payout_pending' => DB::table('tb_payouts')->where('status', 'pending')->count(), // Buka jika tabel payout sudah aktif
+            'payout_pending' => 0, 
+            'komplain_aktif' => DB::table('tb_komplain')->whereIn('status_komplain', ['investigasi', 'menunggu_tanggapan_toko'])->count(),
         ];
 
-        // --- 2. STATISTIK UTAMA ---
+        // 2. Ambil Statistik Global Platform
         $statistik = [
-            // Mengambil total penjualan dari transaksi yang sudah dibayar (paid)
-            'total_penjualan' => DB::table('tb_transaksi')->where('status_pembayaran', 'paid')->sum('total_final') ?? 0,
-            
-            // Menggunakan tb_user sesuai struktur database pondasikita
-            'total_pengguna'  => DB::table('tb_user')->where('level', '!=', 'bot')->count(), 
-            
-            'total_toko'      => DB::table('tb_toko')->where('status', 'active')->count(),
-            'total_produk'    => DB::table('tb_barang')->where('status_moderasi', 'approved')->count(),
+            'total_penjualan' => DB::table('tb_transaksi')->where('status_pesanan_global', 'selesai')->sum('total_final'),
+            'total_pengguna' => DB::table('tb_user')->count(),
+            'total_toko' => DB::table('tb_toko')->where('status', 'active')->count(),
+            'total_produk' => DB::table('tb_barang')
+                                ->where('status_moderasi', 'approved')
+                                ->where('is_active', 1)
+                                ->count(),
         ];
 
-        // --- 3. DATA GRAFIK (Pertumbuhan Pengguna 7 Hari Terakhir) ---
+        // 3. Data Grafik (Pengguna Baru 7 Hari Terakhir)
         $chart_labels = [];
         $chart_values = [];
-
-        // Looping dari 6 hari yang lalu hingga hari ini
         for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
-            $dateString = $date->toDateString(); // Format Y-m-d
-
-            // Hitung user yang mendaftar pada tanggal tersebut (menggunakan tb_user)
-            $count = DB::table('tb_user')
-                ->whereDate('created_at', $dateString)
-                ->count();
-
-            $chart_labels[] = $date->translatedFormat('d M'); // Format misal: 21 Feb
-            $chart_values[] = $count;
+            $date = Carbon::today()->subDays($i);
+            $chart_labels[] = $date->format('D'); 
+            $chart_values[] = DB::table('tb_user')->whereDate('created_at', $date)->count();
         }
 
-        // Kirim semua data ke View
-        return view('admin.dashboard', compact('tugas', 'statistik', 'chart_labels', 'chart_values'));
+        // 4. Ambil Top Performance Toko Bangunan (Mendukung Multi-Vendor)
+        $topToko = DB::table('tb_toko as t')
+            ->join('tb_detail_transaksi as dt', 't.id', '=', 'dt.toko_id')
+            ->join('tb_transaksi as trx', 'dt.transaksi_id', '=', 'trx.id')
+            ->leftJoin('cities as c', 't.city_id', '=', 'c.id')
+            ->select(
+                't.nama_toko', 
+                'c.name as nama_kota', 
+                DB::raw('SUM(dt.subtotal) as total_gmv'), // Hitung GMV dari subtotal masing-masing toko
+                DB::raw('COUNT(DISTINCT trx.id) as total_order') // Hitung jumlah invoice unik
+            )
+            ->where('trx.status_pesanan_global', 'selesai')
+            ->groupBy('t.id', 't.nama_toko', 'c.name')
+            ->orderByDesc('total_gmv')
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact('tugas', 'statistik', 'chart_labels', 'chart_values', 'topToko'));
     }
 }

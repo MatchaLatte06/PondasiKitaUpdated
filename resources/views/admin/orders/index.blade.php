@@ -145,16 +145,35 @@
                             <span class="text-primary fw-bold"><i class="mdi mdi-storefront-outline"></i> {{ $order->nama_toko }}</span>
                         </div>
                     </td>
+                    
+                    {{-- AREA INI YANG KITA UBAH UNTUK SISTEM DP --}}
                     <td>
                         <div class="fw-bold text-dark fs-6">Rp {{ number_format($order->total_final, 0, ',', '.') }}</div>
-                        <div class="mt-1">
-                            @if($order->status_pembayaran == 'paid')
-                                <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="mdi mdi-check-circle"></i> LUNAS (Midtrans)</span>
-                            @else
-                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning"><i class="mdi mdi-clock-outline"></i> Menunggu Bayar</span>
-                            @endif
-                        </div>
+                        
+                        {{-- Logika Tampilan LUNAS vs DP --}}
+                        @if(($order->tipe_pembayaran ?? 'LUNAS') == 'DP')
+                            <div class="mt-2 p-2 rounded" style="background: #fffbeb; border: 1px dashed #f59e0b; font-size: 11px;">
+                                <strong class="text-warning d-block mb-1"><i class="mdi mdi-star-circle"></i> TRANSAKSI B2B (DP)</strong>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Dibayar (Web):</span>
+                                    <span class="fw-bold text-success">Rp {{ number_format($order->jumlah_dp ?? 0, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1 border-top pt-1">
+                                    <span class="text-muted">Tagihan (CASH):</span>
+                                    <span class="fw-bold text-danger">Rp {{ number_format($order->sisa_tagihan ?? 0, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        @else
+                            <div class="mt-1">
+                                @if($order->status_pembayaran == 'paid')
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="mdi mdi-check-circle"></i> LUNAS (Midtrans)</span>
+                                @else
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning"><i class="mdi mdi-clock-outline"></i> Menunggu Bayar</span>
+                                @endif
+                            </div>
+                        @endif
                     </td>
+
                     <td>
                         <div class="logistics-info">
                             <strong class="d-block text-dark"><i class="mdi mdi-truck-delivery"></i> {{ $order->kurir_pengiriman ?? 'Belum dipilih' }}</strong>

@@ -11,6 +11,7 @@
         --rp-success: #10b981;
         --rp-text: #1e293b;
         --rp-muted: #64748b;
+        --rp-danger: #e11d48;
     }
 
     /* HEADER & FILTER BAR */
@@ -25,13 +26,13 @@
     .kpi-icon { position: absolute; top: 24px; right: 24px; width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
     
     .kpi-title { font-size: 13px; font-weight: 700; color: var(--rp-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: block; }
-    .kpi-amount { font-size: 30px; font-weight: 800; color: var(--rp-text); margin-bottom: 8px; letter-spacing: -0.5px; }
-    .kpi-trend { font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; }
+    .kpi-amount { font-size: 28px; font-weight: 800; color: var(--rp-text); margin-bottom: 8px; letter-spacing: -0.5px; }
+    .kpi-trend { font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; }
 
     /* SPECIFIC KPI COLORS */
     .kpi-gmv .kpi-icon { background: #eff6ff; color: #3b82f6; }
-    .kpi-rev .kpi-icon { background: #ecfdf5; color: #10b981; }
-    .kpi-ord .kpi-icon { background: #fef2f2; color: #ef4444; }
+    .kpi-cost .kpi-icon { background: #fff1f2; color: var(--rp-danger); }
+    .kpi-rev .kpi-icon { background: #ecfdf5; color: var(--rp-success); }
     .kpi-aov .kpi-icon { background: #fff7ed; color: #f59e0b; }
 
     /* CHART PANEL */
@@ -45,13 +46,9 @@
     .table-enterprise tbody td { padding: 16px 20px; font-size: 13px; color: var(--rp-text); border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
     .table-enterprise tbody tr:hover { background: #fcfcfc; }
     
-    .invoice-link { font-family: monospace; font-size: 14px; font-weight: 700; color: var(--rp-primary); text-decoration: none; }
-    .invoice-link:hover { text-decoration: underline; }
-    
-    .badge-status { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-block; }
+    .badge-status { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-block; text-transform: uppercase; }
     .bg-paid { background: #dcfce7; color: #15803d; }
     .bg-pending { background: #fef3c7; color: #b45309; }
-    .bg-cancelled { background: #fee2e2; color: #b91c1c; }
 
     .btn-export { background: white; border: 1px solid var(--rp-border); color: var(--rp-text); font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
     .btn-export:hover { background: #f8fafc; border-color: #cbd5e1; }
@@ -60,12 +57,12 @@
 
 @section('content')
 <div class="dashboard-header mb-3">
-    <h2 class="fw-bold text-dark mb-1">Laporan & Analitik</h2>
-    <p class="text-muted small">Ringkasan performa finansial dan transaksi platform Pondasikita.</p>
+    <h2 class="fw-bold text-dark mb-1">Laporan Finansial Platform</h2>
+    <p class="text-muted small">Transparansi arus kas, biaya potongan Midtrans, dan laba bersih admin Pondasikita.</p>
 </div>
 
 {{-- 1. TOOLBAR & FILTER --}}
-<form action="{{ route('admin.reports.index') }}" method="GET" class="report-toolbar">
+<form action="{{ route('admin.reports.index') }}" method="GET" class="report-toolbar shadow-sm">
     <div class="d-flex flex-wrap align-items-center gap-3">
         <div class="date-picker-group">
             <i class="mdi mdi-calendar-range text-muted ms-2"></i>
@@ -73,106 +70,106 @@
             <span class="text-muted">s/d</span>
             <input type="date" name="end_date" value="{{ $end_date }}" required>
         </div>
-        <button type="submit" class="btn btn-primary btn-sm px-4 rounded-3 fw-bold">Terapkan Filter</button>
+        <button type="submit" class="btn btn-primary btn-sm px-4 rounded-3 fw-bold shadow-sm">
+            <i class="mdi mdi-filter-variant me-1"></i> Terapkan Filter
+        </button>
     </div>
     <div class="d-flex gap-2">
-        <button type="button" class="btn-export"><i class="mdi mdi-file-excel text-success"></i> Export Excel</button>
-        <button type="button" class="btn-export"><i class="mdi mdi-file-pdf-box text-danger"></i> Export PDF</button>
+        <button type="button" class="btn-export shadow-sm"><i class="mdi mdi-file-excel text-success"></i> Export Excel</button>
+        <button type="button" class="btn-export shadow-sm"><i class="mdi mdi-file-pdf-box text-danger"></i> PDF</button>
     </div>
 </form>
 
 {{-- 2. KPI METRICS --}}
 <div class="kpi-container">
-    {{-- GMV (Gross Merchandise Value) --}}
-    <div class="kpi-card kpi-gmv">
+    {{-- GMV --}}
+    <div class="kpi-card kpi-gmv shadow-sm">
         <div class="kpi-icon"><i class="mdi mdi-shopping-outline"></i></div>
         <span class="kpi-title">Gross Merchandise Value</span>
         <div class="kpi-amount">Rp {{ number_format($stats['gmv'], 0, ',', '.') }}</div>
-        <div class="kpi-trend bg-light text-success"><i class="mdi mdi-trending-up"></i> Total perputaran uang</div>
+        <div class="kpi-trend bg-light text-primary"><i class="mdi mdi-trending-up"></i> Total omzet masuk</div>
     </div>
 
-    {{-- Pendapatan Komisi --}}
-    <div class="kpi-card kpi-rev">
-        <div class="kpi-icon"><i class="mdi mdi-cash-multiple"></i></div>
-        <span class="kpi-title">Pendapatan Platform</span>
-        <div class="kpi-amount">Rp {{ number_format($stats['revenue'], 0, ',', '.') }}</div>
-        <div class="kpi-trend bg-light text-primary"><i class="mdi mdi-check-circle"></i> Komisi bersih admin</div>
+    {{-- BIAYA MIDTRANS --}}
+    <div class="kpi-card kpi-cost shadow-sm">
+        <div class="kpi-icon"><i class="mdi mdi-bank-minus"></i></div>
+        <span class="kpi-title">Biaya Midtrans (Gateway)</span>
+        <div class="kpi-amount text-danger">- Rp {{ number_format($stats['midtrans_costs'], 0, ',', '.') }}</div>
+        <div class="kpi-trend bg-light text-danger"><i class="mdi mdi-alert-circle-outline"></i> Potongan resmi</div>
     </div>
 
-    {{-- Total Orders --}}
-    <div class="kpi-card kpi-ord">
-        <div class="kpi-icon"><i class="mdi mdi-package-variant-closed"></i></div>
-        <span class="kpi-title">Pesanan Berhasil</span>
-        <div class="kpi-amount">{{ number_format($stats['total_orders']) }} <span style="font-size:16px; color:#94a3b8;">Pesanan</span></div>
-        <div class="kpi-trend bg-light text-muted">Hanya status Paid</div>
+    {{-- NET REVENUE --}}
+    <div class="kpi-card kpi-rev shadow-sm">
+        <div class="kpi-icon"><i class="mdi mdi-cash-check"></i></div>
+        <span class="kpi-title">Laba Bersih Platform</span>
+        <div class="kpi-amount text-success">Rp {{ number_format($stats['revenue'], 0, ',', '.') }}</div>
+        <div class="kpi-trend bg-success text-white fw-bold"><i class="mdi mdi-shield-check"></i> Pendapatan admin</div>
     </div>
 
-    {{-- AOV (Average Order Value) --}}
-    <div class="kpi-card kpi-aov">
+    {{-- AOV --}}
+    <div class="kpi-card kpi-aov shadow-sm">
         <div class="kpi-icon"><i class="mdi mdi-calculator"></i></div>
-        <span class="kpi-title">Rata-rata Nilai Pesanan</span>
+        <span class="kpi-title">Avg. Order Value</span>
         <div class="kpi-amount">Rp {{ number_format($stats['aov'], 0, ',', '.') }}</div>
-        <div class="kpi-trend bg-light text-muted">Per transaksi</div>
+        <div class="kpi-trend bg-light text-muted"><i class="mdi mdi-chart-bubble"></i> Rata-rata belanja</div>
     </div>
 </div>
 
 {{-- 3. CHART ANALYTICS --}}
-<div class="chart-panel">
+<div class="chart-panel shadow-sm">
     <div class="panel-heading">
-        <span>Tren Penjualan (GMV)</span>
-        <i class="mdi mdi-dots-horizontal text-muted fs-4"></i>
+        <span>Tren Pertumbuhan Penjualan</span>
+        <div class="dropdown">
+            <i class="mdi mdi-dots-vertical text-muted fs-4" style="cursor:pointer;"></i>
+        </div>
     </div>
-    <div style="height: 350px; width: 100%;">
+    <div style="height: 380px; width: 100%;">
         <canvas id="salesChart"></canvas>
     </div>
 </div>
 
 {{-- 4. DETAILED TRANSACTION TABLE --}}
-<div class="data-table-wrapper mb-4">
+<div class="data-table-wrapper shadow-sm mb-5">
     <div class="panel-heading px-4 pt-4 pb-2 border-bottom">
-        <span>Rincian Transaksi Terbaru</span>
+        <span>Rincian Transaksi & Potongan Gateway</span>
     </div>
     <div class="table-responsive">
         <table class="table-enterprise">
             <thead>
                 <tr>
-                    <th>Invoice</th>
+                    <th>Invoice & Pelanggan</th>
                     <th>Waktu Transaksi</th>
-                    <th>Pelanggan</th>
-                    <th>Metode Pembayaran</th>
-                    <th>Total Pembayaran</th>
-                    <th>Status Dana</th>
+                    <th>Total Transaksi</th>
+                    <th>Fee Midtrans</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($recent_transactions as $trx)
                 <tr>
                     <td>
-                        <a href="#" class="invoice-link">{{ $trx->kode_invoice }}</a>
-                        <div class="small text-muted mt-1">{{ $trx->sumber_transaksi }}</div>
+                        <span class="fw-bold text-primary">{{ $trx->kode_invoice }}</span>
+                        <div class="small text-muted mt-1 fw-bold">{{ $trx->nama_pembeli }}</div>
                     </td>
                     <td>
                         <span class="fw-bold">{{ \Carbon\Carbon::parse($trx->tanggal_transaksi)->format('d M Y') }}</span><br>
                         <span class="text-muted" style="font-size:11px;">{{ \Carbon\Carbon::parse($trx->tanggal_transaksi)->format('H:i:s') }} WIB</span>
                     </td>
                     <td>
-                        <span class="fw-bold text-dark">{{ $trx->nama_pembeli }}</span>
+                        <span class="fw-bold text-dark fs-6">Rp {{ number_format($trx->total_final, 0, ',', '.') }}</span>
+                    </td>
+                    <td class="text-danger fw-bold">
+                        - Rp {{ number_format($trx->midtrans_fee, 0, ',', '.') }}
                     </td>
                     <td>
-                        <span class="badge bg-light text-dark border"><i class="mdi mdi-credit-card-outline me-1"></i> {{ $trx->metode_pembayaran ?? 'Menunggu' }}</span>
-                    </td>
-                    <td class="fw-bold text-primary fs-6">
-                        Rp {{ number_format($trx->total_final, 0, ',', '.') }}
-                    </td>
-                    <td>
-                        <span class="badge-status bg-{{ $trx->status_pembayaran }}">
-                            {{ strtoupper($trx->status_pembayaran) }}
+                        <span class="badge-status bg-{{ $trx->status_pembayaran == 'paid' || $trx->status_pembayaran == 'dp_paid' ? 'paid' : 'pending' }}">
+                            {{ $trx->status_pembayaran == 'paid' ? 'LUNAS' : ($trx->status_pembayaran == 'dp_paid' ? 'DP LUNAS' : strtoupper($trx->status_pembayaran)) }}
                         </span>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-5 text-muted">
+                    <td colspan="5" class="text-center py-5 text-muted">
                         <i class="mdi mdi-text-box-search-outline fs-1 mb-2 d-block"></i>
                         Tidak ada transaksi pada rentang tanggal ini.
                     </td>
@@ -181,7 +178,7 @@
             </tbody>
         </table>
     </div>
-    <div class="p-3 bg-light border-top">
+    <div class="p-3 bg-light border-top d-flex justify-content-center">
         {{ $recent_transactions->links('pagination::bootstrap-5') }}
     </div>
 </div>
@@ -193,9 +190,9 @@
 document.addEventListener("DOMContentLoaded", function() {
     const ctx = document.getElementById('salesChart').getContext('2d');
     
-    // Create an elegant gradient fill
+    // Create an elegant indigo gradient
     let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.5)'); // Indigo
+    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.5)'); 
     gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
 
     new Chart(ctx, {
@@ -203,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function() {
         data: {
             labels: {!! json_encode($chart_labels) !!},
             datasets: [{
-                label: 'Total GMV (Rp)',
+                label: 'Total GMV',
                 data: {!! json_encode($chart_values) !!},
                 borderColor: '#4f46e5',
                 backgroundColor: gradient,
@@ -213,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 pointBorderWidth: 2,
                 pointRadius: 4,
                 pointHoverRadius: 6,
-                tension: 0.4, // Smooth curve
+                tension: 0.4, 
                 fill: true
             }]
         },
@@ -230,8 +227,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     displayColors: false,
                     callbacks: {
                         label: function(context) {
-                            let value = context.parsed.y;
-                            return 'Rp ' + value.toLocaleString('id-ID');
+                            return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
                         }
                     }
                 }
@@ -239,7 +235,7 @@ document.addEventListener("DOMContentLoaded", function() {
             scales: {
                 x: { 
                     grid: { display: false, drawBorder: false },
-                    ticks: { color: '#64748b', font: { family: 'Inter' } }
+                    ticks: { color: '#64748b', font: { family: 'Inter', weight: '600' } }
                 },
                 y: { 
                     beginAtZero: true,
@@ -248,13 +244,12 @@ document.addEventListener("DOMContentLoaded", function() {
                         color: '#64748b', 
                         font: { family: 'Inter' },
                         callback: function(value) {
-                            if (value >= 1000000) return 'Rp ' + (value / 1000000) + 'M';
+                            if (value >= 1000000) return 'Rp ' + (value / 1000000) + 'jt';
                             return 'Rp ' + value.toLocaleString('id-ID');
                         }
                     }
                 }
-            },
-            interaction: { intersect: false, mode: 'index' },
+            }
         }
     });
 });
