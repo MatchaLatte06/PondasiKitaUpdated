@@ -84,12 +84,17 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     Route::resource('products', ProductController::class);
     Route::post('/products/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle');
 
-    // --- C. MANAJEMEN PESANAN ---
+    // --- C. MANAJEMEN PESANAN & RETUR ---
     Route::prefix('orders')->name('orders.')->group(function() {
         Route::get('/', [SellerController::class, 'pesanan'])->name('index');
-        Route::get('/return', [SellerController::class, 'pengembalian'])->name('return');
+        
+        // Logika Update Pesanan
         Route::post('/update-status', [SellerController::class, 'updateOrderStatus'])->name('updateStatus');
         Route::post('/mass-update', [SellerController::class, 'massUpdateOrderStatus'])->name('massUpdate');
+        
+        // Logika Pengembalian Barang / Return
+        Route::get('/return', [SellerController::class, 'pengembalian'])->name('return');
+        Route::post('/return/process', [SellerController::class, 'processPengembalian'])->name('return.process'); // <--- INI ROUTE POST BARU UNTUK RETURN
     });
 
     // --- D. PENGATURAN PENGIRIMAN ---
@@ -100,10 +105,16 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::delete('/pengiriman/{id}', [SellerController::class, 'destroyPengiriman'])->name('pengiriman.destroy');
     });
 
-    // --- E. PUSAT PROMOSI ---
+// --- E. PUSAT PROMOSI ---
     Route::prefix('promotion')->name('promotion.')->group(function() {
         Route::get('/discounts', [SellerController::class, 'promosi'])->name('discounts');
+        Route::post('/discounts/update', [SellerController::class, 'updateDiscount'])->name('discounts.update');
+        
+        // ROUTE VOUCHER BARU:
         Route::get('/vouchers', [SellerController::class, 'voucher'])->name('vouchers');
+        Route::post('/vouchers/store', [SellerController::class, 'storeVoucher'])->name('vouchers.store');
+        Route::post('/vouchers/toggle', [SellerController::class, 'toggleVoucher'])->name('vouchers.toggle');
+        Route::delete('/vouchers/{id}', [SellerController::class, 'destroyVoucher'])->name('vouchers.destroy');
     });
 
     // --- F. LAYANAN PEMBELI ---
