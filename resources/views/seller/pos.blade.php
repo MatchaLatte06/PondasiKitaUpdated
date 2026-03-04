@@ -1,199 +1,195 @@
 @extends('layouts.seller')
 
-@section('title', 'Point of Sale (Kasir)')
-
-@push('styles')
-<style>
-    /* --- STYLE POS MONOCHROME --- */
-    .pos-container { margin-top: -1rem; }
-    
-    /* Product Card */
-    .product-card { 
-        cursor: pointer; 
-        border: 1px solid #e5e7eb; 
-        border-radius: 12px; 
-        transition: all 0.2s ease;
-        background: #fff;
-        height: 100%;
-        overflow: hidden;
-    }
-    .product-card:hover { 
-        transform: translateY(-4px); 
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
-        border-color: #111827;
-    }
-    .product-card img { 
-        width: 100%; 
-        height: 140px; 
-        object-fit: cover; 
-    }
-    .product-info { padding: 12px; }
-    .product-title { font-size: 0.9rem; font-weight: 600; color: #111827; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .product-price { font-size: 1.05rem; font-weight: 700; color: #111827; }
-    .product-stock { font-size: 0.75rem; color: #6b7280; }
-
-    /* Transaction Panel */
-    .transaction-panel { 
-        position: sticky; 
-        top: 80px; 
-        height: calc(100vh - 100px); 
-        display: flex; 
-        flex-direction: column;
-        border-radius: 16px;
-        border: 1px solid #e5e7eb;
-    }
-    .cart-container { 
-        flex-grow: 1; 
-        overflow-y: auto; 
-        padding-right: 5px;
-    }
-    .cart-container::-webkit-scrollbar { width: 4px; }
-    .cart-container::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 10px; }
-    
-    /* Cart Item */
-    .cart-item { 
-        display: flex; 
-        align-items: center; 
-        justify-content: space-between; 
-        padding: 12px 0; 
-        border-bottom: 1px dashed #e5e7eb; 
-    }
-    .cart-item-title { font-size: 0.9rem; font-weight: 600; color: #111827; }
-    .cart-item-price { font-size: 0.85rem; color: #6b7280; }
-    .qty-control { display: flex; align-items: center; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden; }
-    .qty-btn { background: #f9fafb; border: none; padding: 2px 10px; font-weight: bold; color: #374151; cursor: pointer; transition: 0.2s;}
-    .qty-btn:hover { background: #e5e7eb; }
-    .qty-input { width: 40px; text-align: center; border: none; font-size: 0.9rem; font-weight: 600; padding: 2px 0; }
-    .qty-input:focus { outline: none; }
-    .remove-btn { color: #ef4444; background: none; border: none; cursor: pointer; padding: 5px; font-size: 1.2rem; }
-
-    /* Bottom Panel */
-    .checkout-panel { 
-        background: #f9fafb; 
-        padding: 1.5rem; 
-        border-top: 2px dashed #e5e7eb; 
-        border-radius: 0 0 16px 16px;
-    }
-    
-    /* Tombol Uang Pas */
-    .quick-cash-btn { font-weight: 600; border-color: #d1d5db; color: #374151; }
-    .quick-cash-btn:hover { background-color: #111827; color: white; border-color: #111827; }
-
-    .btn-mono { background: #111827; color: white; border-radius: 8px; font-weight: 600; padding: 12px; }
-    .btn-mono:hover { background: #374151; color: white; }
-    .btn-mono-outline { background: transparent; border: 1px solid #111827; color: #111827; border-radius: 8px; font-weight: 600; padding: 12px; }
-    .btn-mono-outline:hover { background: #f3f4f6; }
-</style>
-@endpush
+@section('title', 'Mesin Kasir (POS)')
 
 @section('content')
-<div class="pos-container">
-    <div class="row g-4">
+<style>
+    /* CSS LANGSUNG DI BODY AGAR ANTI GAGAL */
+    :root {
+        --pos-dark: #0f172a;
+        --pos-light: #f8fafc;
+        --pos-border: #cbd5e1;
+        --pos-primary: #0284c7;
+        --pos-success: #059669;
+    }
+
+    .pos-wrapper {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        height: calc(100vh - 100px);
+        display: flex;
+        gap: 20px;
+        overflow: hidden;
+    }
+
+    /* PANEL KIRI: KATALOG BARANG */
+    .pos-catalog {
+        flex: 2;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--pos-border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+    
+    .catalog-header {
+        padding: 16px 20px;
+        background: #f1f5f9;
+        border-bottom: 2px solid var(--pos-border);
+    }
+    
+    .search-barcode {
+        font-family: monospace;
+        font-size: 16px;
+        font-weight: 700;
+        border: 2px solid #94a3b8;
+        border-radius: 8px;
+        padding: 12px 16px;
+    }
+    .search-barcode:focus {
+        border-color: var(--pos-primary);
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+        outline: none;
+    }
+
+    .table-container { flex: 1; overflow-y: auto; }
+    .pos-table { width: 100%; border-collapse: collapse; }
+    .pos-table th { 
+        position: sticky; 
+        top: 0; 
+        background: #e2e8f0; 
+        color: #334155; 
+        font-size: 11px; 
+        text-transform: uppercase; 
+        padding: 12px 16px; 
+        text-align: left; 
+        z-index: 10;
+        border-bottom: 2px solid #cbd5e1;
+    }
+    .pos-table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .pos-table tbody tr { cursor: pointer; transition: 0.1s; }
+    .pos-table tbody tr:hover { background-color: #eff6ff; }
+    
+    .sku-badge { background: white; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 13px; font-weight: bold; color: #475569; }
+    .p-name { font-weight: 700; color: var(--pos-dark); font-size: 14px; margin-bottom: 2px; }
+    .p-price { font-weight: 800; color: var(--pos-primary); font-size: 15px; }
+
+    /* PANEL KANAN: KERANJANG TRANSAKSI */
+    .pos-cart {
+        flex: 1;
+        min-width: 360px;
+        max-width: 400px;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--pos-border);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+    
+    .cart-header { background: var(--pos-dark); color: white; padding: 16px 20px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
+    .cart-items { flex: 1; overflow-y: auto; background: #fafafa; padding: 12px; }
+    
+    .cart-item-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .qty-group { display: flex; align-items: center; background: #f1f5f9; border-radius: 6px; border: 1px solid #cbd5e1; overflow: hidden; }
+    .qty-btn { border: none; background: transparent; width: 28px; height: 28px; font-weight: bold; cursor: pointer; color: #475569; }
+    .qty-btn:hover { background: #e2e8f0; }
+    .qty-input { width: 35px; border: none; background: transparent; text-align: center; font-weight: bold; font-size: 14px; outline: none; pointer-events: none; }
+    
+    .cart-footer { background: white; border-top: 2px dashed #cbd5e1; padding: 20px; border-radius: 0 0 12px 12px; }
+    .total-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+    
+    .btn-cash { background: white; border: 1px solid #cbd5e1; color: #475569; font-weight: 700; font-size: 14px; padding: 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; width: 100%; }
+    .btn-cash:hover { background: var(--pos-dark); color: white; border-color: var(--pos-dark); }
+    
+    .btn-checkout { background: var(--pos-success); color: white; font-size: 16px; font-weight: 800; padding: 16px; border-radius: 8px; border: none; width: 100%; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+    .btn-checkout:hover { background: #047857; }
+    .btn-checkout:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    /* Custom Scrollbar */
+    .table-container::-webkit-scrollbar, .cart-items::-webkit-scrollbar { width: 8px; }
+    .table-container::-webkit-scrollbar-thumb, .cart-items::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+</style>
+
+<div class="pos-wrapper">
+    {{-- KIRI: KATALOG BARANG --}}
+    <div class="pos-catalog">
+        <div class="catalog-header">
+            <div class="row g-2">
+                <div class="col-md-8">
+                    <input type="text" id="search-input" class="form-control search-barcode w-100" placeholder="Klik disini & Scan Barcode (F2)..." autocomplete="off" autofocus>
+                </div>
+                <div class="col-md-4">
+                    <select id="category-filter" class="form-select form-select-lg fw-bold w-100" style="height: 100%;">
+                        <option value="all">SEMUA KATEGORI</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="pos-table">
+                <thead>
+                    <tr>
+                        <th width="15%">KODE / SKU</th>
+                        <th width="50%">NAMA MATERIAL</th>
+                        <th width="15%" class="text-center">STOK</th>
+                        <th width="20%" class="text-end">HARGA (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody id="product-table-body">
+                    <tr><td colspan="4" class="text-center py-5 fw-bold text-muted">Memuat data gudang...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{-- KANAN: KASIR TRANSAKSI --}}
+    <div class="pos-cart">
+        <div class="cart-header">
+            <h5 class="m-0 fw-bold fs-6"><i class="mdi mdi-cash-register me-2"></i>Transaksi Kasir</h5>
+            <button id="clear-cart-btn" class="btn btn-sm btn-outline-light border-0 py-0"><i class="mdi mdi-trash-can"></i> Reset</button>
+        </div>
         
-        {{-- KIRI: KATALOG PRODUK --}}
-        <div class="col-lg-7 col-xl-8">
-            <div class="page-header mb-4">
-                <h3 class="page-title d-flex align-items-center m-0">
-                    <div class="page-title-icon-mono me-3">
-                        <i class="mdi mdi-point-of-sale"></i>
-                    </div> 
-                    <div class="d-flex align-items-center" style="font-size: 1.6rem;">
-                        <a href="{{ route('seller.dashboard') }}" class="header-path-link">Dashboard</a>
-                        <i class="mdi mdi-chevron-right header-path-separator"></i>
-                        <span class="header-path-current">Point of Sale</span>
-                    </div>
-                </h3>
-            </div>
+        <div class="p-3 bg-white border-bottom">
+            <input type="text" id="customer-name" class="form-control fw-bold bg-light" placeholder="Nama Pelanggan (Umum)">
+        </div>
 
-            <div class="card shadow-sm border-0" style="border-radius: 16px;">
-                <div class="card-body">
-                    
-                    {{-- Filter & Search --}}
-                    <div class="row g-2 mb-4">
-                        <div class="col-md-7">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="mdi mdi-magnify text-muted"></i></span>
-                                <input type="text" id="search-input" class="form-control border-start-0 ps-0" placeholder="Cari nama produk...">
-                            </div>
-                        </div>
-                        <div class="col-md-5">
-                            <select id="category-filter" class="form-select">
-                                <option value="all">Semua Kategori</option>
-                                </select>
-                        </div>
-                    </div>
-
-                    {{-- Grid Produk --}}
-                    <div id="product-grid" class="row g-3" style="min-height: 50vh;">
-                        <div id="loading-spinner" class="col-12 text-center py-5">
-                            <div class="spinner-border text-dark" role="status"></div>
-                            <p class="mt-2 text-muted">Memuat produk...</p>
-                        </div>
-                        </div>
-
-                </div>
+        <div class="cart-items" id="cart-items">
+            <div id="empty-cart-message" class="text-center py-5 text-muted mt-4">
+                <i class="mdi mdi-barcode-scan" style="font-size: 3rem; opacity: 0.2;"></i>
+                <p class="mt-2 fw-bold" style="font-size: 13px;">Belum ada barang masuk.<br>Gunakan Scanner / Klik dari daftar.</p>
             </div>
         </div>
 
-        {{-- KANAN: PANEL TRANSAKSI --}}
-        <div class="col-lg-5 col-xl-4">
-            <div class="card shadow-sm transaction-panel bg-white">
-                
-                {{-- Header Cart --}}
-                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold m-0" style="color: #111827;">Rincian Pesanan</h5>
-                    <button id="clear-cart-btn" class="btn btn-sm btn-light text-danger border-0"><i class="mdi mdi-trash-can-outline"></i> Kosongkan</button>
-                </div>
-
-                {{-- Body Cart --}}
-                <div class="p-3 d-flex flex-column" style="flex-grow: 1; overflow: hidden;">
-                    <input type="text" id="customer-name" class="form-control mb-3" placeholder="Nama Pelanggan (Opsional)">
-                    
-                    <div class="cart-container" id="cart-items">
-                        <div id="empty-cart-message" class="text-center py-5 text-muted">
-                            <i class="mdi mdi-cart-outline" style="font-size: 3rem; color: #d1d5db;"></i>
-                            <p class="mt-2">Keranjang kosong.<br>Klik produk untuk menambahkan.</p>
-                        </div>
-                        </div>
-                </div>
-
-                {{-- Checkout Panel --}}
-                <div class="checkout-panel">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted fw-bold">TOTAL BAYAR</span>
-                        <span id="total-price" class="fs-3 fw-bold" style="color: #111827;">Rp 0</span>
-                    </div>
-
-                    <div class="row g-2 mb-3">
-                        <div class="col-12">
-                            <select id="payment-method" class="form-select">
-                                <option value="Tunai" selected>Tunai (Cash)</option>
-                                <option value="QRIS">QRIS / E-Wallet</option>
-                                <option value="Transfer">Transfer Bank</option>
-                            </select>
-                        </div>
-                        <div class="col-12" id="cash-input-group">
-                            <input type="number" id="amount-paid" class="form-control form-control-lg text-end fw-bold" placeholder="Uang Diterima (Rp)">
-                            <div class="d-flex gap-1 mt-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary quick-cash-btn flex-grow-1" data-amount="exact">Uang Pas</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary quick-cash-btn flex-grow-1" data-amount="50000">50K</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary quick-cash-btn flex-grow-1" data-amount="100000">100K</button>
-                            </div>
-                            <div class="d-flex justify-content-between mt-3 px-1">
-                                <span class="text-muted fw-bold">KEMBALIAN</span>
-                                <span id="change-due" class="fw-bold fs-5 text-success">Rp 0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button id="process-payment-btn" class="btn-mono w-100 mt-2" disabled>
-                        <i class="mdi mdi-cash-register me-1"></i> Proses Transaksi
-                    </button>
-                </div>
-
+        <div class="cart-footer">
+            <div class="total-box d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-muted">TOTAL TAGIHAN</span>
+                <span id="total-price" class="fs-2 fw-bold" style="color: var(--pos-dark);">0</span>
             </div>
-        </div>
 
+            <div class="mb-3">
+                <div class="input-group mb-2">
+                    <span class="input-group-text bg-light fw-bold border-secondary">Rp</span>
+                    <input type="number" id="amount-paid" class="form-control form-control-lg fw-bold fs-4 text-end border-secondary" placeholder="0">
+                </div>
+                <div class="row g-2">
+                    <div class="col-4"><button type="button" class="btn-cash" data-amount="exact">Uang Pas</button></div>
+                    <div class="col-4"><button type="button" class="btn-cash" data-amount="50000">50 Rb</button></div>
+                    <div class="col-4"><button type="button" class="btn-cash" data-amount="100000">100 Rb</button></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 px-1 border-bottom pb-3">
+                <span class="fw-bold text-muted">KEMBALIAN</span>
+                <span id="change-due" class="fs-4 fw-bold text-danger">Rp 0</span>
+            </div>
+
+            <button id="process-payment-btn" class="btn-checkout" disabled>
+                <i class="mdi mdi-printer me-1"></i> CETAK STRUK (F9)
+            </button>
+        </div>
     </div>
 </div>
 @endsection
@@ -206,16 +202,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let cart = [];
     let currentTotal = 0;
     
-    const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+    const formatRp = (num) => new Intl.NumberFormat('id-ID').format(num);
 
-    // --- 1. LOAD DATA DARI API LARAVEL ---
+    // 1. Fetch API Data
     function loadProducts() {
         fetch("{{ route('seller.pos.api.products') }}")
             .then(res => res.json())
             .then(data => {
                 allProducts = data;
                 renderProducts(allProducts);
-                document.getElementById('loading-spinner').style.display = 'none';
             });
     }
 
@@ -224,102 +219,134 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 const select = document.getElementById('category-filter');
-                data.forEach(cat => {
-                    select.insertAdjacentHTML('beforeend', `<option value="${cat.id}">${cat.nama_kategori}</option>`);
-                });
+                data.forEach(cat => select.insertAdjacentHTML('beforeend', `<option value="${cat.id}">${cat.nama_kategori}</option>`));
             });
     }
 
-    // --- 2. RENDER PRODUK ---
+    // 2. Render Daftar Barang (Padat & Rapi)
     function renderProducts(products) {
-        const grid = document.getElementById('product-grid');
-        grid.innerHTML = ''; // Clear existing
+        const tbody = document.getElementById('product-table-body');
+        tbody.innerHTML = ''; 
         
         if(products.length === 0) {
-            grid.innerHTML = `<div class="col-12 text-center py-5 text-muted">Produk tidak ditemukan.</div>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger fw-bold">Barang tidak ditemukan</td></tr>`;
             return;
         }
 
         products.forEach(p => {
-            let imgUrl = p.gambar_utama ? `{{ asset('assets/uploads/products') }}/${p.gambar_utama}` : 'https://placehold.co/150?text=No+Image';
+            let sku = p.kode_barang ? p.kode_barang : 'SKU-'+String(p.id).padStart(4, '0');
+            let stockClass = p.stok <= 5 ? 'text-danger' : 'text-success';
+            
             let html = `
-                <div class="col-6 col-md-4 col-xl-3">
-                    <div class="product-card" onclick="addToCart(${p.id})">
-                        <img src="${imgUrl}" alt="${p.nama_barang}">
-                        <div class="product-info">
-                            <div class="product-title" title="${p.nama_barang}">${p.nama_barang}</div>
-                            <div class="d-flex justify-content-between align-items-center mt-2">
-                                <span class="product-price">${formatRupiah(p.harga)}</span>
-                                <span class="product-stock">Stok: ${p.stok}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <tr onclick="addToCart(${p.id})">
+                    <td><span class="sku-badge">${sku}</span></td>
+                    <td>
+                        <div class="p-name">${p.nama_barang}</div>
+                    </td>
+                    <td class="text-center fw-bold ${stockClass}">${p.stok}</td>
+                    <td class="text-end p-price">${formatRp(p.harga)}</td>
+                </tr>
             `;
-            grid.insertAdjacentHTML('beforeend', html);
+            tbody.insertAdjacentHTML('beforeend', html);
         });
     }
 
-    // --- 3. FILTER & SEARCH ---
-    document.getElementById('search-input').addEventListener('input', filterProducts);
+    // 3. Sistem Pencarian & Scanner Barcode (Sangat Responsif)
+    const searchInput = document.getElementById('search-input');
+    
+    searchInput.addEventListener('input', filterProducts);
+    
+    // Logika Scanner Barcode (Scanner otomatis menekan 'Enter' setelah scan)
+    searchInput.addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            let keyword = this.value.toLowerCase().trim();
+            
+            // Cari kecocokan persis pada KODE BARANG terlebih dahulu
+            let matchedProduct = allProducts.find(p => (p.kode_barang && p.kode_barang.toLowerCase() === keyword));
+            
+            // Jika tidak ada di kode, cari kecocokan persis di nama
+            if(!matchedProduct) {
+                matchedProduct = allProducts.find(p => p.nama_barang.toLowerCase() === keyword);
+            }
+
+            if(matchedProduct) {
+                addToCart(matchedProduct.id);
+                this.value = ''; // Kosongkan input setelah sukses scan
+                filterProducts(); 
+            } else {
+                // Jika barcode tidak ditemukan di database
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: 'error',
+                    title: 'Barcode/Barang tidak ditemukan!',
+                    showConfirmButton: false, timer: 1500
+                });
+                this.value = '';
+            }
+        }
+    });
+
     document.getElementById('category-filter').addEventListener('change', filterProducts);
 
     function filterProducts() {
-        let keyword = document.getElementById('search-input').value.toLowerCase();
+        let keyword = searchInput.value.toLowerCase();
         let categoryId = document.getElementById('category-filter').value;
-
+        
         let filtered = allProducts.filter(p => {
             let matchCat = categoryId === 'all' || p.kategori_id == categoryId;
-            let matchKey = p.nama_barang.toLowerCase().includes(keyword);
+            let kode = p.kode_barang ? p.kode_barang.toLowerCase() : '';
+            let matchKey = p.nama_barang.toLowerCase().includes(keyword) || kode.includes(keyword);
             return matchCat && matchKey;
         });
         renderProducts(filtered);
     }
 
-    // --- 4. LOGIKA KERANJANG (CART) ---
+    // Hotkeys Kasir
+    document.addEventListener('keydown', function(e) {
+        if(e.key === 'F2') { e.preventDefault(); searchInput.focus(); }
+        if(e.key === 'F9') { e.preventDefault(); document.getElementById('process-payment-btn').click(); }
+    });
+
+    // 4. Manajemen Keranjang
     window.addToCart = function(productId) {
         let product = allProducts.find(p => p.id === productId);
         if(!product) return;
 
         let existing = cart.find(item => item.id === productId);
         if(existing) {
-            if(existing.qty < product.stok) existing.qty++;
-            else alert('Maksimal stok tercapai!');
+            if(existing.qty < product.stok) {
+                existing.qty++;
+                playBeep();
+            } else {
+                Swal.fire({toast: true, position: 'top-end', icon: 'warning', title: 'Stok Fisik Habis!', showConfirmButton: false, timer: 1500});
+            }
         } else {
             cart.push({ id: product.id, nama_barang: product.nama_barang, harga: product.harga, qty: 1, stok: product.stok });
+            playBeep();
         }
         updateCartDisplay();
     };
+
+    function playBeep() {
+        // Efek suara scan barcode (opsional jika ingin tambah audio file)
+        // new Audio('beep.mp3').play().catch(e => {}); 
+    }
 
     window.updateQty = function(productId, change) {
         let item = cart.find(i => i.id === productId);
         if(!item) return;
-
         let newQty = item.qty + change;
-        if(newQty > 0 && newQty <= item.stok) {
-            item.qty = newQty;
-        } else if (newQty === 0) {
-            cart = cart.filter(i => i.id !== productId);
-        }
+        if(newQty > 0 && newQty <= item.stok) item.qty = newQty;
+        else if (newQty === 0) cart = cart.filter(i => i.id !== productId);
         updateCartDisplay();
     };
 
-    window.removeCartItem = function(productId) {
-        cart = cart.filter(i => i.id !== productId);
-        updateCartDisplay();
-    };
-
-    document.getElementById('clear-cart-btn').addEventListener('click', () => {
-        cart = [];
-        updateCartDisplay();
-    });
+    document.getElementById('clear-cart-btn').addEventListener('click', () => { cart = []; updateCartDisplay(); amountInput.value = ''; calculateChange(); });
 
     function updateCartDisplay() {
         const container = document.getElementById('cart-items');
         const emptyMsg = document.getElementById('empty-cart-message');
-        
-        document.querySelectorAll('.cart-item').forEach(e => e.remove()); // Bersihkan list
-        
+        document.querySelectorAll('.cart-item-card').forEach(e => e.remove());
         currentTotal = 0;
 
         if(cart.length === 0) {
@@ -332,52 +359,37 @@ document.addEventListener('DOMContentLoaded', function() {
             cart.forEach(item => {
                 currentTotal += (item.harga * item.qty);
                 let html = `
-                    <div class="cart-item">
+                    <div class="cart-item-card">
                         <div style="flex-grow: 1; padding-right: 10px;">
-                            <div class="cart-item-title">${item.nama_barang}</div>
-                            <div class="cart-item-price">${formatRupiah(item.harga)}</div>
+                            <h6 style="font-size:13px; font-weight:800; margin:0 0 4px 0; color:#0f172a;">${item.nama_barang}</h6>
+                            <span style="font-size:13px; color:#0284c7; font-weight:700;">Rp ${formatRp(item.harga)}</span>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="qty-control">
+                        <div class="d-flex flex-column align-items-end">
+                            <div class="qty-group mb-1">
                                 <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
                                 <input type="text" class="qty-input" value="${item.qty}" readonly>
                                 <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
                             </div>
-                            <button class="remove-btn" onclick="removeCartItem(${item.id})"><i class="mdi mdi-close-circle"></i></button>
+                            <span class="fw-bold text-dark" style="font-size:14px;">${formatRp(item.harga * item.qty)}</span>
                         </div>
                     </div>
                 `;
                 container.insertAdjacentHTML('beforeend', html);
             });
         }
-
-        document.getElementById('total-price').innerText = formatRupiah(currentTotal);
+        document.getElementById('total-price').innerText = formatRp(currentTotal);
         calculateChange();
     }
 
-    // --- 5. LOGIKA PEMBAYARAN & KEMBALIAN ---
+    // 5. Pembayaran & Kembalian
     const amountInput = document.getElementById('amount-paid');
     const changeDisplay = document.getElementById('change-due');
-    const paymentMethod = document.getElementById('payment-method');
-    const cashInputGroup = document.getElementById('cash-input-group');
-
-    paymentMethod.addEventListener('change', function() {
-        if(this.value === 'Tunai') {
-            cashInputGroup.style.display = 'block';
-        } else {
-            cashInputGroup.style.display = 'none';
-            amountInput.value = '';
-            changeDisplay.innerText = 'Rp 0';
-        }
-    });
 
     amountInput.addEventListener('input', calculateChange);
-
-    document.querySelectorAll('.quick-cash-btn').forEach(btn => {
+    document.querySelectorAll('.btn-cash').forEach(btn => {
         btn.addEventListener('click', function() {
             let val = this.getAttribute('data-amount');
-            if(val === 'exact') amountInput.value = currentTotal;
-            else amountInput.value = val;
+            amountInput.value = val === 'exact' ? currentTotal : val;
             calculateChange();
         });
     });
@@ -385,65 +397,66 @@ document.addEventListener('DOMContentLoaded', function() {
     function calculateChange() {
         let paid = parseInt(amountInput.value) || 0;
         let change = paid - currentTotal;
+        if(currentTotal === 0) { changeDisplay.innerText = "Rp 0"; return; }
+        
         if(change < 0) {
-            changeDisplay.innerText = "Uang Kurang!";
-            changeDisplay.classList.replace('text-success', 'text-danger');
+            changeDisplay.innerText = "UANG KURANG";
+            changeDisplay.className = "fs-4 fw-bold text-danger";
         } else {
-            changeDisplay.innerText = formatRupiah(change);
-            changeDisplay.classList.replace('text-danger', 'text-success');
+            changeDisplay.innerText = "Rp " + formatRp(change);
+            changeDisplay.className = "fs-4 fw-bold text-success";
         }
     }
 
-    // --- 6. PROSES CHECKOUT AJAX ---
+    // 6. Checkout ke Database
     document.getElementById('process-payment-btn').addEventListener('click', function() {
-        let method = paymentMethod.value;
         let paid = parseInt(amountInput.value) || 0;
-
-        if(method === 'Tunai' && paid < currentTotal) {
-            Swal.fire('Peringatan', 'Jumlah uang pembayaran kurang dari Total Bayar!', 'warning');
+        if(paid < currentTotal) {
+            Swal.fire('Pembayaran Gagal', 'Jumlah uang tunai kurang dari total tagihan.', 'error');
             return;
         }
 
-        Swal.fire({
-            title: 'Proses Transaksi?',
-            text: "Pastikan data pesanan sudah benar.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#111827',
-            cancelButtonColor: '#d1d5db',
-            confirmButtonText: 'Ya, Proses!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                
-                let payload = {
-                    customer_name: document.getElementById('customer-name').value,
-                    payment_method: method,
-                    total: currentTotal,
-                    cart: cart
-                };
+        // Tampilkan loading button
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> MEMPROSES...';
+        this.disabled = true;
 
-                fetch("{{ route('seller.pos.api.checkout') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.status === 'success') {
-                        Swal.fire('Berhasil!', `Transaksi sukses. Invoice: ${data.invoice}`, 'success');
-                        cart = []; // Kosongkan keranjang
-                        document.getElementById('customer-name').value = '';
-                        amountInput.value = '';
-                        updateCartDisplay();
-                        loadProducts(); // Refresh stok
-                    } else {
-                        Swal.fire('Error', 'Terjadi kesalahan sistem.', 'error');
-                    }
+        let payload = {
+            customer_name: document.getElementById('customer-name').value || 'Pelanggan Walk-in',
+            payment_method: 'Tunai Kasir',
+            total: currentTotal,
+            cart: cart
+        };
+
+        fetch("{{ route('seller.pos.api.checkout') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                Swal.fire({
+                    title: 'TRANSAKSI LUNAS!',
+                    html: `Kembalian: <b class="text-success fs-2 d-block my-2">Rp ${formatRp(paid - currentTotal)}</b><span class="text-muted">No. Struk: ${data.invoice}</span>`,
+                    icon: 'success',
+                    confirmButtonText: '<i class="mdi mdi-printer"></i> Selesai & Cetak Baru',
+                    confirmButtonColor: '#0f172a',
+                    allowOutsideClick: false
+                }).then(() => {
+                    // Reset POS untuk pelanggan berikutnya
+                    cart = []; amountInput.value = ''; document.getElementById('customer-name').value = '';
+                    updateCartDisplay(); loadProducts(); searchInput.focus();
+                    document.getElementById('process-payment-btn').innerHTML = '<i class="mdi mdi-printer me-1"></i> CETAK STRUK (F9)';
                 });
+            } else {
+                Swal.fire('Error Database', data.message, 'error');
+                document.getElementById('process-payment-btn').innerHTML = '<i class="mdi mdi-printer me-1"></i> CETAK STRUK (F9)';
+                document.getElementById('process-payment-btn').disabled = false;
             }
+        }).catch(err => {
+            Swal.fire('Koneksi Terputus', 'Periksa koneksi internet Anda.', 'error');
+            document.getElementById('process-payment-btn').innerHTML = '<i class="mdi mdi-printer me-1"></i> CETAK STRUK (F9)';
+            document.getElementById('process-payment-btn').disabled = false;
         });
     });
 

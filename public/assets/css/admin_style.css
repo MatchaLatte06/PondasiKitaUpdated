@@ -3,23 +3,24 @@
 /* ========================================= */
 
 /* --- 1. FONT & VARIABEL GLOBAL --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-    --sidebar-bg: #1F2937; /* Warna sidebar admin sedikit beda (lebih gelap) */
-    --main-bg: #F9FAFB;
-    --surface-color: #FFFFFF;
+    --sidebar-bg: #1f2937; /* Warna sidebar admin sedikit beda (lebih gelap) */
+    --main-bg: #f9fafb;
+    --surface-color: #ffffff;
     --text-primary: #111827;
-    --text-secondary: #6B7280;
-    --border-color: #E5E7EB;
-    --accent-color: #DC2626; /* Warna aksen admin (merah) untuk membedakan */
-    --accent-hover: #B91C1C;
-    --success-color: #10B981;
-    --warning-color: #F59E0B;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --accent-color: #dc2626; /* Warna aksen admin (merah) untuk membedakan */
+    --accent-hover: #b91c1c;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
 }
 
 /* --- 2. LAYOUT DASAR & TIPOGRAFI --- */
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -27,7 +28,7 @@ html, body {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     background-color: var(--main-bg);
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
@@ -81,7 +82,6 @@ body {
 }
 /* ... (Style sidebar lainnya bisa menyusul atau disamakan dengan seller) ... */
 
-
 /* --- 4. KOMPONEN UMUM ADMIN --- */
 .card {
     background-color: var(--surface-color);
@@ -89,8 +89,13 @@ body {
     border-radius: 12px;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
-.card-body { padding: 1.5rem; }
-.card-title { font-size: 1.2rem; font-weight: 600; }
+.card-body {
+    padding: 1.5rem;
+}
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
 
 .btn {
     padding: 0.75rem 1.5rem;
@@ -101,51 +106,50 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-.btn-primary { background-color: var(--accent-color); color: white; }
-.btn-primary:hover { background-color: var(--accent-hover); }
-
-.table { width: 100%; border-collapse: collapse; }
-.table th, .table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-.table th { background-color: #F9FAFB; font-weight: 600; }
-
-.status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: capitalize; }
-.status-badge.status-active { background-color: #D1FAE5; color: #065F46; }
-.status-badge.status-pending { background-color: #FEF3C7; color: #92400E; }
-.status-badge.status-suspended, .status-badge.status-rejected { background-color: #FEE2E2; color: #991B1B; }
-/* ========================================= */
-/* ==   STYLE UNTUK HALAMAN KELOLA PENGGUNA == */
-/* ========================================= */
-
-.user-info-cell {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white;
 }
-.user-info-cell .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--border-color);
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table th,
+.table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+.table th {
+    background-color: #f9fafb;
     font-weight: 600;
 }
-.user-info-cell .user-details .username {
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 600;
+    text-transform: capitalize;
 }
-.user-info-cell .user-details .full-name {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
+.status-badge.status-active {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+.status-badge.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+.status-badge.status-suspended,
+.status-badge.status-rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
 }
 
-/* Status Badge untuk Verifikasi */
-.status-badge.status-verified {
-    background-color: #DBEAFE; /* Biru muda */
-    color: #1E40AF;
-}
 /* ========================================= */
 /* == STYLE UNTUK HALAMAN LAPORAN TRANSAKSI == */
 /* ========================================= */
@@ -156,7 +160,7 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 1.5rem;
-    background-color: #F9FAFB;
+    background-color: #f9fafb;
     border: 1px solid var(--border-color);
     border-radius: 12px;
     margin-bottom: 1.5rem;
@@ -176,9 +180,16 @@ body {
 .payment-status {
     font-weight: 500;
 }
-.payment-status.paid { color: var(--success-color); }
-.payment-status.pending { color: var(--warning-color); }
-.payment-status.failed, .payment-status.cancelled { color: var(--danger-color); }
+.payment-status.paid {
+    color: var(--success-color);
+}
+.payment-status.pending {
+    color: var(--warning-color);
+}
+.payment-status.failed,
+.payment-status.cancelled {
+    color: var(--danger-color);
+}
 /* ========================================= */
 /* == STYLE UNTUK HALAMAN LAPORAN TRANSAKSI == */
 /* ========================================= */
@@ -189,7 +200,7 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 1.5rem;
-    background-color: #F9FAFB;
+    background-color: #f9fafb;
     border: 1px solid var(--border-color);
     border-radius: 12px;
     margin-bottom: 1.5rem;
@@ -209,9 +220,16 @@ body {
 .payment-status {
     font-weight: 500;
 }
-.payment-status.paid { color: var(--success-color); }
-.payment-status.pending { color: var(--warning-color); }
-.payment-status.failed, .payment-status.cancelled { color: var(--danger-color); }
+.payment-status.paid {
+    color: var(--success-color);
+}
+.payment-status.pending {
+    color: var(--warning-color);
+}
+.payment-status.failed,
+.payment-status.cancelled {
+    color: var(--danger-color);
+}
 /* ========================================= */
 /* == STYLE UNTUK HALAMAN PENGATURAN KATEGORI == */
 /* ========================================= */
@@ -299,7 +317,7 @@ body {
     position: relative;
 }
 .timeline:before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     bottom: 0;
@@ -432,39 +450,7 @@ body {
     border: 1px solid var(--border-color);
     cursor: pointer;
 }
-/* ========================================= */
-/* ==   STYLE UNTUK DASHBOARD ADMIN BARU    == */
-/* ========================================= */
 
-.stat-card-dashboard {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.stat-card-dashboard .stat-icon {
-    font-size: 2.5rem;
-    padding: 1rem;
-    border-radius: 50%;
-    color: white;
-}
-.stat-card-dashboard .stat-icon.icon-primary { background-color: var(--accent-color); }
-.stat-card-dashboard .stat-icon.icon-success { background-color: var(--success-color); }
-.stat-card-dashboard .stat-icon.icon-warning { background-color: var(--warning-color); }
-.stat-card-dashboard .stat-icon.icon-info { background-color: #3B82F6; }
-
-.stat-card-dashboard .stat-content .stat-label {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-.stat-card-dashboard .stat-content .stat-value {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0;
-}
 /* ========================================= */
 /* ==   STYLE UNTUK HALAMAN DETAIL TRANSAKSI == */
 /* ========================================= */
@@ -476,7 +462,7 @@ body {
     position: relative;
 }
 .timeline:before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     bottom: 0;

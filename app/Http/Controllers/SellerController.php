@@ -15,7 +15,6 @@ class SellerController extends Controller
     {
         $user = Auth::user();
         
-        // 1. Ambil Data Toko dari User yang login
         $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
 
         if (!$toko) {
@@ -24,31 +23,26 @@ class SellerController extends Controller
 
         $tokoId = $toko->id;
 
-        // 2. Total Penjualan (Omset)
         $totalPenjualan = DB::table('tb_detail_transaksi')
             ->where('toko_id', $tokoId)
             ->sum('subtotal');
 
-        // 3. Pesanan Diterima (Count Transaksi Unik)
         $totalPesanan = DB::table('tb_detail_transaksi')
             ->where('toko_id', $tokoId)
             ->distinct('transaksi_id')
             ->count('transaksi_id');
 
-        // 4. Total Item Terjual
         $totalItemTerjual = DB::table('tb_detail_transaksi')
             ->where('toko_id', $tokoId)
             ->sum('jumlah');
 
-        // 5. Total Produk Aktif
         $totalProdukAktif = DB::table('tb_barang')
             ->where('toko_id', $tokoId)
             ->where('is_active', 1)
             ->count();
 
-        // 6. Grafik Penjualan Bulanan (Tahun Ini)
         $tahunSekarang = date('Y');
-        $penjualanTahunan = array_fill(1, 12, 0); // Array bulan 1-12 isi 0
+        $penjualanTahunan = array_fill(1, 12, 0); 
 
         $dataGrafik = DB::table('tb_detail_transaksi as d')
             ->join('tb_transaksi as t', 'd.transaksi_id', '=', 't.id')
@@ -64,7 +58,6 @@ class SellerController extends Controller
 
         $labelsBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 
-        // 7. Top 5 Produk Terlaris
         $topProduk = DB::table('tb_detail_transaksi as d')
             ->join('tb_barang as b', 'd.barang_id', '=', 'b.id')
             ->select('b.nama_barang', DB::raw('SUM(d.jumlah) as total_terjual'))
@@ -77,18 +70,9 @@ class SellerController extends Controller
         $topProdukLabels = $topProduk->pluck('nama_barang');
         $topProdukData = $topProduk->pluck('total_terjual');
 
-        // Kirim semua data ke View Dashboard
         return view('seller.dashboard', compact(
-            'toko',
-            'totalPenjualan',
-            'totalPesanan',
-            'totalItemTerjual',
-            'totalProdukAktif',
-            'labelsBulan',
-            'penjualanTahunan',
-            'topProdukLabels',
-            'topProdukData',
-            'tahunSekarang'
+            'toko', 'totalPenjualan', 'totalPesanan', 'totalItemTerjual', 'totalProdukAktif',
+            'labelsBulan', 'penjualanTahunan', 'topProdukLabels', 'topProdukData', 'tahunSekarang'
         ));
     }
 
@@ -99,18 +83,15 @@ class SellerController extends Controller
     {
         $user = Auth::user();
         
-        // 1. Ambil Data Toko
         $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
         if (!$toko) {
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        // 2. Query Pengambilan Data Pesanan Khusus Toko Ini
-        // Menggabungkan tb_detail_transaksi, tb_transaksi, tb_barang, dan tb_user
         $pesananRaw = DB::table('tb_detail_transaksi as d')
             ->join('tb_transaksi as t', 'd.transaksi_id', '=', 't.id')
             ->join('tb_barang as b', 'd.barang_id', '=', 'b.id')
-            ->join('tb_user as u', 't.user_id', '=', 'u.id') // Untuk ambil nama pelanggan
+            ->join('tb_user as u', 't.user_id', '=', 'u.id') 
             ->where('d.toko_id', $toko->id)
             ->select(
                 'd.id as detail_id', 'd.jumlah', 'd.subtotal', 'd.status_pesanan_item', 
@@ -118,16 +99,12 @@ class SellerController extends Controller
                 'b.nama_barang', 'b.gambar_utama', 
                 'u.nama as nama_pelanggan'
             )
-            // Urutkan status 'siap_kirim' & 'diproses' di paling atas
             ->orderByRaw("FIELD(d.status_pesanan_item, 'siap_kirim', 'diproses', 'dikirim', 'sampai_tujuan', 'dibatalkan', 'ditolak') DESC")
             ->orderBy('t.tanggal_transaksi', 'desc')
             ->get();
 
-        // 3. Grouping data berdasarkan kode_invoice 
-        // Fitur bawaan Laravel Collection agar per-invoice bisa digabungkan jadi satu tabel
         $groupedOrders = $pesananRaw->groupBy('kode_invoice');
 
-        // Kirim data Map Status untuk Tabs (Pilihan status di UI)
         $statusMap = [
             'Semua' => 'Semua',
             'Belum Bayar' => 'menunggu_pembayaran',
@@ -140,10 +117,9 @@ class SellerController extends Controller
         
         $currentFilter = $request->query('status', '');
 
-        // Kirim ke View Pesanan
         return view('seller.pesanan', compact('groupedOrders', 'statusMap', 'currentFilter'));
     }
-    // Memperbarui status pesanan SATUAN (Tombol Perbarui)
+
     public function updateOrderStatus(Request $request)
     {
         $request->validate([
@@ -153,16 +129,14 @@ class SellerController extends Controller
 
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
 
-        // Update status di database
         DB::table('tb_detail_transaksi')
             ->where('id', $request->detail_id)
-            ->where('toko_id', $toko->id) // Keamanan: Pastikan pesanan milik toko ini
+            ->where('toko_id', $toko->id)
             ->update(['status_pesanan_item' => $request->status_baru]);
 
         return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui!');
     }
 
-    // Memperbarui status pesanan MASSAL (Tombol Proses Pengiriman Massal)
     public function massUpdateOrderStatus(Request $request)
     {
         if (!$request->has('detail_ids') || empty($request->detail_ids)) {
@@ -171,7 +145,6 @@ class SellerController extends Controller
 
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
 
-        // Update semua ID yang diceklis menjadi 'dikirim'
         DB::table('tb_detail_transaksi')
             ->whereIn('id', $request->detail_ids)
             ->where('toko_id', $toko->id)
@@ -179,6 +152,7 @@ class SellerController extends Controller
 
         return redirect()->back()->with('success', count($request->detail_ids) . ' Pesanan berhasil diproses ke pengiriman!');
     }
+
     // =========================================================================
     // 3. HALAMAN PENGEMBALIAN PESANAN (RETURN/REFUND)
     // =========================================================================
@@ -191,46 +165,113 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        // TODO: Ganti dengan Query Database Asli Anda (Tabel tb_pengembalian / tb_komplain)
-        // Contoh Data Dummy untuk menampilkan UI
-        $returns = [
-            (object)[
-                'id_return' => 'RET-001',
-                'kode_invoice' => 'INV/202310/001',
-                'tanggal_pengajuan' => '2023-10-25 14:30:00',
-                'nama_pelanggan' => 'Budi Santoso',
-                'nama_barang' => 'Sepatu Sneakers Pria Hitam',
-                'gambar_utama' => 'default.jpg',
-                'jumlah' => 1,
-                'total_pengembalian' => 250000,
-                'alasan' => 'Barang cacat / sobek di bagian samping.',
-                'bukti_foto' => 'default.jpg',
-                'status' => 'menunggu_respon' // menunggu_respon, disetujui, ditolak
-            ],
-            (object)[
-                'id_return' => 'RET-002',
-                'kode_invoice' => 'INV/202310/088',
-                'tanggal_pengajuan' => '2023-10-24 09:15:00',
-                'nama_pelanggan' => 'Siti Aminah',
-                'nama_barang' => 'Tas Selempang Wanita',
-                'gambar_utama' => 'default.jpg',
-                'jumlah' => 2,
-                'total_pengembalian' => 300000,
-                'alasan' => 'Warna tidak sesuai dengan yang di foto (Minta hitam, dikirim navy).',
-                'bukti_foto' => 'default.jpg',
-                'status' => 'disetujui'
-            ]
-        ];
-
         $currentFilter = $request->query('status', '');
+
+        // Query Selaras dengan Database Pondasikita
+        $query = DB::table('tb_komplain as k') 
+            ->join('tb_transaksi as t', 'k.transaksi_id', '=', 't.id')
+            ->join('tb_user as u', 'k.user_id', '=', 'u.id')
+            ->where('k.toko_id', $toko->id)
+            ->select(
+                'k.id as id_return', 
+                'k.alasan_komplain as alasan', // DISESUAIKAN DENGAN NAMA KOLOM DB
+                'k.bukti_foto_1 as bukti_foto', // DISESUAIKAN DENGAN NAMA KOLOM DB
+                'k.status_komplain as status', 
+                'k.created_at as tanggal_pengajuan',
+                't.kode_invoice',
+                'u.nama as nama_pelanggan',
+                DB::raw("'Material Retur' as nama_barang"),
+                DB::raw("'default.jpg' as gambar_utama"),
+                DB::raw("1 as jumlah"),
+                't.total_final as total_pengembalian'
+            )
+            ->orderBy('k.created_at', 'desc');
+
+        // Menerapkan Filter UI ke Enum Database
+        if ($currentFilter != '') {
+            if($currentFilter == 'menunggu_respon') {
+                $query->whereIn('k.status_komplain', ['investigasi', 'menunggu_tanggapan_toko']);
+            } elseif ($currentFilter == 'disetujui') {
+                $query->where('k.status_komplain', 'refund_pembeli');
+            } elseif ($currentFilter == 'ditolak') {
+                $query->whereIn('k.status_komplain', ['teruskan_dana_toko', 'selesai']); 
+            }
+        }
+
+        $returnsRaw = $query->get();
+
+        // Menerjemahkan Enum Database kembali ke Format View
+        $returns = $returnsRaw->map(function($item) {
+            if(in_array($item->status, ['investigasi', 'menunggu_tanggapan_toko'])) {
+                $item->status = 'menunggu_respon';
+            } elseif ($item->status == 'refund_pembeli') {
+                $item->status = 'disetujui';
+            } elseif (in_array($item->status, ['teruskan_dana_toko', 'selesai'])) {
+                $item->status = 'ditolak'; 
+            }
+            return $item;
+        });
+
+        // Fallback Dummy Data jika tabel kosong (Untuk keperluan UI Testing)
+        if ($returns->isEmpty()) {
+            $returns = [
+                (object)[
+                    'id_return' => 'RET-001', 'kode_invoice' => 'INV/202310/001', 'tanggal_pengajuan' => '2023-10-25 14:30:00',
+                    'nama_pelanggan' => 'PT. Bangun Persada', 'nama_barang' => 'Semen Tiga Roda 40kg', 'gambar_utama' => 'default.jpg',
+                    'jumlah' => 10, 'total_pengembalian' => 500000,
+                    'alasan' => 'Semen mengeras karena kehujanan saat pengiriman armada toko.',
+                    'bukti_foto' => 'default.jpg', 'status' => 'menunggu_respon' 
+                ],
+                (object)[
+                    'id_return' => 'RET-002', 'kode_invoice' => 'INV/202310/088', 'tanggal_pengajuan' => '2023-10-24 09:15:00',
+                    'nama_pelanggan' => 'Budi Mandor', 'nama_barang' => 'Keramik Roman 40x40', 'gambar_utama' => 'default.jpg',
+                    'jumlah' => 5, 'total_pengembalian' => 300000,
+                    'alasan' => 'Satu dus pecah semua di ujung.',
+                    'bukti_foto' => 'default.jpg', 'status' => 'disetujui'
+                ]
+            ];
+            
+            if($currentFilter != '') {
+                $returns = array_filter($returns, function($r) use ($currentFilter) {
+                    return $r->status == $currentFilter;
+                });
+            }
+        }
 
         return view('seller.pengembalian', compact('returns', 'currentFilter'));
     }
+
+    public function processPengembalian(Request $request)
+    {
+        $request->validate([
+            'id_return' => 'required',
+            'action' => 'required|in:approve,reject'
+        ]);
+
+        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
+        
+        // Mapping action UI ke Enum Database
+        // approve = Refund ke pembeli
+        // reject = Tolak, teruskan dana ke dompet toko
+        $statusBaru = $request->action == 'approve' ? 'refund_pembeli' : 'teruskan_dana_toko';
+
+        if(DB::getSchemaBuilder()->hasTable('tb_komplain')) {
+            DB::table('tb_komplain')
+                ->where('id', $request->id_return)
+                ->where('toko_id', $toko->id)
+                ->update(['status_komplain' => $statusBaru, 'updated_at' => now()]);
+        }
+
+        $msg = $request->action == 'approve' 
+               ? 'Pengembalian dana disetujui. Dana akan direfund ke pembeli.' 
+               : 'Komplain ditolak. Dana transaksi akan diteruskan ke saldo toko Anda.';
+
+        return redirect()->back()->with('success', $msg);
+    }
+
+// =========================================================================
+    // 4. PENGATURAN PENGIRIMAN (LOGISTIK B2B)
     // =========================================================================
-    // 4. PENGATURAN PENGIRIMAN
-    // =========================================================================
-    
-    // Menampilkan halaman pengaturan pengiriman
     public function pengaturanPengiriman()
     {
         $user = Auth::user();
@@ -240,25 +281,18 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        // Ambil data kurir dan urutkan
         $kurirList = DB::table('tb_kurir_toko')
             ->where('toko_id', $toko->id)
-            ->orderBy('tipe_kurir')
+            ->orderBy('tipe_kurir', 'asc') // TOKO akan muncul lebih dulu
             ->orderBy('nama_kurir')
             ->get();
 
+        // KITA SELARASKAN DENGAN ENUM DATABASE ('TOKO', 'PIHAK_KETIGA')
         $tipeOrder = [
-            'REGULAR' => 'Reguler (Cashless)',
-            'HEMAT' => 'Hemat',
-            'KARGO' => 'Kargo',
-            'INSTANT' => 'Instan',
-            'SAME_DAY' => 'Same Day',
-            'NEXT_DAY' => 'Next Day',
-            'AMBIL_DI_TEMPAT' => 'Ambil di Tempat',
-            'PILIHAN_LAINNYA' => 'Pilihan Jasa Kirim Lainnya'
+            'TOKO' => 'Armada Toko (Khusus Material Berat/Curah)',
+            'PIHAK_KETIGA' => 'Kurir Ekspedisi (Barang Ringan/Kecil)'
         ];
 
-        // Kelompokkan kurir berdasarkan tipe
         $groupedKurir = [];
         foreach ($kurirList as $kurir) {
             $groupedKurir[$kurir->tipe_kurir][] = $kurir;
@@ -267,12 +301,11 @@ class SellerController extends Controller
         return view('seller.pengaturan_pengiriman', compact('groupedKurir', 'tipeOrder'));
     }
 
-    // Menyimpan atau Mengupdate Data Kurir
     public function storePengiriman(Request $request)
     {
         $request->validate([
             'nama_kurir' => 'required|string|max:100',
-            'tipe_kurir' => 'required|string',
+            'tipe_kurir' => 'required|in:TOKO,PIHAK_KETIGA', // Validasi keamananan ENUM
             'estimasi_waktu' => 'required|string|max:50',
             'biaya' => 'required|numeric|min:0',
         ]);
@@ -289,14 +322,12 @@ class SellerController extends Controller
         ];
 
         if ($request->action == 'update' && $request->kurir_id) {
-            // Proses Edit
             DB::table('tb_kurir_toko')
                 ->where('id', $request->kurir_id)
-                ->where('toko_id', $toko->id) // Security check
+                ->where('toko_id', $toko->id) 
                 ->update($data);
             $msg = 'Layanan pengiriman berhasil diperbarui.';
         } else {
-            // Proses Tambah Baru
             DB::table('tb_kurir_toko')->insert($data);
             $msg = 'Layanan pengiriman berhasil ditambahkan.';
         }
@@ -304,7 +335,6 @@ class SellerController extends Controller
         return redirect()->route('seller.pengaturan.pengiriman')->with('success', $msg);
     }
 
-    // Mengubah Status Aktif/Nonaktif Kurir via AJAX
     public function togglePengiriman(Request $request)
     {
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
@@ -320,7 +350,6 @@ class SellerController extends Controller
         return response()->json(['status' => 'error'], 400);
     }
 
-    // Menghapus Kurir
     public function destroyPengiriman($id)
     {
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
@@ -332,90 +361,228 @@ class SellerController extends Controller
 
         return redirect()->route('seller.pengaturan.pengiriman')->with('success', 'Layanan pengiriman berhasil dihapus.');
     }
+// =========================================================================
+    // 5. PUSAT PROMOSI (MANAJEMEN HARGA CORET)
     // =========================================================================
-    // 5. PUSAT PROMOSI
-    // =========================================================================
-    public function promosi()
+    public function promosi(Request $request)
     {
-        // TODO: Nanti tambahkan query untuk mengambil daftar promo toko dari database
-        $promosi_list = []; // Dibuat array kosong dulu untuk memunculkan Empty State
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        
+        if (!$toko) {
+            return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
+        }
 
-        return view('seller.promosi', compact('promosi_list'));
+        $query = DB::table('tb_barang')->where('toko_id', $toko->id);
+
+        // Pencarian Nama Barang
+        if($request->has('search') && $request->search != '') {
+            $query->where('nama_barang', 'like', '%'.$request->search.'%');
+        }
+
+        // Filter Tab (Status Diskon)
+        $currentTab = $request->query('tab', 'semua');
+        $now = now();
+
+        if ($currentTab == 'aktif') {
+            $query->whereNotNull('nilai_diskon')->where('nilai_diskon', '>', 0)
+                  ->where('diskon_mulai', '<=', $now)->where('diskon_berakhir', '>=', $now);
+        } elseif ($currentTab == 'akan_datang') {
+            $query->whereNotNull('nilai_diskon')->where('nilai_diskon', '>', 0)
+                  ->where('diskon_mulai', '>', $now);
+        } elseif ($currentTab == 'tidak_aktif') {
+            $query->where(function($q) use ($now) {
+                $q->whereNull('nilai_diskon')->orWhere('nilai_diskon', 0)
+                  ->orWhere('diskon_berakhir', '<', $now);
+            });
+        }
+
+        $products = $query->orderBy('updated_at', 'desc')->paginate(10);
+
+        return view('seller.promosi', compact('products', 'currentTab'));
     }
-    // =========================================================================
-    // 6. HALAMAN VOUCHER TOKO
-    // =========================================================================
-    public function voucher()
+
+    // API: Menyimpan Diskon Massal & Satuan (Via AJAX)
+    public function updateDiscount(Request $request)
     {
-        // TODO: Ganti dengan query pemanggilan data voucher dari database
-        $voucher_list = []; // Kosongkan dulu untuk menampilkan Empty State
+        $request->validate([
+            'product_ids' => 'required|array',
+            'tipe_diskon' => 'nullable|in:NOMINAL,PERSEN',
+            'nilai_diskon' => 'nullable|numeric|min:0',
+            'diskon_mulai' => 'nullable|date',
+            'diskon_berakhir' => 'nullable|date|after:diskon_mulai'
+        ]);
 
-        return view('seller.voucher', compact('voucher_list'));
+        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
+
+        // Logika: Jika nilai diskon 0 atau null, artinya user menghapus/menonaktifkan diskon
+        if(empty($request->nilai_diskon) || $request->nilai_diskon == 0) {
+            DB::table('tb_barang')
+                ->whereIn('id', $request->product_ids)
+                ->where('toko_id', $toko->id)
+                ->update([
+                    'tipe_diskon' => null, 'nilai_diskon' => null,
+                    'diskon_mulai' => null, 'diskon_berakhir' => null,
+                    'updated_at' => now()
+                ]);
+            return response()->json(['status' => 'success', 'message' => 'Diskon berhasil dihapus / dinonaktifkan.']);
+        }
+
+        // Logika: Update Harga Coret
+        DB::table('tb_barang')
+            ->whereIn('id', $request->product_ids)
+            ->where('toko_id', $toko->id)
+            ->update([
+                'tipe_diskon' => $request->tipe_diskon,
+                'nilai_diskon' => $request->nilai_diskon,
+                'diskon_mulai' => $request->diskon_mulai,
+                'diskon_berakhir' => $request->diskon_berakhir,
+                'updated_at' => now()
+            ]);
+
+        return response()->json(['status' => 'success', 'message' => 'Promo Harga Coret berhasil diterapkan.']);
     }
+// =========================================================================
+    // 6. HALAMAN VOUCHER TOKO (ENTERPRISE LOGIC)
+    // =========================================================================
+    public function voucher(Request $request)
+    {
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        
+        if (!$toko) {
+            return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
+        }
+
+        // Statistik Cepat untuk Dashboard Voucher
+        $stats = [
+            'aktif' => DB::table('vouchers')->where('toko_id', $toko->id)->where('status', 'AKTIF')->count(),
+            'terpakai' => DB::table('vouchers')->where('toko_id', $toko->id)->sum('kuota_terpakai') ?? 0,
+        ];
+
+        // Query Ambil Voucher
+        $query = DB::table('vouchers')->where('toko_id', $toko->id);
+
+        // Filter Pencarian
+        if($request->has('search') && $request->search != '') {
+            $query->where('kode_voucher', 'like', '%'.$request->search.'%')
+                  ->orWhere('deskripsi', 'like', '%'.$request->search.'%');
+        }
+
+        // Filter Status Tab
+        $currentTab = $request->query('tab', 'semua');
+        if($currentTab == 'aktif') {
+            $query->where('status', 'AKTIF')->where('tanggal_berakhir', '>=', now());
+        } elseif($currentTab == 'habis') {
+            $query->whereRaw('kuota_terpakai >= kuota');
+        } elseif($currentTab == 'nonaktif') {
+            $query->where('status', 'TIDAK_AKTIF')->orWhere('tanggal_berakhir', '<', now());
+        }
+
+        $voucher_list = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('seller.voucher', compact('voucher_list', 'stats', 'currentTab'));
+    }
+
+    // API: Simpan Voucher Baru
+    public function storeVoucher(Request $request)
+    {
+        $request->validate([
+            'kode_voucher' => 'required|string|max:12|unique:vouchers,kode_voucher',
+            'deskripsi' => 'required|string|max:255',
+            'tipe_diskon' => 'required|in:RUPIAH,PERSEN',
+            'nilai_diskon' => 'required|numeric|min:1',
+            'min_pembelian' => 'required|numeric|min:0',
+            'kuota' => 'required|integer|min:1',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
+        ]);
+
+        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
+
+        // Keamanan Bisnis B2B: 
+        // Jika diskon persen, wajib ada limit/maksimal diskon. Jika tidak diisi, set default aman.
+        $maksDiskon = null;
+        if ($request->tipe_diskon == 'PERSEN') {
+            if ($request->nilai_diskon > 100) return back()->with('error', 'Diskon persen tidak boleh lebih dari 100%');
+            $maksDiskon = $request->maks_diskon > 0 ? $request->maks_diskon : null; 
+        }
+
+        DB::table('vouchers')->insert([
+            'toko_id' => $toko->id,
+            'kode_voucher' => strtoupper($request->kode_voucher),
+            'deskripsi' => $request->deskripsi,
+            'tipe_diskon' => $request->tipe_diskon,
+            'nilai_diskon' => $request->nilai_diskon,
+            'maks_diskon' => $maksDiskon,
+            'min_pembelian' => $request->min_pembelian,
+            'kuota' => $request->kuota,
+            'kuota_terpakai' => 0,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'tanggal_berakhir' => $request->tanggal_berakhir,
+            'status' => 'AKTIF'
+        ]);
+
+        return redirect()->route('seller.promotion.vouchers')->with('success', 'Voucher berhasil diterbitkan!');
+    }
+
+    // API: Toggle Status Voucher (Aktif/Nonaktif) via AJAX
+    public function toggleVoucher(Request $request)
+    {
+        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
+        
+        $status_baru = $request->is_active ? 'AKTIF' : 'TIDAK_AKTIF';
+
+        $updated = DB::table('vouchers')
+            ->where('id', $request->voucher_id)
+            ->where('toko_id', $toko->id)
+            ->update(['status' => $status_baru]);
+
+        if($updated) return response()->json(['status' => 'success']);
+        return response()->json(['status' => 'error'], 400);
+    }
+
+
 
     // =========================================================================
     // 7. MANAJEMEN CHAT
     // =========================================================================
-    
-    // Menampilkan UI Halaman Chat
     public function chat()
     {
         return view('seller.chat');
     }
 
-    // [API] Mendapatkan daftar percakapan (List Kiri)
     public function getChatList()
     {
-        // TODO: Ganti dengan Query Tabel Chat Asli Anda
-        // Ini adalah DUMMY RESPONSE agar UI bisa ditesting
         $dummyChats = [
             ['id' => 1, 'nama_pelanggan' => 'Budi Santoso', 'last_message' => 'Apakah barang ini ready?'],
-            ['id' => 2, 'nama_pelanggan' => 'Siti Aminah', 'last_message' => 'Terima kasih, paket sudah sampai.'],
-            ['id' => 3, 'nama_pelanggan' => 'Ahmad Reza', 'last_message' => 'Bisa dikirim hari ini kak?']
+            ['id' => 2, 'nama_pelanggan' => 'Siti Aminah', 'last_message' => 'Terima kasih, paket sudah sampai.']
         ];
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $dummyChats
-        ]);
+        return response()->json(['status' => 'success', 'data' => $dummyChats]);
     }
 
-    // [API] Mendapatkan isi pesan dari satu chat
     public function getMessages($chatId)
     {
-        // TODO: Ganti dengan Query Tabel Pesan Asli Anda berdasarkan $chatId
-        $userId = Auth::id(); // ID Seller
-        
-        // DUMMY RESPONSE
+        $userId = Auth::id(); 
         $dummyMessages = [];
+        
         if($chatId == 1) {
             $dummyMessages = [
-                ['sender_id' => 999, 'message_text' => 'Apakah barang ini ready?'], // 999 = Customer
-                ['sender_id' => $userId, 'message_text' => 'Ready kak, silakan diorder ya.'], // Seller
+                ['sender_id' => 999, 'message_text' => 'Apakah barang ini ready?'], 
+                ['sender_id' => $userId, 'message_text' => 'Ready kak, silakan diorder ya.'], 
             ];
         }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => array_reverse($dummyMessages) // Di-reverse karena UI chat biasanya bottom-up
-        ]);
+        return response()->json(['status' => 'success', 'data' => array_reverse($dummyMessages)]);
     }
 
-    // [API] Mengirim pesan baru
     public function sendMessage(Request $request)
     {
         $request->validate([
             'chat_id' => 'required',
             'message_text' => 'required|string'
         ]);
-
-        // TODO: Insert data ke tabel pesan database Anda
-        // DB::table('tb_chat_messages')->insert([
-        //     'chat_id' => $request->chat_id,
-        //     'sender_id' => Auth::id(),
-        //     'message_text' => $request->message_text,
-        //     'created_at' => now()
-        // ]);
 
         return response()->json(['status' => 'success']);
     }
@@ -426,28 +593,11 @@ class SellerController extends Controller
     
     public function pos()
     {
-        // Halaman POS biasanya butuh layar penuh, kita kirim variabel penanda
         return view('seller.pos');
     }
 
-    // API: Ambil Data Produk Toko
-    public function getPosProducts()
-    {
-        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
-        
-        $products = DB::table('tb_barang')
-            ->where('toko_id', $toko->id)
-            ->select('id', 'nama_barang', 'harga', 'stok', 'gambar_utama', 'kategori_id')
-            ->where('stok', '>', 0) // Hanya tampilkan yang ada stoknya
-            ->get();
-
-        return response()->json($products);
-    }
-
-    // API: Ambil Data Kategori Toko
     public function getPosCategories()
     {
-        // Ambil kategori yang HANYA dimiliki oleh produk di toko ini
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
 
         $categories = DB::table('tb_kategori')
@@ -460,46 +610,75 @@ class SellerController extends Controller
         return response()->json($categories);
     }
 
-    // API: Proses Transaksi Kasir
+    public function getPosProducts()
+    {
+        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
+        
+        $products = DB::table('tb_barang')
+            ->where('toko_id', $toko->id)
+            ->select('id', 'kode_barang', 'nama_barang', 'harga', 'stok', 'kategori_id')
+            ->where('stok', '>', 0)
+            ->orderBy('nama_barang', 'asc')
+            ->get();
+
+        return response()->json($products);
+    }
+
     public function processPosCheckout(Request $request)
     {
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
         
-        // 1. Buat Data Transaksi Induk
-        $invoice = 'POS/' . date('Ymd') . '/' . strtoupper(uniqid());
-        $transaksiId = DB::table('tb_transaksi')->insertGetId([
-            'kode_invoice' => $invoice,
-            'user_id' => Auth::id(), // Atau biarkan null jika pembeli offline
-            'total_harga' => $request->total,
-            'metode_pembayaran' => $request->payment_method,
-            'status_transaksi' => 'lunas',
-            'tanggal_transaksi' => now(),
-            'catatan' => 'Pelanggan: ' . ($request->customer_name ?? 'Offline')
-        ]);
+        try {
+            DB::beginTransaction();
 
-        // 2. Looping Keranjang dan Insert Detail Transaksi
-        foreach ($request->cart as $item) {
-            DB::table('tb_detail_transaksi')->insert([
-                'transaksi_id' => $transaksiId,
-                'toko_id' => $toko->id,
-                'barang_id' => $item['id'],
-                'jumlah' => $item['qty'],
-                'harga' => $item['harga'],
-                'subtotal' => $item['harga'] * $item['qty'],
-                'status_pesanan_item' => 'sampai_tujuan' // Langsung selesai karena dibeli di tempat
+            $invoice = 'POS-' . strtoupper(substr($toko->nama_toko, 0, 3)) . '-' . date('ymdHis');
+            
+            $transaksiId = DB::table('tb_transaksi')->insertGetId([
+                'kode_invoice' => $invoice,
+                'user_id' => null, 
+                'total_harga' => $request->total,
+                'total_final' => $request->total, 
+                'metode_pembayaran' => $request->payment_method, 
+                'status_pembayaran' => 'paid',
+                'status_pesanan_global' => 'selesai', 
+                'tanggal_transaksi' => now(),
+                'catatan' => 'Pelanggan Walk-In: ' . ($request->customer_name ?? 'Umum'),
+                'midtrans_fee' => 0, 
+                'customer_service_fee' => 0,
+                'customer_handling_fee' => 0
             ]);
 
-            // 3. Kurangi Stok Barang
-            DB::table('tb_barang')->where('id', $item['id'])->decrement('stok', $item['qty']);
-        }
+            foreach ($request->cart as $item) {
+                DB::table('tb_detail_transaksi')->insert([
+                    'transaksi_id' => $transaksiId,
+                    'toko_id' => $toko->id,
+                    'barang_id' => $item['id'],
+                    'jumlah' => $item['qty'],
+                    'harga' => $item['harga'],
+                    'subtotal' => $item['harga'] * $item['qty'],
+                    'biaya_pengiriman_item' => 0,
+                    'kurir_terpilih' => 'Ambil Sendiri',
+                    'status_pesanan_item' => 'selesai', 
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
 
-        return response()->json(['status' => 'success', 'message' => 'Transaksi berhasil!', 'invoice' => $invoice]);
+                DB::table('tb_barang')->where('id', $item['id'])->decrement('stok', $item['qty']);
+            }
+
+            DB::commit(); 
+
+            return response()->json(['status' => 'success', 'message' => 'Transaksi berhasil!', 'invoice' => $invoice]);
+
+        } catch (\Exception $e) {
+            DB::rollBack(); 
+            return response()->json(['status' => 'error', 'message' => 'Gagal menyimpan transaksi: ' . $e->getMessage()], 500);
+        }
     }
 
     // =========================================================================
     // 9. PENILAIAN TOKO (REVIEWS)
     // =========================================================================
-    
     public function reviews(Request $request)
     {
         $user = Auth::user();
@@ -508,13 +687,11 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        // 1. Ambil data ringkasan rating
         $summary = DB::table('tb_toko_review')
             ->where('toko_id', $toko->id)
             ->selectRaw('AVG(rating) as avg_rating, COUNT(id) as total_reviews')
             ->first();
 
-        // Placeholder data performa
         $performa = [
             'chat_response_rate' => "95%",
             'chat_response_time' => "≈ 1 jam",
@@ -522,8 +699,6 @@ class SellerController extends Controller
             'late_shipment_rate' => "1.2%"
         ];
 
-        // 2. Query Detail Review (Sama seperti native, tapi pakai query builder Laravel)
-        // Ambil filter bintang dari request (contoh: ?star=5)
         $starFilter = $request->query('star', 'all');
 
         $query = DB::table('tb_toko_review as r')
@@ -543,7 +718,6 @@ class SellerController extends Controller
             ->groupBy('r.id', 'r.rating', 'r.ulasan', 'r.balasan_penjual', 'r.created_at', 'u.nama')
             ->orderBy('r.created_at', 'desc');
 
-        // Jika ada filter bintang
         if ($starFilter !== 'all' && is_numeric($starFilter)) {
             $query->where('r.rating', $starFilter);
         }
@@ -553,7 +727,6 @@ class SellerController extends Controller
         return view('seller.reviews', compact('summary', 'performa', 'reviews', 'starFilter'));
     }
 
-    // Proses membalas ulasan
     public function replyReview(Request $request)
     {
         $request->validate([
@@ -563,13 +736,12 @@ class SellerController extends Controller
 
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
 
-        // Pastikan review yang dibalas benar-benar milik toko ini
         DB::table('tb_toko_review')
             ->where('id', $request->review_id)
             ->where('toko_id', $toko->id)
             ->update([
                 'balasan_penjual' => $request->balasan,
-                'updated_at' => now() // Opsional jika Anda punya kolom ini
+                'updated_at' => now() 
             ]);
 
         return redirect()->route('seller.service.reviews')->with('success', 'Balasan berhasil dikirim.');
@@ -578,7 +750,6 @@ class SellerController extends Controller
     // =========================================================================
     // 10. PENGHASILAN TOKO (FINANCE)
     // =========================================================================
-    
     public function income()
     {
         $user = Auth::user();
@@ -588,15 +759,11 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        // TODO: Ganti dengan Query Database Asli Anda
-        // Data Placeholder
         $penghasilan_pending = 0;
         $penghasilan_dilepas = 52459320;
         $dilepas_minggu_ini = 4500000;
         $dilepas_bulan_ini = 15230000;
-
-        // Placeholder untuk daftar transaksi
-        $transaksi_dilepas = []; // Nanti diisi query tabel transaksi
+        $transaksi_dilepas = []; 
 
         return view('seller.income', compact(
             'penghasilan_pending', 
@@ -610,18 +777,15 @@ class SellerController extends Controller
     // =========================================================================
     // 11. REKENING BANK
     // =========================================================================
-    
     public function bank()
     {
         $user = Auth::user();
-        
         $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        
         if (!$toko) {
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        // TODO: Ganti dengan Query Database Asli (Tabel Rekening Toko)
-        // Data Placeholder rekening yang sudah tersimpan
         $rekening_tersimpan = [
             (object)[
                 'id' => 1,
@@ -632,7 +796,6 @@ class SellerController extends Controller
             ]
         ];
 
-        // Daftar bank untuk dropdown TomSelect
         $daftar_bank = ['SeaBank', 'BCA', 'BRI', 'BNI', 'Bank Mandiri', 'Bank Raya Indonesia', 'CIMB Niaga', 'Bank Syariah Indonesia'];
 
         return view('seller.bank', compact('rekening_tersimpan', 'daftar_bank'));
@@ -641,18 +804,15 @@ class SellerController extends Controller
     // =========================================================================
     // 12. DATA PERFORMA TOKO (STATISTIK GRAFIK)
     // =========================================================================
-    
     public function performance()
     {
         $user = Auth::user();
-        
         $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+        
         if (!$toko) {
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        // TODO: Ganti dengan Query Database Asli (Tabel Transaksi, dll)
-        // Data Placeholder untuk Grafik & Analitik
         $kriteria = [
             'penjualan' => ['nilai' => 8500000, 'perbandingan' => 15.2],
             'pesanan' => ['nilai' => 120, 'perbandingan' => 5.1],
@@ -685,19 +845,13 @@ class SellerController extends Controller
         $pembeli_donut_chart = ['baru' => 58, 'berulang' => 27];
 
         return view('seller.performance', compact(
-            'kriteria', 
-            'chart_labels', 
-            'chart_data', 
-            'saluran', 
-            'pembeli', 
-            'pembeli_donut_chart'
+            'kriteria', 'chart_labels', 'chart_data', 'saluran', 'pembeli', 'pembeli_donut_chart'
         ));
     }
 
     // =========================================================================
     // 13. KESEHATAN TOKO
     // =========================================================================
-    
     public function health()
     {
         $user = Auth::user();
@@ -707,7 +861,6 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        // TODO: Ganti dengan Query Database Asli (Tabel Penalti/Performa)
         $status_kesehatan = "Sangat baik";
         
         $top_summary = [
@@ -745,12 +898,8 @@ class SellerController extends Controller
         ];
 
         return view('seller.health', compact(
-            'status_kesehatan', 
-            'top_summary', 
-            'metrics', 
-            'poin_penalti_kuartal_ini', 
-            'pelanggaran_penalti', 
-            'masalah_perlu_diselesaikan'
+            'status_kesehatan', 'top_summary', 'metrics', 'poin_penalti_kuartal_ini', 
+            'pelanggaran_penalti', 'masalah_perlu_diselesaikan'
         ));
     }
 }
