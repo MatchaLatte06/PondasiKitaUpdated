@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/navbar_style.css') }}">
-    {{-- Hapus produk_detail.css bawaan Anda, kita pakai CSS Grid Enterprise di bawah ini --}}
 
     <style>
         body { background-color: #f8fafc; font-family: 'Inter', sans-serif; color: #334155; }
@@ -27,12 +26,12 @@
             display: grid;
             grid-template-columns: 350px 1fr 300px;
             gap: 30px;
-            align-items: start; /* Penting agar kolom kanan bisa sticky */
+            align-items: start; 
             margin-bottom: 50px;
         }
 
         @media (max-width: 992px) {
-            .product-grid-layout { grid-template-columns: 1fr; } /* Jadi 1 kolom di HP */
+            .product-grid-layout { grid-template-columns: 1fr; } 
         }
 
         /* --- KOLOM KIRI (GALERI FOTO) --- */
@@ -224,7 +223,7 @@
                     </div>
                 </div>
 
-                {{-- Action Box (Keranjang) --}}
+                {{-- Action Box (Keranjang & Beli) --}}
                 <div class="action-box">
                     <h3>Atur Jumlah dan Catatan</h3>
 
@@ -247,7 +246,9 @@
 
                         @if ($product->stok > 0)
                             <button type="button" class="btn-add-cart" id="btnKeranjang"><i class="fas fa-plus"></i> Keranjang</button>
-                            <button type="button" class="btn-buy-now" onclick="alert('Fitur Beli Langsung menyusul ya!')">Beli Langsung</button>
+                            
+                            {{-- PERBAIKAN: Tombol Beli Langsung Diubah ID-nya --}}
+                            <button type="button" class="btn-buy-now" id="btnBeliLangsung">Beli Langsung</button>
                         @else
                             <button type="button" class="out-of-stock-btn" disabled>Stok Habis</button>
                         @endif
@@ -265,14 +266,44 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // 1. Image Gallery Switcher
+        // --- 1. VARIABEL AUTH & LOGIC ---
+        const isLoggedIn = @json(auth()->check());
+        const loginUrl = "{{ route('login') }}";
+
+        // Fungsi Penahan Aksi (Meminta Login)
+        function requireLogin(event) {
+            if (!isLoggedIn) {
+                if(event) event.preventDefault();
+                
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Kamu Belum Masuk',
+                    text: 'Silakan masuk atau daftar akun dahulu untuk melanjutkan belanja.',
+                    confirmButtonText: 'Masuk Sekarang',
+                    showCancelButton: true,
+                    cancelButtonText: 'Nanti Saja',
+                    confirmButtonColor: '#2563eb',
+                    cancelButtonColor: '#94a3b8',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = loginUrl;
+                    }
+                });
+                return false; // Berhenti di sini
+            }
+            return true; // Lanjut jika sudah login
+        }
+
+
+        // --- 2. IMAGE GALLERY SWITCHER ---
         function changeImage(element, imgUrl) {
             document.getElementById('mainProductImage').src = imgUrl;
             document.querySelectorAll('.thumb-box').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
         }
 
-        // 2. Quantity & Subtotal Logic
+        // --- 3. QUANTITY & SUBTOTAL LOGIC ---
         const basePrice = {{ $product->harga }};
         const maxStock = {{ $product->stok }};
         const inputQty = document.getElementById('inputQty');
@@ -292,13 +323,14 @@
             }
         }
 
-        // 3. AJAX Add to Cart (Enterprise Feel with SweetAlert)
-        document.getElementById('btnKeranjang')?.addEventListener('click', function() {
+        // --- 4. AJAX ADD TO CART ---
+        document.getElementById('btnKeranjang')?.addEventListener('click', function(e) {
+            if (!requireLogin(e)) return; // Cek Login Dulu
+
             let form = document.getElementById('formTambahKeranjang');
             let formData = new FormData(form);
 
-            // Ganti URL ini dengan rute penambahan keranjang Laravel Anda sesungguhnya
-            fetch('{{ url("/api/keranjang/tambah") }}', {
+            fetch('{{ route("keranjang.tambah") }}', { 
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -308,25 +340,36 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Asumsi data merespon success / logic dummy
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Berhasil dimasukkan ke keranjang!',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
+                if(data.status === 'success') {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: data.message || 'Berhasil dimasukkan ke keranjang!',
+                        showConfirmButton: false,
+                        timer: 2500
+                    });
+                    
+                    // Opsional: Refresh halaman setelah 1 detik untuk update angka keranjang di Navbar
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                } else {
+                    Swal.fire('Gagal', data.message || 'Terjadi kesalahan.', 'error');
+                }
             })
             .catch(error => {
-                // Fallback untuk demo jika URL API belum dibuat
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: 'Produk telah ditambahkan ke keranjang.',
-                    icon: 'success',
-                    confirmButtonColor: '#3b82f6'
-                });
+                Swal.fire('Oops!', 'Gagal menyambung ke server.', 'error');
             });
+        });
+
+        // --- 5. DIRECT BUY (BELI LANGSUNG) ---
+        document.getElementById('btnBeliLangsung')?.addEventListener('click', function(e) {
+            if (!requireLogin(e)) return; // Cek Login Dulu
+
+            // Jika sudah login, lempar langsung ke rute Checkout beserta ID dan Jumlah
+            let qty = inputQty.value;
+            let productId = "{{ $product->id }}";
+            
+            window.location.href = `{{ route('checkout') }}?product_id=${productId}&jumlah=${qty}`;
         });
     </script>
 </body>

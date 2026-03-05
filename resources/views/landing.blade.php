@@ -67,7 +67,8 @@
                     <span class="typing-text"></span><span class="typing-cursor">&nbsp;</span>
                 </h2>
                 <h3>Temukan semua kebutuhan proyek Anda dari toko-toko terpercaya.</h3>
-                <a href="{{ url('pages/produk') }}" class="btn-primary">Jelajahi Produk</a>
+                {{-- PERBAIKAN URL --}}
+                <a href="{{ route('produk.index') }}" class="btn-primary">Jelajahi Produk</a>
             </div>
         </div>
     </section>
@@ -80,7 +81,8 @@
                 <h2 class="section-title"><span>Kategori Populer</span></h2>
                 <div class="category-grid">
                     @forelse($categories ?? [] as $cat)
-                        <a href="{{ url('pages/produk?kategori=' . $cat->id) }}" class="category-item">
+                        {{-- PERBAIKAN URL --}}
+                        <a href="{{ route('produk.index', ['kategori' => $cat->id]) }}" class="category-item">
                             <div class="category-icon">
                                 <i class="{{ $cat->icon_class ?? 'fas fa-tools' }}"></i>
                             </div>
@@ -96,7 +98,8 @@
             <section class="featured-stores">
                 <div class="section-header">
                     <h2 class="section-title"><span>{{ $tokoSectionTitle ?? 'Toko Populer' }}</span></h2>
-                    <a href="{{ url('pages/semua_toko') }}" class="see-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+                    {{-- PERBAIKAN URL --}}
+                    <a href="{{ route('toko.index') }}" class="see-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="store-grid">
                     @forelse($listToko ?? [] as $toko)
@@ -123,7 +126,8 @@
                             $hasLogo = !empty($toko->logo_toko) && file_exists(public_path($logoPath));
                         @endphp
 
-                        <a href="{{ url('pages/toko?slug=' . ($toko->slug ?? '#')) }}" class="store-card">
+                        {{-- PERBAIKAN URL TOKO --}}
+                        <a href="{{ route('toko.detail', ['slug' => $toko->slug ?? '#']) }}" class="store-card">
                             <div class="store-banner" style="{{ $bgStyle }}">
                                 @if($hasLogo)
                                     <img src="{{ asset($logoPath) }}" class="store-logo" alt="Logo">
@@ -151,7 +155,8 @@
             <section class="products">
                 <div class="section-header">
                     <h2 class="section-title"><span>Produk Terlaris di Wilayah Anda</span></h2>
-                    <a href="{{ url('pages/produk') }}" class="see-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+                    {{-- PERBAIKAN URL --}}
+                    <a href="{{ route('produk.index') }}" class="see-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="product-grid">
                     @foreach($listProdukLokal as $p)
@@ -179,14 +184,14 @@
             <section id="nasional-content" class="products">
                 <div class="section-header">
                     <h2 class="section-title"><span>Produk Terlaris Nasional</span></h2>
-                    <a href="{{ url('pages/produk') }}" class="see-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+                    {{-- PERBAIKAN URL --}}
+                    <a href="{{ route('produk.index') }}" class="see-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="product-grid">
                     @forelse($listProdukNasional ?? [] as $p)
                         @php
                             $img = !empty($p->gambar_utama) ? 'assets/uploads/products/'.$p->gambar_utama : 'assets/uploads/products/default.jpg';
                         @endphp
-                        {{-- INI YANG SAYA PERBAIKI: LINK DI PRODUK NASIONAL --}}
                         <a href="{{ route('produk.detail', $p->id) }}" class="product-link">
                             <div class="product-card">
                                 <div class="product-image">

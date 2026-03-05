@@ -167,32 +167,43 @@ class AuthController extends Controller
     // ==========================================================
     public function showRegister()
     {
+        // Mencegah user yang sudah login mengakses halaman register
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
         return view('auth.register_customer');
     }
 
-    public function register(Request $request)
+   public function register(Request $request)
     {
+        // 1. Validasi Input (Tanpa no_telepon karena di form tidak ada)
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|email|unique:tb_user', // Sesuai nama tabel tb_user
-            'username' => 'required|unique:tb_user',
-            'password' => 'required|min:6',
-            'no_telepon' => 'required|numeric',
+            'nama'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:tb_user,email', 
+            'username' => 'required|string|unique:tb_user,username',
+            'password' => 'required|min:8|confirmed', // Harus cocok dengan password_confirmation
+        ], [
+            'username.unique'    => 'Nama pengguna ini sudah dipakai.',
+            'email.unique'       => 'Email ini sudah terdaftar, silakan login.',
+            'password.min'       => 'Kata sandi minimal harus 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.'
         ]);
 
+        // 2. Simpan ke Database
         User::create([
-            'nama' => $request->nama,
-            'email' => $request->email,
-            'username' => $request->username,
-            'no_telepon' => $request->no_telepon,
-            'password' => Hash::make($request->password),
-            'level' => 'customer',
-            'status' => 'offline',
+            'nama'        => $request->nama,
+            'email'       => $request->email,
+            'username'    => $request->username,
+            // 'no_telepon' sengaja dihilangkan atau dikosongkan (pastikan di database Anda kolom ini boleh NULL)
+            'password'    => Hash::make($request->password),
+            'level'       => 'customer',
+            'status'      => 'offline',
             'is_verified' => 1,
-            'is_banned' => 0
+            'is_banned'   => 0
         ]);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
+        // 3. Arahkan kembali dengan SweetAlert Success
+        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan masuk menggunakan akun baru Anda.');
     }
 
     // ==========================================================
