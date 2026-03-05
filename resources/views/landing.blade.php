@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pondasikita - Marketplace Bahan Bangunan</title>
-    
+
     {{-- CSS Assets --}}
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.css') }}"> 
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/navbar_style.css') }}"> 
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/navbar_style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -40,7 +40,7 @@
         .voice-visualizer.speaking { animation: pulse-blue 1.5s infinite; background: #4facfe; }
         .voice-visualizer.listening { animation: pulse-white 1.5s infinite; background: #ff416c; }
         .voice-btn-hangup { background: #ff416c; color: white; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; gap: 8px; align-items: center; }
-        
+
         /* === STORE CARD STYLE === */
         .store-card { position: relative; overflow: hidden; display: block; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: white; transition: transform 0.2s; text-decoration: none; color: inherit; }
         .store-card:hover { transform: translateY(-5px); }
@@ -48,15 +48,15 @@
         .store-info { padding: 35px 15px 15px 15px; position: relative; }
         .store-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; bottom: -30px; left: 20px; z-index: 2; background: white; }
         .store-logo-initial { width: 60px; height: 60px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; text-transform: uppercase; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; bottom: -30px; left: 20px; z-index: 2; }
-        
+
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         @keyframes pulse-white { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); transform: scale(1); } 70% { box-shadow: 0 0 0 20px rgba(255,255,255,0); transform: scale(1.1); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); transform: scale(1); } }
         @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(79,172,254,0.7); transform: scale(1); } 70% { box-shadow: 0 0 0 20px rgba(79,172,254,0); transform: scale(1.1); } 100% { box-shadow: 0 0 0 0 rgba(79,172,254,0); transform: scale(1); } }
     </style>
 </head>
 <body>
-    
-    {{-- Navbar (Menggunakan @include) --}}
+
+    {{-- Navbar --}}
     @include('partials.navbar')
 
     {{-- Hero Section --}}
@@ -74,12 +74,11 @@
 
     <main class="main-content">
         <div class="container">
-            
+
             {{-- KATEGORI --}}
             <section class="categories">
                 <h2 class="section-title"><span>Kategori Populer</span></h2>
                 <div class="category-grid">
-                    {{-- GUNAKAN ?? [] AGAR TIDAK ERROR 500 --}}
                     @forelse($categories ?? [] as $cat)
                         <a href="{{ url('pages/produk?kategori=' . $cat->id) }}" class="category-item">
                             <div class="category-icon">
@@ -102,14 +101,11 @@
                 <div class="store-grid">
                     @forelse($listToko ?? [] as $toko)
                         @php
-                            // LOGIC AMAN UNTUK GAMBAR
                             $bannerPath = 'assets/uploads/banners/' . ($toko->banner_toko ?? '');
                             $hasBanner = !empty($toko->banner_toko) && file_exists(public_path($bannerPath));
-                            
                             $colors = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00acc1', '#00897b', '#43a047', '#7cb342', '#c0ca33', '#fdd835', '#ffb300', '#fb8c00', '#f4511e'];
-                            // Pastikan nama_toko ada sebelum di-crc32
                             $storeColor = $colors[crc32($toko->nama_toko ?? 'Toko') % count($colors)];
-                            
+
                             if (empty($toko->initials)) {
                                 $words = explode(" ", $toko->nama_toko ?? 'Toko Kami');
                                 $acronym = "";
@@ -119,8 +115,8 @@
                                 $initials = $toko->initials;
                             }
 
-                            $bgStyle = $hasBanner 
-                                ? "background-image: url(" . asset($bannerPath) . ");" 
+                            $bgStyle = $hasBanner
+                                ? "background-image: url(" . asset($bannerPath) . ");"
                                 : "background-color: " . $storeColor . "; opacity: 0.8;";
 
                             $logoPath = 'assets/uploads/logos/' . ($toko->logo_toko ?? '');
@@ -150,7 +146,7 @@
                 </div>
             </section>
 
-            {{-- PRODUK LOKAL (Jika Ada) --}}
+            {{-- PRODUK LOKAL --}}
             @if(isset($listProdukLokal) && count($listProdukLokal) > 0)
             <section class="products">
                 <div class="section-header">
@@ -162,13 +158,13 @@
                         @php
                             $img = !empty($p->gambar_utama) ? 'assets/uploads/products/'.$p->gambar_utama : 'assets/uploads/products/default.jpg';
                         @endphp
-                        <a href="{{ url('pages/detail_produk?id=' . $p->id . '&toko_slug=' . $p->slug_toko) }}" class="product-link">
+                        <a href="{{ route('produk.detail', $p->id) }}" class="product-link">
                             <div class="product-card">
                                 <div class="product-image">
                                     <img src="{{ asset($img) }}" onerror="this.onerror=null; this.src='{{ asset('assets/uploads/products/default.jpg') }}';">
                                 </div>
                                 <div class="product-details">
-                                    <h3>{{ Str::limit($p->nama_barang, 40) }}</h3>
+                                    <h3>{{ \Illuminate\Support\Str::limit($p->nama_barang, 40) }}</h3>
                                     <p class="price">Rp{{ number_format($p->harga, 0, ',', '.') }}</p>
                                     <div class="product-store-info"><i class="fas fa-store-alt"></i> <span>{{ $p->nama_toko }}</span></div>
                                 </div>
@@ -190,13 +186,14 @@
                         @php
                             $img = !empty($p->gambar_utama) ? 'assets/uploads/products/'.$p->gambar_utama : 'assets/uploads/products/default.jpg';
                         @endphp
-                        <a href="{{ url('pages/detail_produk?id=' . $p->id . '&toko_slug=' . ($p->slug_toko ?? '#')) }}" class="product-link">
+                        {{-- INI YANG SAYA PERBAIKI: LINK DI PRODUK NASIONAL --}}
+                        <a href="{{ route('produk.detail', $p->id) }}" class="product-link">
                             <div class="product-card">
                                 <div class="product-image">
                                     <img src="{{ asset($img) }}" onerror="this.onerror=null; this.src='{{ asset('assets/uploads/products/default.jpg') }}';">
                                 </div>
                                 <div class="product-details">
-                                    <h3>{{ Str::limit($p->nama_barang, 40) }}</h3>
+                                    <h3>{{ \Illuminate\Support\Str::limit($p->nama_barang, 40) }}</h3>
                                     <p class="price">Rp{{ number_format($p->harga, 0, ',', '.') }}</p>
                                     <div class="product-store-info"><i class="fas fa-store-alt"></i> <span>{{ $p->nama_toko }}</span></div>
                                 </div>
@@ -210,19 +207,19 @@
 
         </div>
     </main>
-    
+
     {{-- Include Footer --}}
     @include('partials.footer')
-    
+
     {{-- Scripts Bawaan Navbar --}}
     <script src="{{ asset('assets/js/navbar.js') }}"></script>
 
-    {{-- ===================== FITUR CHATBOT POTA (FULL) ===================== --}}
-    
+    {{-- ===================== FITUR CHATBOT POTA ===================== --}}
+
     <button id="live-chat-toggle" class="live-chat-toggle" onclick="toggleChat()">
         <i class="fas fa-robot"></i> <span class="chat-toggle-text">Tanya POTA</span>
     </button>
-    
+
     <div id="live-chat-window" class="live-chat-window">
         <div class="chat-header">
             <div style="display:flex; align-items:center; gap:10px;">
@@ -240,12 +237,11 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="chat-messages" id="chat-messages">
-             {{-- Pesan sambutan mengambil nama user dari Auth::user() --}}
-             <div class="chat-message bot">Halo {{ Auth::user()->nama ?? 'Tamu' }}! Saya POTA. Tekan tombol telepon 📞 di atas untuk ngobrol langsung, atau ketik di bawah ya!</div>
+             <div class="chat-message bot">Halo {{ auth()->user()?->nama ?? 'Tamu' }}! Saya POTA. Tekan tombol telepon 📞 di atas untuk ngobrol langsung, atau ketik di bawah ya!</div>
         </div>
-        
+
         <div class="chat-input-area">
             <button id="voice-btn" onclick="toggleVoice()" title="Tekan untuk bicara"><i class="fas fa-microphone"></i></button>
             <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleEnter(event)">
@@ -259,14 +255,13 @@
         </div>
     </div>
 
-    {{-- JAVASCRIPT LENGKAP --}}
     <script>
         /* === TYPEWRITER EFFECT === */
         const typingText = document.querySelector(".typing-text");
         const phrases = [
-            "Cari Bahan Bangunan?", 
-            "Renovasi Rumah Impian?", 
-            "Solusi Material Terlengkap", 
+            "Cari Bahan Bangunan?",
+            "Renovasi Rumah Impian?",
+            "Solusi Material Terlengkap",
             "Harga Terbaik & Terpercaya",
             "Belanja Mudah dari Rumah"
         ];
@@ -276,11 +271,12 @@
         let typeSpeed = 100;
 
         function typeEffect() {
+            if (!typingText) return;
             const currentPhrase = phrases[phraseIndex];
             if (isDeleting) {
                 typingText.textContent = currentPhrase.substring(0, charIndex - 1);
                 charIndex--;
-                typeSpeed = 50; 
+                typeSpeed = 50;
             } else {
                 typingText.textContent = currentPhrase.substring(0, charIndex + 1);
                 charIndex++;
@@ -288,7 +284,7 @@
             }
             if (!isDeleting && charIndex === currentPhrase.length) {
                 isDeleting = true;
-                typeSpeed = 2000; 
+                typeSpeed = 2000;
             } else if (isDeleting && charIndex === 0) {
                 isDeleting = false;
                 phraseIndex = (phraseIndex + 1) % phrases.length;
@@ -306,11 +302,11 @@
         const callOverlay = document.getElementById('voice-call-overlay');
         const voiceStatus = document.getElementById('voice-status-text');
         const voiceVisualizer = document.getElementById('voice-visualizer');
-        
-        let chatHistory = []; 
+
+        let chatHistory = [];
         let isCallMode = false;
         let recognition = null;
-        let voices = []; 
+        let voices = [];
 
         function loadVoices() { voices = window.speechSynthesis.getVoices(); }
         window.speechSynthesis.onvoiceschanged = loadVoices;
@@ -341,14 +337,14 @@
                     else { voiceStatus.innerText = "Gagal mendengar."; setTimeout(startListening, 2000); }
                 }
             };
-            recognition.onend = () => { 
-                if(!isCallMode) document.getElementById('voice-btn').classList.remove('recording'); 
+            recognition.onend = () => {
+                if(!isCallMode) document.getElementById('voice-btn').classList.remove('recording');
             };
         }
 
         function toggleChat() {
-            chatWindow.classList.toggle('active');
-            if(!chatWindow.classList.contains('active')) {
+            if(chatWindow) chatWindow.classList.toggle('active');
+            if(chatWindow && !chatWindow.classList.contains('active')) {
                 toggleBtn.style.display = 'flex';
                 endVoiceCallMode();
             } else {
@@ -360,7 +356,7 @@
         function toggleFullScreen() {
             chatWindow.classList.toggle('expanded');
             const icon = document.getElementById('icon-resize');
-            icon.className = chatWindow.classList.contains('expanded') ? 'fas fa-compress' : 'fas fa-expand';
+            if(icon) icon.className = chatWindow.classList.contains('expanded') ? 'fas fa-compress' : 'fas fa-expand';
         }
 
         function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
@@ -437,24 +433,23 @@
             }
 
             try {
-                // Fetch URL disesuaikan dengan route API Anda
-                const res = await fetch('{{ url("/api/chat") }}', { 
+                const res = await fetch('{{ url("/api/chat") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Token keamanan Laravel
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify({message: text, history: chatHistory})
                 });
-                
+
                 if (!res.ok) throw new Error("HTTP Error: " + res.status);
                 const data = await res.json();
-                
+
                 if(!isCallMode) {
                     const loader = document.getElementById('loading-indicator');
                     if(loader) loader.remove();
                 }
-                
+
                 appendMessage(data.reply, 'bot');
                 let cleanText = data.reply.replace(/<[^>]*>?/gm, '');
                 chatHistory.push({sender:'bot', text: cleanText});
@@ -477,25 +472,25 @@
             const clean = text.replace(/<[^>]*>?/gm, '').replace(/[*_#]/g, '');
             const u = new SpeechSynthesisUtterance(clean);
             u.lang = 'id-ID';
-            u.pitch = 0.8; 
+            u.pitch = 0.8;
             u.rate = 1.1;
-            
+
             if (voices.length === 0) loadVoices();
-            const indoVoice = voices.find(v => v.lang === 'id-ID' && v.name.includes('Google')); 
+            const indoVoice = voices.find(v => v.lang === 'id-ID' && v.name.includes('Google'));
             if (indoVoice) u.voice = indoVoice;
 
-            u.onstart = () => { 
-                if(isCallMode) { 
-                    voiceVisualizer.className="voice-visualizer speaking"; 
-                    voiceVisualizer.innerHTML='<i class="fas fa-volume-up"></i>'; 
+            u.onstart = () => {
+                if(isCallMode) {
+                    voiceVisualizer.className="voice-visualizer speaking";
+                    voiceVisualizer.innerHTML='<i class="fas fa-volume-up"></i>';
                     voiceStatus.innerText = "POTA Menjawab...";
                 }
             };
-            
-            u.onend = () => { 
+
+            u.onend = () => {
                 if(isCallMode) {
                     voiceVisualizer.className="voice-visualizer";
-                    if(autoListen) setTimeout(startListening, 500); 
+                    if(autoListen) setTimeout(startListening, 500);
                 }
             };
             window.speechSynthesis.speak(u);
