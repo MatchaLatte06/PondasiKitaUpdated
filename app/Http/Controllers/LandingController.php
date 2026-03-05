@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class LandingController extends Controller
 {
@@ -13,10 +14,10 @@ class LandingController extends Controller
         // ==========================================
         // 1. DATA USER & LOKASI
         // ==========================================
-        $user = Auth::user(); 
+        $user = Auth::user();
         $cityId = 0;
         $districtId = 0;
-        $tokoSectionTitle = "Toko Populer Nasional";
+        $tokoSectionTitle = "Mitra Toko Populer";
 
         if ($user) {
             // Cek alamat utama user untuk personalisasi konten
@@ -55,7 +56,7 @@ class LandingController extends Controller
 
         // Filter Lokasi (Jika User Punya Alamat)
         if ($cityId > 0) {
-            $tokoSectionTitle = "Toko di Wilayah Anda";
+            $tokoSectionTitle = "Toko Terdekat di Wilayah Anda";
             $queryToko->where(function($q) use ($cityId, $districtId) {
                 $q->where('t.city_id', $cityId)
                   ->orWhere('t.district_id', $districtId);
@@ -77,7 +78,7 @@ class LandingController extends Controller
         // ==========================================
         // 4. PRODUK TERLARIS (Lokal & Nasional)
         // ==========================================
-        
+
         // Produk Lokal (Hanya jika ada lokasi user)
         $listProdukLokal = [];
         if ($cityId > 0) {
@@ -91,10 +92,10 @@ class LandingController extends Controller
         // 5. RETURN VIEW
         // ==========================================
         return view('landing', compact(
-            'categories', 
-            'listToko', 
-            'tokoSectionTitle', 
-            'listProdukLokal', 
+            'categories',
+            'listToko',
+            'tokoSectionTitle',
+            'listProdukLokal',
             'listProdukNasional',
             'user'
         ));
@@ -109,7 +110,11 @@ class LandingController extends Controller
     {
         $query = DB::table('tb_barang as b')
             ->join('tb_toko as t', 'b.toko_id', '=', 't.id')
-            ->select('b.id', 'b.nama_barang', 'b.harga', 'b.gambar_utama', 't.nama_toko', 't.slug as slug_toko')
+            ->leftJoin('cities as c', 't.city_id', '=', 'c.id') // JOIN KOTA AGAR BISA MUNCUL DI CARD
+            ->select(
+                'b.id', 'b.nama_barang', 'b.harga', 'b.gambar_utama',
+                't.nama_toko', 't.slug as slug_toko', 'c.name as kota_toko' // SELECT KOTA
+            )
             ->where('b.is_active', 1)
             ->where('b.status_moderasi', 'approved');
 
@@ -121,16 +126,17 @@ class LandingController extends Controller
             });
         }
 
-        // Hitung total terjual untuk sorting (Menggunakan selectSub agar kompatibel semua DB)
+        // Hitung total terjual untuk sorting
         $query->selectSub(function ($q) {
             $q->from('tb_detail_transaksi')
               ->whereColumn('barang_id', 'b.id')
+              ->where('status_pesanan_item', 'sampai_tujuan') // Hitung yg sudah selesai
               ->selectRaw('COALESCE(SUM(jumlah), 0)');
         }, 'total_terjual');
 
         $query->orderByDesc('total_terjual');
 
-        return $query->limit(8)->get();
+        return $query->limit(12)->get(); // Limit 12 agar grid HTML terlihat penuh & rapi
     }
 
     /**
