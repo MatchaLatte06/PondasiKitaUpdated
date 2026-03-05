@@ -127,10 +127,15 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::post('/reviews/reply', [SellerController::class, 'replyReview'])->name('reviews.reply');
     });
 
-    // --- G. KEUANGAN ---
+// --- G. KEUANGAN ---
     Route::prefix('finance')->name('finance.')->group(function() {
         Route::get('/income', [SellerController::class, 'income'])->name('income');
+        Route::post('/payout', [SellerController::class, 'requestPayout'])->name('payout');
+        
+        // ROUTE REKENING BANK:
         Route::get('/bank', [SellerController::class, 'bank'])->name('bank');
+        Route::post('/bank/update', [SellerController::class, 'updateBank'])->name('bank.update');
+        Route::post('/bank/destroy', [SellerController::class, 'destroyBank'])->name('bank.destroy');
     });
 
    // --- H. DATA / STATISTIK ---

@@ -544,8 +544,8 @@ class SellerController extends Controller
 
 
 
-    // =========================================================================
-    // 7. MANAJEMEN CHAT
+// =========================================================================
+    // 7. MANAJEMEN CHAT (ENTERPRISE GRADE)
     // =========================================================================
     public function chat()
     {
@@ -554,39 +554,91 @@ class SellerController extends Controller
 
     public function getChatList()
     {
-        $dummyChats = [
-            ['id' => 1, 'nama_pelanggan' => 'Budi Santoso', 'last_message' => 'Apakah barang ini ready?'],
-            ['id' => 2, 'nama_pelanggan' => 'Siti Aminah', 'last_message' => 'Terima kasih, paket sudah sampai.']
-        ];
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
 
-        return response()->json(['status' => 'success', 'data' => $dummyChats]);
+        if (!$toko) return response()->json(['status' => 'error', 'message' => 'Toko tidak ditemukan']);
+
+        // Query Kompleks untuk mengambil daftar chat beserta pesan terakhirnya
+        $chats = DB::table('chats as c')
+            ->join('tb_user as u', 'c.customer_id', '=', 'u.id')
+            ->where('c.toko_id', $toko->id)
+            ->select(
+                'c.id',
+                'u.nama as nama_pelanggan',
+                // Subquery untuk pesan terakhir
+                DB::raw('(SELECT message_text FROM messages m WHERE m.chat_id = c.id ORDER BY timestamp DESC LIMIT 1) as last_message'),
+                // Subquery untuk waktu pesan terakhir
+                DB::raw('(SELECT timestamp FROM messages m WHERE m.chat_id = c.id ORDER BY timestamp DESC LIMIT 1) as last_time')
+            )
+            ->orderByRaw('last_time DESC NULLS LAST') // Urutkan yang terbaru di atas
+            ->get();
+
+        // Format waktu agar lebih cantik di frontend
+        $formattedChats = $chats->map(function($chat) {
+            if ($chat->last_time) {
+                $date = \Carbon\Carbon::parse($chat->last_time);
+                $chat->time_display = $date->isToday() ? $date->format('H:i') : $date->format('d/m/y');
+            } else {
+                $chat->time_display = '';
+            }
+            return $chat;
+        });
+
+        return response()->json(['status' => 'success', 'data' => $formattedChats]);
     }
 
     public function getMessages($chatId)
     {
-        $userId = Auth::id(); 
-        $dummyMessages = [];
-        
-        if($chatId == 1) {
-            $dummyMessages = [
-                ['sender_id' => 999, 'message_text' => 'Apakah barang ini ready?'], 
-                ['sender_id' => $userId, 'message_text' => 'Ready kak, silakan diorder ya.'], 
-            ];
-        }
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
 
-        return response()->json(['status' => 'success', 'data' => array_reverse($dummyMessages)]);
+        // Keamanan: Pastikan chat ini benar-benar milik toko yang sedang login
+        $validChat = DB::table('chats')->where('id', $chatId)->where('toko_id', $toko->id)->exists();
+        if (!$validChat) return response()->json(['status' => 'error', 'message' => 'Unauthorized']);
+
+        // Ambil pesan dari yang terlama ke terbaru (ASC) agar urut di UI dari atas ke bawah
+        $messages = DB::table('messages')
+            ->where('chat_id', $chatId)
+            ->orderBy('timestamp', 'asc')
+            ->get();
+
+        $formattedMessages = $messages->map(function($msg) use ($user) {
+            return [
+                'id' => $msg->id,
+                'is_mine' => ($msg->sender_id == $user->id), // True jika yang kirim adalah Seller
+                'text' => $msg->message_text,
+                'time' => \Carbon\Carbon::parse($msg->timestamp)->format('H:i')
+            ];
+        });
+
+        return response()->json(['status' => 'success', 'data' => $formattedMessages]);
     }
 
     public function sendMessage(Request $request)
     {
         $request->validate([
-            'chat_id' => 'required',
+            'chat_id' => 'required|integer',
             'message_text' => 'required|string'
+        ]);
+
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+
+        // Verifikasi kepemilikan chat
+        $validChat = DB::table('chats')->where('id', $request->chat_id)->where('toko_id', $toko->id)->exists();
+        if (!$validChat) return response()->json(['status' => 'error'], 403);
+
+        // Simpan ke database messages
+        DB::table('messages')->insert([
+            'chat_id' => $request->chat_id,
+            'sender_id' => $user->id, // ID Penjual
+            'message_text' => $request->message_text,
+            'timestamp' => now()
         ]);
 
         return response()->json(['status' => 'success']);
     }
-
     // =========================================================================
     // 8. POINT OF SALE (KASIR)
     // =========================================================================
@@ -676,8 +728,8 @@ class SellerController extends Controller
         }
     }
 
-    // =========================================================================
-    // 9. PENILAIAN TOKO (REVIEWS)
+ // =========================================================================
+    // 9. PENILAIAN TOKO (REVIEWS - ENTERPRISE GRADE)
     // =========================================================================
     public function reviews(Request $request)
     {
@@ -687,11 +739,28 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
+        // 1. Ambil Summary Rata-Rata Rating
         $summary = DB::table('tb_toko_review')
             ->where('toko_id', $toko->id)
             ->selectRaw('AVG(rating) as avg_rating, COUNT(id) as total_reviews')
             ->first();
 
+        // 2. [BARU] Ambil Breakdown Rating (Hitung jumlah masing-masing bintang)
+        $ratingCountsRaw = DB::table('tb_toko_review')
+            ->where('toko_id', $toko->id)
+            ->select('rating', DB::raw('count(*) as total'))
+            ->groupBy('rating')
+            ->pluck('total', 'rating')->toArray();
+
+        $ratingCounts = [
+            5 => $ratingCountsRaw[5] ?? 0,
+            4 => $ratingCountsRaw[4] ?? 0,
+            3 => $ratingCountsRaw[3] ?? 0,
+            2 => $ratingCountsRaw[2] ?? 0,
+            1 => $ratingCountsRaw[1] ?? 0,
+        ];
+
+        // 3. Performa Layanan Pelanggan
         $performa = [
             'chat_response_rate' => "95%",
             'chat_response_time' => "≈ 1 jam",
@@ -701,6 +770,7 @@ class SellerController extends Controller
 
         $starFilter = $request->query('star', 'all');
 
+        // 4. Query List Review
         $query = DB::table('tb_toko_review as r')
             ->join('tb_user as u', 'r.user_id', '=', 'u.id')
             ->leftJoin('tb_detail_transaksi as dt', function($join) {
@@ -722,9 +792,9 @@ class SellerController extends Controller
             $query->where('r.rating', $starFilter);
         }
 
-        $reviews = $query->get();
+        $reviews = $query->paginate(10); // Gunakan Paginate agar web tidak berat jika review ribuan
 
-        return view('seller.reviews', compact('summary', 'performa', 'reviews', 'starFilter'));
+        return view('seller.reviews', compact('summary', 'ratingCounts', 'performa', 'reviews', 'starFilter'));
     }
 
     public function replyReview(Request $request)
@@ -744,13 +814,12 @@ class SellerController extends Controller
                 'updated_at' => now() 
             ]);
 
-        return redirect()->route('seller.service.reviews')->with('success', 'Balasan berhasil dikirim.');
+        return redirect()->back()->with('success', 'Balasan ulasan berhasil dipublikasikan!');
     }
-
+// =========================================================================
+    // 10. PENGHASILAN TOKO & DOMPET (FINANCE - ENTERPRISE)
     // =========================================================================
-    // 10. PENGHASILAN TOKO (FINANCE)
-    // =========================================================================
-    public function income()
+    public function income(Request $request)
     {
         $user = Auth::user();
         $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
@@ -759,23 +828,110 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        $penghasilan_pending = 0;
-        $penghasilan_dilepas = 52459320;
-        $dilepas_minggu_ini = 4500000;
-        $dilepas_bulan_ini = 15230000;
-        $transaksi_dilepas = []; 
+        // 1. Dana Tertahan (Pending): Pesanan sudah dibayar pembeli, tapi barang belum sampai
+        $penghasilan_pending = DB::table('tb_detail_transaksi as d')
+            ->join('tb_transaksi as t', 'd.transaksi_id', '=', 't.id')
+            ->where('d.toko_id', $toko->id)
+            ->whereIn('d.status_pesanan_item', ['diproses', 'siap_kirim', 'dikirim'])
+            ->where('t.status_pembayaran', 'paid')
+            ->sum('d.subtotal');
+
+        // 2. Penghasilan Kotor (Dana dari Pesanan Selesai)
+        $penghasilan_kotor = DB::table('tb_detail_transaksi')
+            ->where('toko_id', $toko->id)
+            ->where('status_pesanan_item', 'sampai_tujuan')
+            ->sum('subtotal');
+
+        // 3. Dana yang sudah pernah ditarik (Payout) atau sedang diproses admin
+        $dana_ditarik = DB::table('tb_payouts')
+            ->where('toko_id', $toko->id)
+            ->whereIn('status', ['pending', 'completed'])
+            ->sum('jumlah_payout');
+
+        // 4. Saldo Aktif (Bisa Ditarik) = Kotor - Yang Sudah Ditarik
+        $saldo_aktif = $penghasilan_kotor - $dana_ditarik;
+
+        // 5. Analitik Mingguan & Bulanan
+        $dilepas_minggu_ini = DB::table('tb_detail_transaksi as d')
+            ->join('tb_transaksi as t', 'd.transaksi_id', '=', 't.id')
+            ->where('d.toko_id', $toko->id)
+            ->where('d.status_pesanan_item', 'sampai_tujuan')
+            ->whereBetween('t.tanggal_transaksi', [now()->startOfWeek(), now()->endOfWeek()])
+            ->sum('d.subtotal');
+
+        $dilepas_bulan_ini = DB::table('tb_detail_transaksi as d')
+            ->join('tb_transaksi as t', 'd.transaksi_id', '=', 't.id')
+            ->where('d.toko_id', $toko->id)
+            ->where('d.status_pesanan_item', 'sampai_tujuan')
+            ->whereBetween('t.tanggal_transaksi', [now()->startOfMonth(), now()->endOfMonth()])
+            ->sum('d.subtotal');
+
+        // 6. Query Tabel Rincian Transaksi (Dengan Filter)
+        $tab = $request->query('tab', 'dilepas'); 
+        $query = DB::table('tb_detail_transaksi as d')
+            ->join('tb_transaksi as t', 'd.transaksi_id', '=', 't.id')
+            ->where('d.toko_id', $toko->id);
+
+        if ($tab == 'pending') {
+            $query->whereIn('d.status_pesanan_item', ['diproses', 'siap_kirim', 'dikirim'])->where('t.status_pembayaran', 'paid');
+        } else {
+            $query->where('d.status_pesanan_item', 'sampai_tujuan'); // dilepas
+        }
+
+        // Search by Invoice
+        if ($request->search) {
+            $query->where('t.kode_invoice', 'like', '%'.$request->search.'%');
+        }
+        // Filter by Date
+        if ($request->date) {
+            $query->whereDate('t.tanggal_transaksi', $request->date);
+        }
+
+        $transaksi_list = $query->select('t.kode_invoice', 't.tanggal_transaksi', 'd.status_pesanan_item', 't.metode_pembayaran', 'd.subtotal')
+                                ->orderBy('t.tanggal_transaksi', 'desc')
+                                ->paginate(10);
+
+        // 7. Riwayat Penarikan Dana (Widget Kanan)
+        $riwayat_payout = DB::table('tb_payouts')->where('toko_id', $toko->id)->orderBy('tanggal_request', 'desc')->limit(5)->get();
 
         return view('seller.income', compact(
-            'penghasilan_pending', 
-            'penghasilan_dilepas', 
-            'dilepas_minggu_ini', 
-            'dilepas_bulan_ini', 
-            'transaksi_dilepas'
+            'penghasilan_pending', 'saldo_aktif', 'penghasilan_kotor',
+            'dilepas_minggu_ini', 'dilepas_bulan_ini', 
+            'transaksi_list', 'tab', 'riwayat_payout'
         ));
     }
 
-    // =========================================================================
-    // 11. REKENING BANK
+    // API: Proses Request Tarik Dana
+    public function requestPayout(Request $request)
+    {
+        $request->validate([
+            'jumlah_payout' => 'required|numeric|min:50000'
+        ]);
+
+        $user = Auth::user();
+        $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
+
+        // Validasi Saldo Ganda di Backend (Mencegah Hack/Manipulasi Input)
+        $penghasilan_kotor = DB::table('tb_detail_transaksi')->where('toko_id', $toko->id)->where('status_pesanan_item', 'sampai_tujuan')->sum('subtotal');
+        $dana_ditarik = DB::table('tb_payouts')->where('toko_id', $toko->id)->whereIn('status', ['pending', 'completed'])->sum('jumlah_payout');
+        $saldo_aktif = $penghasilan_kotor - $dana_ditarik;
+
+        if ($request->jumlah_payout > $saldo_aktif) {
+            return back()->with('error', 'Penarikan ditolak! Nominal melebihi Saldo Aktif Anda.');
+        }
+
+        // Insert ke tabel payouts (Akan diverifikasi oleh Admin Pusat)
+        DB::table('tb_payouts')->insert([
+            'toko_id' => $toko->id,
+            'jumlah_payout' => $request->jumlah_payout,
+            'status' => 'pending',
+            'tanggal_request' => now()
+        ]);
+
+        return back()->with('success', 'Berhasil! Permintaan pencairan dana sedang diproses oleh admin.');
+    }
+// =========================================================================
+    // 11. REKENING BANK (ENTERPRISE GRADE)
     // =========================================================================
     public function bank()
     {
@@ -786,21 +942,52 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'Data toko tidak ditemukan.');
         }
 
-        $rekening_tersimpan = [
-            (object)[
-                'id' => 1,
-                'nama_bank' => 'BCA',
-                'no_rekening' => '**** **** **** 1234',
-                'nama_pemilik' => 'Prabu A. T. S.',
-                'logo' => 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia_logo.svg'
-            ]
+        // Daftar Bank Resmi Nasional
+        $daftar_bank = [
+            'BCA', 'Bank Mandiri', 'BNI', 'BRI', 'BSI (Bank Syariah Indonesia)', 
+            'CIMB Niaga', 'Bank Permata', 'Bank Danamon', 'SeaBank', 'Bank Jago', 
+            'BNC (Bank Neo Commerce)', 'Bank Raya'
         ];
 
-        $daftar_bank = ['SeaBank', 'BCA', 'BRI', 'BNI', 'Bank Mandiri', 'Bank Raya Indonesia', 'CIMB Niaga', 'Bank Syariah Indonesia'];
-
-        return view('seller.bank', compact('rekening_tersimpan', 'daftar_bank'));
+        return view('seller.bank', compact('toko', 'daftar_bank'));
     }
-    
+
+    // API: Simpan / Ubah Rekening
+    public function updateBank(Request $request)
+    {
+        $request->validate([
+            'nama_bank' => 'required|string|max:50',
+            'no_rekening' => 'required|string|max:50|regex:/^[0-9]+$/',
+            'nama_pemilik' => 'required|string|max:100',
+        ]);
+
+        $user = Auth::user();
+        
+        DB::table('tb_toko')->where('user_id', $user->id)->update([
+            'rekening_bank' => $request->nama_bank,
+            'nomor_rekening' => $request->no_rekening,
+            'atas_nama_rekening' => strtoupper($request->nama_pemilik),
+            'updated_at' => now()
+        ]);
+
+        return redirect()->back()->with('success', 'Data Rekening Bank berhasil disimpan dan siap digunakan untuk pencairan dana.');
+    }
+
+    // API: Hapus Rekening
+    public function destroyBank()
+    {
+        $user = Auth::user();
+        
+        // Hapus data (Set null)
+        DB::table('tb_toko')->where('user_id', $user->id)->update([
+            'rekening_bank' => null,
+            'nomor_rekening' => null,
+            'atas_nama_rekening' => null,
+            'updated_at' => now()
+        ]);
+
+        return redirect()->back()->with('success', 'Rekening bank berhasil dihapus.');
+    }
     // =========================================================================
     // 12. DATA PERFORMA TOKO (STATISTIK GRAFIK)
     // =========================================================================
