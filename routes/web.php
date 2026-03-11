@@ -66,6 +66,9 @@ Route::controller(PageController::class)->group(function () {
     // Status Pesanan & Lacak
     Route::get('/pesanan-saya', 'pesanan')->name('pesanan.index');
     Route::get('/pesanan-saya/lacak/{kode_pesanan}', 'lacakPesanan')->name('pesanan.lacak');
+
+    // Tambahkan ini di bagian route yang memiliki middleware 'auth'
+    Route::get('/pesanan/{kode_invoice}', [PageController::class, 'lacakPesanan'])->name('pesanan.lacak');
 });
 
 // 3. AUTHENTICATION (CUSTOMER & SELLER)
