@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\User;
-use App\Models\Toko; // Pastikan Model Toko sudah ada (sesuai langkah sebelumnya)
+use App\Models\Toko;
 
 class AuthController extends Controller
 {
@@ -43,14 +43,11 @@ class AuthController extends Controller
         return view('auth.login_seller', compact('sisaDetik'));
     }
 
-// ==========================================================
+    // ==========================================================
     // LOGIN ADMIN
     // ==========================================================
-
-    // 1. Menampilkan Halaman Login Admin
     public function showLoginAdmin()
     {
-        // Jika sudah login dan levelnya admin, langsung ke dashboard
         if (Auth::check() && Auth::user()->level === 'admin') {
             return redirect('/admin/dashboard');
         }
@@ -58,63 +55,52 @@ class AuthController extends Controller
         return view('auth.login_admin');
     }
 
-    // 2. Memproses Data Login Admin
     public function loginAdmin(Request $request)
     {
-        // Validasi input
         $request->validate([
             'username' => 'required',
             'password' => 'required',
         ]);
 
-        // Cek apakah input berupa email atau username
         $loginType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        // Syarat login: Kredensial benar DAN levelnya harus admin
         $credentials = [
             $loginType => $request->username,
             'password' => $request->password,
             'level'    => 'admin' 
         ];
 
-        // Ambil nilai checkbox 'Ingat Saya'
         $remember = $request->has('remember');
 
-        // Eksekusi Login
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             return redirect()->intended('/admin/dashboard');
         }
 
-        // Jika Gagal (Cek apakah dia user biasa yang salah kamar)
         $userExists = User::where($loginType, $request->username)->first();
         if ($userExists && $userExists->level !== 'admin') {
             return back()->with('error', 'Akses ditolak! Akun ini bukan akun Admin.')->withInput();
         }
 
-        // Jika username/password memang salah
         return back()->with('error', 'Username atau Password salah.')->withInput();
     }
 
     // ==========================================================
-    // 3. PROSES LOGIN (UMUM: CUSTOMER & SELLER)
+    // 3. PROSES LOGIN (UMUM: CUSTOMER)
     // ==========================================================
     public function login(Request $request)
     {
-        // 1. Cek Rate Limiter (Anti Brute Force)
         $throttleKey = $request->ip();
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             return back()->with('error', "Terlalu banyak percobaan. Coba lagi dalam $seconds detik.");
         }
 
-        // 2. Validasi Input
         $request->validate([
             'username' => 'required', 
             'password' => 'required',
         ]);
 
-        // 3. Deteksi Input (Email atau Username)
         $inputType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         $credentials = [
@@ -122,14 +108,12 @@ class AuthController extends Controller
             'password' => $request->password,
         ];
 
-        // 4. Proses Login
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             RateLimiter::clear($throttleKey); 
 
             $user = Auth::user();
             
-            // Redirect Sesuai Level
             if ($user->level === 'admin') {
                 return redirect()->intended('/admin/dashboard');
             } elseif ($user->level === 'seller') {
@@ -139,9 +123,49 @@ class AuthController extends Controller
             }
         }
 
-        // 5. Jika Gagal
         RateLimiter::hit($throttleKey); 
         return back()->with('error', 'Username atau Password salah.');
+    }
+
+    // ==========================================================
+    // 3B. PROSES LOGIN KHUSUS SELLER (YANG MEMBUAT ERROR TADI)
+    // ==========================================================
+    public function loginSeller(Request $request)
+    {
+        $throttleKey = $request->ip();
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()->with('error', "Terlalu banyak percobaan. Coba lagi dalam $seconds detik.");
+        }
+
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        $loginType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $credentials = [
+            $loginType => $request->username,
+            'password' => $request->password
+        ];
+
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+
+            // Pastikan yang login benar-benar seller
+            if ($user->level === 'seller') {
+                $request->session()->regenerate();
+                RateLimiter::clear($throttleKey);
+                return redirect()->route('seller.dashboard')->with('success', 'Selamat datang kembali di Pondasikita Seller Centre!');
+            } else {
+                Auth::logout();
+                return redirect()->route('seller.login')->with('error', 'Akun Anda bukan Penjual. Silakan daftar toko terlebih dahulu.');
+            }
+        }
+
+        RateLimiter::hit($throttleKey);
+        return back()->with('error', 'Email/Username atau Kata Sandi salah!');
     }
 
     // ==========================================================
@@ -154,6 +178,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect('/login');
     }
+    
     public function logoutSeller(Request $request)
     {
         Auth::logout();
@@ -163,25 +188,23 @@ class AuthController extends Controller
     }
 
     // ==========================================================
-    // 5. REGISTER CUSTOMER (VIEW & PROCESS)
+    // 5. REGISTER CUSTOMER
     // ==========================================================
     public function showRegister()
     {
-        // Mencegah user yang sudah login mengakses halaman register
         if (Auth::check()) {
             return redirect()->route('home');
         }
         return view('auth.register_customer');
     }
 
-   public function register(Request $request)
+    public function register(Request $request)
     {
-        // 1. Validasi Input (Tanpa no_telepon karena di form tidak ada)
         $request->validate([
             'nama'     => 'required|string|max:255',
             'email'    => 'required|email|unique:tb_user,email', 
             'username' => 'required|string|unique:tb_user,username',
-            'password' => 'required|min:8|confirmed', // Harus cocok dengan password_confirmation
+            'password' => 'required|min:8|confirmed',
         ], [
             'username.unique'    => 'Nama pengguna ini sudah dipakai.',
             'email.unique'       => 'Email ini sudah terdaftar, silakan login.',
@@ -189,12 +212,10 @@ class AuthController extends Controller
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.'
         ]);
 
-        // 2. Simpan ke Database
         User::create([
             'nama'        => $request->nama,
             'email'       => $request->email,
             'username'    => $request->username,
-            // 'no_telepon' sengaja dihilangkan atau dikosongkan (pastikan di database Anda kolom ini boleh NULL)
             'password'    => Hash::make($request->password),
             'level'       => 'customer',
             'status'      => 'offline',
@@ -202,54 +223,45 @@ class AuthController extends Controller
             'is_banned'   => 0
         ]);
 
-        // 3. Arahkan kembali dengan SweetAlert Success
         return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan masuk menggunakan akun baru Anda.');
     }
 
     // ==========================================================
-    // 6. REGISTER SELLER (VIEW & PROCESS)
+    // 6. REGISTER SELLER
     // ==========================================================
     public function showRegisterSeller()
     {
-        // Ambil Data Provinsi untuk Dropdown
         $provinces = DB::table('provinces')->orderBy('name', 'ASC')->get();
         return view('auth.register_seller', compact('provinces'));
     }
 
     public function registerSeller(Request $request)
     {
-        // 1. Validasi Input Lengkap
         $request->validate([
-            // Data Pemilik (User)
             'nama_pemilik' => 'required|string|max:255',
             'username' => 'required|string|max:50|unique:tb_user,username',
             'email' => 'required|email|unique:tb_user,email',
             'password' => 'required|min:6',
-            'telepon_toko' => 'required|numeric', // Digunakan juga sebagai no_telepon user
-            
-            // Data Toko
+            'telepon_toko' => 'required|numeric', 
             'nama_toko' => 'required|string|max:100|unique:tb_toko,nama_toko',
             'alamat_toko' => 'required|string',
             'province_id' => 'required|exists:provinces,id',
             'city_id' => 'required|exists:cities,id',
             'district_id' => 'required|exists:districts,id',
-            'logo_toko' => 'nullable|image|mimes:jpeg,png,jpg|max:2048' // Maks 2MB
+            'logo_toko' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        // 2. Database Transaction (Agar Data User & Toko Masuk Bersamaan)
         DB::beginTransaction();
 
         try {
-            // A. Upload Logo Toko (Jika Ada)
             $logoPath = null;
             if ($request->hasFile('logo_toko')) {
                 $file = $request->file('logo_toko');
                 $filename = time() . '_' . Str::slug($request->nama_toko) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/toko'), $filename); // Simpan di public/uploads/toko
+                $file->move(public_path('uploads/toko'), $filename); 
                 $logoPath = $filename;
             }
 
-            // B. Buat User Baru (Level Seller)
             $user = User::create([
                 'nama' => $request->nama_pemilik,
                 'username' => $request->username,
@@ -262,13 +274,11 @@ class AuthController extends Controller
                 'is_banned' => 0
             ]);
 
-            // C. Buat Slug Toko Unik
             $slug = Str::slug($request->nama_toko);
             if (Toko::where('slug', $slug)->exists()) {
                 $slug .= '-' . time();
             }
 
-            // D. Simpan Data Toko
             Toko::create([
                 'user_id' => $user->id,
                 'nama_toko' => $request->nama_toko,
@@ -285,7 +295,6 @@ class AuthController extends Controller
 
             DB::commit();
 
-            // PERBAIKAN: Redirect ke seller.login, bukan route('login')
             return redirect()->route('seller.login')->with('success', 'Pendaftaran Toko Berhasil! Akun Seller Anda sudah aktif, silakan masuk ke Seller Centre.');
 
         } catch (\Exception $e) {

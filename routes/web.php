@@ -7,6 +7,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController as FrontProductController;
+use App\Http\Controllers\WebhookController; // <-- IMPORT WEBHOOK CONTROLLER
 
 // --- IMPORT CONTROLLER SELLER ---
 use App\Http\Controllers\SellerController;
@@ -59,6 +60,8 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/profil-saya', 'profil')->name('profil.index');
     Route::get('/profil-saya/edit', 'editProfil')->name('profil.edit');
     Route::post('/profil-saya/update', 'updateProfil')->name('profil.update');
+    Route::get('/profil-saya/ganti-password', 'gantiPassword')->name('profil.password');
+    Route::post('/profil-saya/ganti-password', 'updatePassword')->name('profil.password.update');
 
     // Status Pesanan & Lacak
     Route::get('/pesanan-saya', 'pesanan')->name('pesanan.index');
@@ -70,7 +73,7 @@ Route::controller(AuthController::class)->group(function () {
     // Customer
     Route::get('/login', 'showLogin')->name('login');
     Route::post('/login', 'login')->name('login.process');
-    Route::get('/register', 'showRegister')->name('register'); // Diubah dari Route::view agar konsisten
+    Route::get('/register', 'showRegister')->name('register'); 
     Route::post('/register', 'register')->name('register.process');
 
     // Seller
@@ -182,17 +185,23 @@ Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->grou
         Route::post('/payouts/{id}/process', [AdminPayoutController::class, 'process'])->name('payouts.process');
         Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
         Route::post('/settings/update', [AdminSettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/sync-komerce', [AdminSettingController::class, 'syncKomerce'])->name('settings.syncKomerce');
         Route::get('/logistics', [AdminLogisticSettingController::class, 'index'])->name('logistics.index');
         Route::post('/logistics/update', [AdminLogisticSettingController::class, 'update'])->name('logistics.update');
     });
 });
 
-// 6. API & AJAX
+// 6. API & AJAX & WEBHOOKS
 Route::get('/api/cities/{province_id}', [AuthController::class, 'getCities']);
 Route::get('/api/districts/{city_id}', [AuthController::class, 'getDistricts']);
 Route::post('/api/chat', function() {
     return response()->json(['reply' => 'Halo! Saya POTA (Versi Laravel).']);
 })->name('api.chat');
+
+// --- ROUTE WEBHOOK MIDTRANS ---
+// Route ini akan ditembak otomatis oleh server Midtrans saat pembayaran lunas/batal
+Route::post('/webhook/midtrans', [WebhookController::class, 'midtransHandler'])->name('webhook.midtrans');
+
 
 // 7. EXTRA
 Route::get('/auth/google', function() { return "Fitur Login Google"; });

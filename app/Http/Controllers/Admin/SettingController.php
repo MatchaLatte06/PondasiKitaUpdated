@@ -32,36 +32,39 @@ class SettingController extends Controller
     }
 
     /**
-     * Menyimpan semua pembaruan pengaturan secara massal (Bulk Update)
+     * Menyimpan semua pembaruan pengaturan (Pola Dinamis & Bersih)
      */
     public function update(Request $request)
     {
-        $data = $request->except(['_token', '_method', 'couriers']);
+        // 1. Ambil semua inputan kecuali token dan method
+        $settings = $request->except(['_token', '_method']);
 
-        // Handle array khusus (seperti pilihan kurir)
-        if ($request->has('couriers')) {
-            $data['rajaongkir_active_couriers'] = json_encode($request->couriers);
-        } else {
-            $data['rajaongkir_active_couriers'] = json_encode([]);
-        }
-
-        // Handle Checkbox/Toggle Switch (Karena unchecked checkbox tidak terkirim via POST)
-        $toggles = ['midtrans_is_production', 'auto_approve_products', 'auto_approve_stores'];
+        // 2. Keamanan Checkbox: Jika toggle dimatikan, paksa nilainya jadi '0'
+        $toggles = ['midtrans_is_production', 'auto_approve_products', 'auto_approve_stores', 'enable_dp_system'];
         foreach ($toggles as $toggle) {
-            if (!isset($data[$toggle])) {
-                $data[$toggle] = '0';
+            if (!isset($settings[$toggle])) {
+                $settings[$toggle] = '0';
             }
         }
 
-        // Looping dan Update/Insert ke tb_pengaturan
-        foreach ($data as $key => $value) {
-            DB::table('tb_pengaturan')->updateOrInsert(
-                ['setting_nama' => $key],
-                ['setting_nilai' => $value]
-            );
+        // 3. Keamanan Array: Ubah pilihan kurir menjadi format JSON agar bisa disimpan di 1 kolom
+        if (isset($settings['couriers'])) {
+            $settings['rajaongkir_active_couriers'] = json_encode($settings['couriers']);
+            unset($settings['couriers']); // Hapus array asli agar tidak error saat di-looping di bawah
+        } else {
+            $settings['rajaongkir_active_couriers'] = json_encode([]);
         }
 
-        return back()->with('success', 'Konfigurasi platform berhasil diperbarui.');
+        // 4. Looping Simpan ke Database (Disesuaikan dengan tabel tb_pengaturan)
+        foreach ($settings as $key => $value) {
+            DB::table('tb_pengaturan')
+                ->updateOrInsert(
+                    ['setting_nama' => $key],
+                    ['setting_nilai' => $value]
+                );
+        }
+
+        return redirect()->back()->with('success', 'Pengaturan sistem berhasil diperbarui!');
     }
 
     /**
@@ -101,8 +104,6 @@ class SettingController extends Controller
                 throw new \Exception('Gagal mengambil data kota: ' . $cityResponse->json('message', 'Unknown Error'));
             }
 
-            // Hapus kota lama agar bersih (Hati-hati jika tabel ini terelasi restrict dengan alamat)
-            // Alternatif aman: UpdateOrInsert
             foreach ($cityResponse->json('data') as $city) {
                 DB::table('cities')->updateOrInsert(
                     ['id' => $city['id']],
@@ -113,7 +114,7 @@ class SettingController extends Controller
                 );
             }
 
-            // Catat waktu sinkronisasi terakhir
+            // 3. Catat waktu sinkronisasi terakhir
             DB::table('tb_pengaturan')->updateOrInsert(
                 ['setting_nama' => 'rajaongkir_last_sync'],
                 ['setting_nilai' => now()->format('Y-m-d H:i:s')]

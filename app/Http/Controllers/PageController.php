@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class PageController extends Controller
 {
-   // =================================================================
+    // =================================================================
     // 1. HALAMAN DAFTAR PRODUK (Katalog Utama Lengkap dengan Filter)
     // =================================================================
     public function produk(Request $request)
@@ -39,22 +40,18 @@ class PageController extends Controller
 
         // C. TERAPKAN FILTER
         
-        // --- PERBAIKAN LOGIKA KATEGORI ---
-        // Tangkap input, pastikan selalu menjadi Array agar in_array() di Blade tidak error
         $raw_kategori = $request->kategori;
         $filter_kategori = [];
         
         if (is_array($raw_kategori)) {
             $filter_kategori = $raw_kategori;
         } elseif (!empty($raw_kategori)) {
-            $filter_kategori = [$raw_kategori]; // Ubah string "1" menjadi array ["1"]
+            $filter_kategori = [$raw_kategori]; 
         }
 
-        // Terapkan ke Query Database
         if (!empty($filter_kategori)) {
             $query->whereIn('b.kategori_id', $filter_kategori);
         }
-        // ---------------------------------
 
         if ($request->filled('lokasi')) {
             $query->where('t.city_id', $request->lokasi);
@@ -92,23 +89,19 @@ class PageController extends Controller
     // =================================================================
     public function search(Request $request) 
     {
-        // Tangkap parameter dari URL (?query=semen&kategori=1)
         $keyword = $request->input('query');
         $kategoriId = $request->input('kategori');
 
-        // Ambil semua kategori untuk ditampilkan di Sidebar Filter Kiri
         $categories = DB::table('tb_kategori')->orderBy('nama_kategori', 'ASC')->get();
 
-        // Mulai Query pencarian ke tabel barang
         $query = DB::table('tb_barang as b')
             ->join('tb_toko as t', 'b.toko_id', '=', 't.id')
             ->leftJoin('cities as c', 't.city_id', '=', 'c.id')
             ->select('b.id', 'b.nama_barang', 'b.harga', 'b.gambar_utama', 't.nama_toko', 't.slug as slug_toko', 'c.name as kota_toko')
             ->where('b.is_active', 1)
             ->where('b.status_moderasi', 'approved')
-            ->where('t.status', 'active'); // Pastikan toko sedang aktif
+            ->where('t.status', 'active'); 
 
-        // 1. Filter Berdasarkan Kata Kunci (Nama Barang ATAU Nama Toko)
         if (!empty($keyword)) {
             $query->where(function($q) use ($keyword) {
                 $q->where('b.nama_barang', 'like', '%' . $keyword . '%')
@@ -116,16 +109,12 @@ class PageController extends Controller
             });
         }
 
-        // 2. Filter Berdasarkan Kategori (Jika user mengklik sidebar kategori)
         if (!empty($kategoriId)) {
             $query->where('b.kategori_id', $kategoriId);
         }
 
-        // Eksekusi query dengan paginasi (12 produk per halaman)
-        // ->appends() agar saat user klik "Next Page", kata kuncinya tidak hilang
         $products = $query->paginate(12)->appends($request->query());
 
-        // Kirim data ke View khusus pencarian (search.blade.php)
         return view('pages.search', compact('products', 'categories', 'keyword', 'kategoriId'));
     }
 
@@ -160,15 +149,12 @@ class PageController extends Controller
 
 
     // =================================================================
-    // 5. HALAMAN LAINNYA (Placeholder)
+    // 4. HALAMAN SEMUA TOKO
     // =================================================================
-
     public function semuaToko(Request $request) 
     {
-        // 1. Tangkap filter lokasi dari URL (?lokasi=12)
         $filter_lokasi = $request->query('lokasi', 'semua');
 
-        // 2. Ambil data kota yang ada tokonya (Untuk Dropdown Filter)
         $locations = DB::table('tb_toko as t')
             ->join('cities as c', 't.city_id', '=', 'c.id')
             ->select('t.city_id', 'c.name as city_name')
@@ -178,14 +164,12 @@ class PageController extends Controller
             ->orderBy('c.name', 'ASC')
             ->get();
 
-        // 3. Query Utama: Ambil daftar toko beserta jumlah produk & rating
         $query = DB::table('tb_toko as t')
             ->join('cities as c', 't.city_id', '=', 'c.id')
             ->select(
                 't.id', 't.nama_toko', 't.slug', 't.deskripsi_toko', 
                 't.logo_toko', 't.banner_toko', 't.city_id', 'c.name as city_name'
             )
-            // Subquery: Hitung jumlah produk yang aktif & disetujui di toko ini
             ->selectSub(function ($q) {
                 $q->from('tb_barang')
                   ->whereColumn('toko_id', 't.id')
@@ -193,7 +177,6 @@ class PageController extends Controller
                   ->where('status_moderasi', 'approved')
                   ->selectRaw('COUNT(id)');
             }, 'jumlah_produk')
-            // Subquery: Hitung rata-rata rating toko ini
             ->selectSub(function ($q) {
                 $q->from('tb_toko_review')
                   ->whereColumn('toko_id', 't.id')
@@ -201,16 +184,13 @@ class PageController extends Controller
             }, 'rating')
             ->where('t.status', 'active');
 
-        // 4. Terapkan Filter Lokasi (Jika user memilih selain "Semua Kota")
         if ($filter_lokasi !== 'semua' && !empty($filter_lokasi)) {
             $query->where('t.city_id', $filter_lokasi);
         }
 
-        // 5. Eksekusi Query dengan Paginasi (12 Toko per halaman)
         $query->orderBy('t.nama_toko', 'ASC');
         $stores = $query->paginate(12)->withQueryString();
 
-        // 6. Return ke View
         return view('pages.semua_toko', compact('locations', 'stores', 'filter_lokasi'));
     }
 
@@ -221,7 +201,6 @@ class PageController extends Controller
     {
         $slug = $request->query('slug');
 
-        // 1. Ambil Data Toko beserta nama kotanya
         $toko = DB::table('tb_toko as t')
             ->leftJoin('cities as c', 't.city_id', '=', 'c.id')
             ->select('t.*', 'c.name as kota')
@@ -229,12 +208,10 @@ class PageController extends Controller
             ->where('t.status', 'active')
             ->first();
 
-        // Jika toko tidak ada atau tidak aktif, lempar error 404
         if (!$toko) {
             abort(404, 'Toko tidak ditemukan atau sedang tidak aktif.');
         }
 
-        // 2. Generate Inisial dan Warna (Jika tidak punya logo)
         $colors = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00acc1', '#00897b', '#43a047', '#7cb342', '#c0ca33', '#fdd835', '#ffb300', '#fb8c00', '#f4511e'];
         $storeColor = $colors[crc32($toko->nama_toko) % count($colors)];
         
@@ -244,28 +221,24 @@ class PageController extends Controller
         $storeInitials = strtoupper(substr($acronym, 0, 2));
         if (empty($storeInitials)) { $storeInitials = "TK"; }
 
-        // 3. Ambil Semua Produk Milik Toko Ini
         $products = DB::table('tb_barang as b')
             ->where('b.toko_id', $toko->id)
             ->where('b.is_active', 1)
             ->where('b.status_moderasi', 'approved')
             ->paginate(12);
 
-        // 4. Return ke View
         return view('pages.detail_toko', compact('toko', 'products', 'storeColor', 'storeInitials'));
     }
 
     // =================================================================
-    // HALAMAN KERANJANG
+    // 6. HALAMAN KERANJANG
     // =================================================================
     public function keranjang() 
     {
-        // LOGIKA 1: Jika belum login, kirim penanda ke view
         if (!Auth::check()) {
             return view('pages.keranjang', ['is_guest' => true]);
         }
 
-        // Ambil data keranjang, JOIN dengan barang dan toko
         $cartItems = DB::table('tb_keranjang as k')
             ->join('tb_barang as b', 'k.barang_id', '=', 'b.id')
             ->join('tb_toko as t', 'b.toko_id', '=', 't.id')
@@ -278,19 +251,17 @@ class PageController extends Controller
             ->orderBy('t.nama_toko', 'ASC')
             ->get();
 
-        // Kelompokkan barang berdasarkan nama toko (Standar Marketplace)
         $groupedCart = $cartItems->groupBy('nama_toko');
 
         return view('pages.keranjang', compact('groupedCart', 'cartItems'));
     }
 
     // =================================================================
-    // API KERANJANG (TAMBAH, UPDATE, HAPUS)
+    // 7. API KERANJANG (TAMBAH, UPDATE, HAPUS)
     // =================================================================
     
     public function tambahKeranjang(Request $request)
     {
-        // LOGIKA 2: Cegah Guest menambahkan barang
         if (!Auth::check()) {
             return response()->json([
                 'status' => 'error', 
@@ -302,7 +273,6 @@ class PageController extends Controller
         $barangId = $request->barang_id;
         $jumlah = $request->jumlah ?? 1;
 
-        // Cek apakah barang sudah ada di keranjang user ini
         $existing = DB::table('tb_keranjang')
             ->where('user_id', $userId)
             ->where('barang_id', $barangId)
@@ -344,6 +314,7 @@ class PageController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
     // =================================================================
     // 8. HALAMAN CHECKOUT
     // =================================================================
@@ -356,7 +327,6 @@ class PageController extends Controller
         $userId = Auth::id();
         $userEmail = Auth::user()->email ?? 'customer@example.com';
 
-        // 1. Ambil Alamat Utama Profil
         $alamatUser = DB::table('tb_user_alamat as ua')
             ->leftJoin('provinces as p', 'ua.province_id', '=', 'p.id')
             ->leftJoin('cities as c', 'ua.city_id', '=', 'c.id')
@@ -368,13 +338,11 @@ class PageController extends Controller
 
         $isAlamatIncomplete = !$alamatUser || empty($alamatUser->nama_penerima) || empty($alamatUser->alamat_lengkap);
 
-        // 2. Siapkan Keranjang / Produk Langsung
         $itemsPerToko = [];
         $totalProduk = 0;
         $isDirectPurchase = $request->has('product_id');
 
         if ($isDirectPurchase) {
-            // BELI LANGSUNG (Tombol dari halaman Detail Produk)
             $productId = $request->input('product_id');
             $jumlah = $request->input('jumlah', 1);
 
@@ -393,10 +361,8 @@ class PageController extends Controller
                 $totalProduk += $item->harga * $jumlah;
             }
         } else {
-            // DARI KERANJANG (Menangkap Array/String dari POST form keranjang)
             $selectedItems = $request->input('selected_items');
             
-            // Format string "1,2,3" menjadi array [1,2,3]
             if (is_string($selectedItems)) {
                 $selectedItems = explode(',', $selectedItems);
             }
@@ -432,26 +398,155 @@ class PageController extends Controller
         return view('pages.checkout', compact('userEmail', 'alamatUser', 'isAlamatIncomplete', 'itemsPerToko', 'totalProduk', 'isDirectPurchase', 'request'));
     }
 
-    public function prosesCheckout(Request $request)
+   public function prosesCheckout(Request $request)
     {
-        // Fungsi placeholder untuk menyimpan order ke Database / Midtrans nantinya
-        // Untuk sekarang kita lempar pesan berhasil saja
-        return redirect()->route('pesanan.index')->with('success', 'Pesanan Anda berhasil dibuat! (Simulasi)');
+        try {
+            $user = Auth::user();
+            $grandTotal = $request->input('grand_total'); 
+            $orderId = 'INV-' . time() . '-' . rand(100, 999);
+            
+            // Hitung manual biaya pengiriman (Total Akhir dikurangi Total Harga Barang)
+            $biayaPengiriman = $grandTotal - $request->input('total_produk_subtotal');
+
+            // 1. Simpan Transaksi Induk
+            $transaksiId = DB::table('tb_transaksi')->insertGetId([
+                'kode_invoice'              => $orderId,
+                'sumber_transaksi'          => 'ONLINE',
+                'user_id'                   => $user->id,
+                'total_harga_produk'        => $request->input('total_produk_subtotal'),
+                'total_diskon'              => 0,
+                'total_final'               => $grandTotal,
+                'tipe_pembayaran'           => 'LUNAS',
+                'status_pembayaran'         => 'pending',
+                'status_pesanan_global'     => 'menunggu_pembayaran',
+                
+                // Merekam Semua Data Pengiriman dari Form Checkout
+                'shipping_label_alamat'     => $request->input('shipping_label_alamat'),
+                'shipping_nama_penerima'    => $request->input('shipping_nama_penerima'),
+                'shipping_telepon_penerima' => $request->input('shipping_telepon_penerima'),
+                'shipping_alamat_lengkap'   => $request->input('shipping_alamat_lengkap'),
+                'shipping_kecamatan'        => $request->input('shipping_kecamatan'),
+                'shipping_kota_kabupaten'   => $request->input('shipping_kota_kabupaten'),
+                'shipping_provinsi'         => $request->input('shipping_provinsi'),
+                'shipping_kode_pos'         => $request->input('shipping_kode_pos'),
+                'catatan'                   => $request->input('catatan'),
+                'biaya_pengiriman'          => $biayaPengiriman,
+                'tipe_pengambilan'          => $request->input('tipe_pengambilan') ?? 'pengiriman',
+                'tanggal_transaksi'         => now()
+            ]);
+
+            // =================================================================
+            // 2. SIMPAN RINCIAN BARANG KE tb_detail_transaksi
+            // =================================================================
+            if ($request->has('direct_purchase')) {
+                $produk = DB::table('tb_barang')->where('id', $request->input('product_id'))->first();
+                $jumlah = $request->input('jumlah', 1);
+                
+                if ($produk) {
+                    DB::table('tb_detail_transaksi')->insert([
+                        'transaksi_id'               => $transaksiId,
+                        'toko_id'                    => $produk->toko_id,
+                        'barang_id'                  => $produk->id, 
+                        'nama_barang_saat_transaksi' => $produk->nama_barang, // <--- WAJIB DIISI SESUAI DATABASE
+                        'harga_saat_transaksi'       => $produk->harga,       // <--- NAMA KOLOM YANG BENAR
+                        'jumlah'                     => $jumlah,
+                        'subtotal'                   => $produk->harga * $jumlah
+                    ]);
+                }
+            } else {
+                if ($request->has('selected_items')) {
+                    $keranjangs = DB::table('tb_keranjang')
+                        ->join('tb_barang', 'tb_keranjang.barang_id', '=', 'tb_barang.id')
+                        ->whereIn('tb_keranjang.id', $request->input('selected_items'))
+                        // Pastikan kita juga mengambil nama_barang dari tb_barang
+                        ->select('tb_keranjang.*', 'tb_barang.toko_id', 'tb_barang.harga', 'tb_barang.nama_barang')
+                        ->get();
+
+                    foreach ($keranjangs as $item) {
+                        DB::table('tb_detail_transaksi')->insert([
+                            'transaksi_id'               => $transaksiId,
+                            'toko_id'                    => $item->toko_id,
+                            'barang_id'                  => $item->barang_id, 
+                            'nama_barang_saat_transaksi' => $item->nama_barang, // <--- WAJIB DIISI SESUAI DATABASE
+                            'harga_saat_transaksi'       => $item->harga,       // <--- NAMA KOLOM YANG BENAR
+                            'jumlah'                     => $item->jumlah,
+                            'subtotal'                   => $item->harga * $item->jumlah
+                        ]);
+                    }
+
+                    DB::table('tb_keranjang')
+                        ->where('user_id', $user->id)
+                        ->whereIn('id', $request->input('selected_items'))
+                        ->delete();
+                }
+            }
+            // =================================================================
+
+            // 3. Ambil Kunci Midtrans dari Database
+            $settings = DB::table('tb_pengaturan')
+                ->whereIn('setting_nama', ['midtrans_server_key', 'midtrans_is_production'])
+                ->pluck('setting_nilai', 'setting_nama');
+
+            $serverKey = $settings['midtrans_server_key'] ?? '';
+            $isProduction = ($settings['midtrans_is_production'] ?? '0') == '1';
+
+            // 4. Konfigurasi Midtrans
+            \Midtrans\Config::$serverKey = $serverKey;
+            \Midtrans\Config::$isProduction = $isProduction;
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
+
+            // 5. Siapkan Data untuk Dikirim ke Midtrans
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $orderId,
+                    'gross_amount' => (int) $grandTotal,
+                ],
+                'customer_details' => [
+                    'first_name' => $request->input('shipping_nama_penerima') ?? $user->nama,
+                    'email' => $request->input('user_email'),
+                    'phone' => $request->input('shipping_telepon_penerima') ?? ($user->no_telepon ?? '081234567890'),
+                    'shipping_address' => [
+                        'first_name' => $request->input('shipping_nama_penerima'),
+                        'phone' => $request->input('shipping_telepon_penerima'),
+                        'address' => $request->input('shipping_alamat_lengkap'),
+                        'city' => $request->input('shipping_kota_kabupaten'),
+                        'postal_code' => $request->input('shipping_kode_pos'),
+                    ]
+                ],
+            ];
+
+            // 6. Generate Snap Token
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+            // Update token ke tabel transaksi
+            DB::table('tb_transaksi')->where('id', $transaksiId)->update(['snap_token' => $snapToken]);
+
+            // Kembalikan Response JSON ke Javascript Blade
+            return response()->json([
+                'status' => 'success', 
+                'snap_token' => $snapToken
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Kesalahan Midtrans: ' . $e->getMessage()
+            ], 500);
+        }
     }
+
     // =================================================================
     // 9. HALAMAN PROFIL CUSTOMER
     // =================================================================
     public function profil()
     {
-        // Pastikan user sudah login
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Silakan masuk terlebih dahulu.');
         }
 
-        // Ambil data user yang sedang login
         $user = Auth::user();
 
-        // Ambil data alamat utama
         $alamatUtama = DB::table('tb_user_alamat as ua')
             ->leftJoin('districts as d', 'ua.district_id', '=', 'd.id')
             ->leftJoin('cities as c', 'ua.city_id', '=', 'c.id')
@@ -464,7 +559,6 @@ class PageController extends Controller
             ->where('ua.is_utama', 1)
             ->first();
 
-        // Format alamat jika ada
         $alamatLengkapFormatted = '-';
         if ($alamatUtama) {
             $alamatLengkapFormatted = 
@@ -477,7 +571,8 @@ class PageController extends Controller
 
         return view('pages.profil', compact('user', 'alamatLengkapFormatted'));
     }
-   // =================================================================
+
+    // =================================================================
     // 10. HALAMAN EDIT PROFIL & ALAMAT
     // =================================================================
     public function editProfil()
@@ -486,16 +581,13 @@ class PageController extends Controller
         
         $user = Auth::user();
         
-        // Ambil Data Alamat Utama
         $alamatUtama = DB::table('tb_user_alamat')
             ->where('user_id', $user->id)
             ->where('is_utama', 1)
             ->first();
 
-        // Ambil Data Provinsi untuk Dropdown Pertama
         $provinces = DB::table('provinces')->orderBy('name', 'ASC')->get();
         
-        // Ambil Kota & Kecamatan jika user sudah punya alamat (Untuk Selected Data)
         $cities = [];
         $districts = [];
         if ($alamatUtama && $alamatUtama->province_id) {
@@ -514,7 +606,6 @@ class PageController extends Controller
 
         $user = Auth::user();
 
-        // 1. Validasi Input (Data Diri & Alamat)
         $request->validate([
             'nama' => 'required|string|max:255',
             'no_telepon' => 'nullable|string|max:20',
@@ -522,7 +613,6 @@ class PageController extends Controller
             'tanggal_lahir' => 'nullable|date',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             
-            // Validasi Alamat
             'label_alamat' => 'nullable|string|max:50',
             'nama_penerima' => 'nullable|string|max:255',
             'telepon_penerima' => 'nullable|string|max:20',
@@ -533,7 +623,6 @@ class PageController extends Controller
             'kode_pos' => 'nullable|string|max:10',
         ]);
 
-        // 2. Handle Upload Foto
         $namaFoto = $user->profile_picture_url; 
 
         if ($request->hasFile('foto')) {
@@ -547,7 +636,6 @@ class PageController extends Controller
             }
         }
 
-        // 3. Update Data Diri (tb_user)
         DB::table('tb_user')->where('id', $user->id)->update([
             'nama' => $request->nama,
             'no_telepon' => $request->no_telepon,
@@ -557,7 +645,6 @@ class PageController extends Controller
             'updated_at' => now(),
         ]);
 
-        // 4. Update atau Insert Alamat Utama (tb_user_alamat)
         if ($request->filled('alamat_lengkap')) {
             $cekAlamat = DB::table('tb_user_alamat')->where('user_id', $user->id)->where('is_utama', 1)->first();
 
@@ -583,6 +670,7 @@ class PageController extends Controller
 
         return redirect()->route('profil.index')->with('success', 'Profil dan Alamat berhasil diperbarui!');
     }
+
     // =================================================================
     // 11. STATUS PESANAN SAYA
     // =================================================================
@@ -590,7 +678,7 @@ class PageController extends Controller
     {
         if (!Auth::check()) return redirect()->route('login');
 
-        $orders =DB::table('tb_transaksi')
+        $orders = DB::table('tb_transaksi')
             ->where('user_id', Auth::id())
             ->orderBy('tanggal_transaksi', 'desc')
             ->get();
@@ -601,20 +689,19 @@ class PageController extends Controller
     // =================================================================
     // 12. LACAK PENGIRIMAN (DETAIL PESANAN)
     // =================================================================
-    public function lacakPesanan($kode_pesanan)
+    public function lacakPesanan($kode_invoice)
     {
         if (!Auth::check()) return redirect()->route('login');
 
-        // Ambil data pesanan
         $order = DB::table('tb_transaksi')
+            ->where('kode_invoice', $kode_invoice)
             ->where('user_id', Auth::id())
-            ->orderBy('tanggal_transaksi', 'desc')
-            ->get();
+            ->first();
 
-        if (!$order) abort(404);
+        if (!$order) {
+            abort(404, 'Pesanan tidak ditemukan.');
+        }
 
-        // Simulasi History Perjalanan (Nantinya data ini dari tabel tb_pesanan_log)
-        // Kita buat dummy data untuk tampilan modern
         $trackingLogs = [
             ['status' => 'Selesai', 'desc' => 'Pesanan telah diterima oleh pembeli', 'time' => '05 Mar 2026 14:00'],
             ['status' => 'Dikirim', 'desc' => 'Pesanan sedang dibawa oleh kurir', 'time' => '04 Mar 2026 09:00'],
@@ -623,5 +710,40 @@ class PageController extends Controller
         ];
 
         return view('pages.pesanan_lacak', compact('order', 'trackingLogs'));
+    }
+
+    // =================================================================
+    // HALAMAN GANTI PASSWORD
+    // =================================================================
+    public function gantiPassword()
+    {
+        if (!Auth::check()) return redirect()->route('login');
+        return view('pages.ganti_password');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        if (!Auth::check()) return redirect()->route('login');
+
+        $request->validate([
+            'password_lama' => 'required',
+            'password_baru' => 'required|min:8|confirmed', 
+        ], [
+            'password_baru.min' => 'Password baru minimal 8 karakter.',
+            'password_baru.confirmed' => 'Konfirmasi password tidak cocok.'
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->password_lama, $user->password)) {
+            return back()->with('error', 'Password lama yang Anda masukkan salah!');
+        }
+
+        DB::table('tb_user')->where('id', $user->id)->update([
+            'password' => Hash::make($request->password_baru),
+            'updated_at' => now()
+        ]);
+
+        return back()->with('success', 'Password Anda berhasil diperbarui! Silakan gunakan password baru untuk login selanjutnya.');
     }
 }

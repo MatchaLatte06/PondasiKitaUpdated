@@ -21,6 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
             // Middleware Kasta/Role Admin (BARU)
             'admin.role' => \App\Http\Middleware\CheckAdminRole::class,
         ]);
+
+        // --- PENGECUALIAN CSRF TOKEN ---
+        // Biarkan Midtrans bisa mengakses route ini tanpa diblokir sistem keamanan Laravel
+        $middleware->validateCsrfTokens(except: [
+            '/webhook/midtrans',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

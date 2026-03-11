@@ -257,7 +257,7 @@
                         
                         <div>
                             {{-- Saya matikan href-nya sementara dengan '#' agar tidak error jika rute lacak belum dibuat --}}
-                            <a href="#" class="btn-track">
+                            <a href="{{ route('pesanan.lacak', $row->kode_invoice) }}" class="btn-track">
                                 <i class="fas fa-truck-fast"></i> Rincian & Lacak
                             </a>
                         </div>

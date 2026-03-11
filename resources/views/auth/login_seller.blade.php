@@ -32,8 +32,8 @@
                 {{-- Menggunakan route() untuk link yang dinamis --}}
                 <p>Ingin mulai berjualan? <a href="{{ route('seller.register') }}">Daftar sebagai Penjual</a></p>
 
-                {{-- Form Action mengarah ke Route Laravel --}}
-                <form action="{{ route('login.process') }}" method="POST">
+                {{-- PERBAIKAN: Form Action mengarah ke Route Laravel khusus Seller --}}
+                <form action="{{ route('seller.login.process') }}" method="POST">
                     
                     {{-- WAJIB: Token keamanan Laravel --}}
                     @csrf 
@@ -79,6 +79,5 @@
             });
         @endif
     </script>
-</body>
 </body>
 </html>

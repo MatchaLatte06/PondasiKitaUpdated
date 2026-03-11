@@ -73,7 +73,8 @@
 <body>
     @include('partials.navbar')
 
-    <form id="checkout-form" action="{{ route('checkout.process') }}" method="POST">
+    {{-- Form kita arahkan ke JS (Intercept) bukan langsung pindah halaman --}}
+    <form id="checkout-form">
         @csrf
         {{-- Data Tersembunyi (Hidden Inputs) --}}
         <input type="hidden" name="user_email" value="{{ $userEmail }}">
@@ -95,7 +96,6 @@
             <input type="hidden" name="product_id" value="{{ request('product_id') }}">
             <input type="hidden" name="jumlah" value="{{ request('jumlah') }}">
         @else
-            {{-- PERBAIKAN ERROR FOREACH: Pecah string menjadi array terlebih dahulu --}}
             @php
                 $rawItems = request('selected_items', '');
                 $itemArray = is_string($rawItems) && $rawItems !== '' ? explode(',', $rawItems) : (is_array($rawItems) ? $rawItems : []);
@@ -115,7 +115,6 @@
                     <h3 class="card-title">1. Alamat Pengiriman</h3>
                     
                     <div class="address-grid">
-                        {{-- Opsi Alamat Profil --}}
                         <label class="address-card selected" id="card-saved">
                             <input type="radio" name="address_type" value="saved" checked>
                             <h4><i class="fas fa-home text-blue-500"></i> Alamat Profil</h4>
@@ -128,7 +127,6 @@
                             @endif
                         </label>
 
-                        {{-- Opsi Alamat Baru --}}
                         <label class="address-card" id="card-manual">
                             <input type="radio" name="address_type" value="manual">
                             <h4><i class="fas fa-map-marker-alt text-blue-500"></i> Kirim ke Alamat Lain</h4>
@@ -136,7 +134,6 @@
                         </label>
                     </div>
 
-                    {{-- Form Manual --}}
                     <div id="manual-address-form" class="manual-form">
                         <div class="form-row">
                             <div class="form-group">
@@ -208,7 +205,7 @@
                                     <label>Pilih Durasi Pengiriman</label>
                                     <select name="shipping[{{ $tokoId }}]" class="form-control shipping-select" style="max-width: 100%;">
                                         <option value="reguler_15000">Reguler (2-3 Hari) - Rp15.000</option>
-                                        <option value="kargo_30000">Kargo Truk (Khusus Material Berat) - Rp30.000</option>
+                                        <option value="kargo_30000">Kargo Truk (Khusus Material) - Rp30.000</option>
                                     </select>
                                 </div>
                             </div>
@@ -238,6 +235,7 @@
                         <span>Total Tagihan</span>
                         <span id="grand-total-display">Rp{{ number_format($totalProduk, 0, ',', '.') }}</span>
                     </div>
+                    <input type="hidden" name="grand_total" id="input_grand_total" value="{{ $totalProduk }}">
                     <button type="submit" class="btn-submit" id="btn-submit">Bayar Sekarang</button>
                 </div>
             </div>
@@ -246,8 +244,14 @@
 
     @include('partials.footer')
     
-    {{-- SCRIPT INTERAKTIF MODERN --}}
+    {{-- ========================================================================= --}}
+    {{-- PENGATURAN MIDTRANS SECARA DINAMIS DARI DATABASE --}}
+    {{-- ========================================================================= --}}
     @php
+        $clientKey = \Illuminate\Support\Facades\DB::table('tb_pengaturan')->where('setting_nama', 'midtrans_client_key')->value('setting_nilai');
+        $isProd = \Illuminate\Support\Facades\DB::table('tb_pengaturan')->where('setting_nama', 'midtrans_is_production')->value('setting_nilai') == '1';
+        $midtransUrl = $isProd ? "https://app.midtrans.com/snap/snap.js" : "https://app.sandbox.midtrans.com/snap/snap.js";
+
         $addressData = null;
         if ($alamatUser) {
             $addressData = [
@@ -263,16 +267,16 @@
         }
     @endphp
 
+    {{-- Script SweetAlert & Midtrans Snap --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ $midtransUrl }}" data-client-key="{{ $clientKey }}"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            
-            // 1. DATA ALAMAT DARI BACKEND
             const savedAddress = @json($addressData);
-            
             const isProfileIncomplete = @json($isAlamatIncomplete);
             const totalProduk = {{ $totalProduk }};
 
-            // 2. ELEMEN DOM
             const radioAddress = document.querySelectorAll('input[name="address_type"]');
             const cardSaved = document.getElementById('card-saved');
             const cardManual = document.getElementById('card-manual');
@@ -280,54 +284,35 @@
             const manualInputs = document.querySelectorAll('.manual-input');
             const btnSubmit = document.getElementById('btn-submit');
             
-            // Input Final (Hidden)
             const final = {
-                label: document.getElementById('final_label'),
-                nama: document.getElementById('final_nama'),
-                telepon: document.getElementById('final_telepon'),
-                alamat: document.getElementById('final_alamat'),
-                kecamatan: document.getElementById('final_kecamatan'),
-                kota: document.getElementById('final_kota'),
-                provinsi: document.getElementById('final_provinsi'),
-                kodepos: document.getElementById('final_kodepos')
+                label: document.getElementById('final_label'), nama: document.getElementById('final_nama'),
+                telepon: document.getElementById('final_telepon'), alamat: document.getElementById('final_alamat'),
+                kecamatan: document.getElementById('final_kecamatan'), kota: document.getElementById('final_kota'),
+                provinsi: document.getElementById('final_provinsi'), kodepos: document.getElementById('final_kodepos')
             };
             
-            // 3. LOGIKA TOGGLE KARTU ALAMAT
             function updateAddressUI() {
                 const selected = document.querySelector('input[name="address_type"]:checked').value;
-                
-                // Ubah style kartu
                 if (selected === 'saved') {
-                    cardSaved.classList.add('selected');
-                    cardManual.classList.remove('selected');
+                    cardSaved.classList.add('selected'); cardManual.classList.remove('selected');
                     manualFormDiv.classList.remove('active');
-                    
-                    // Masukkan data saved ke hidden input
                     if (savedAddress) {
                         final.label.value = savedAddress.label; final.nama.value = savedAddress.nama;
                         final.telepon.value = savedAddress.telepon; final.alamat.value = savedAddress.alamat;
                         final.kecamatan.value = savedAddress.kecamatan; final.kota.value = savedAddress.kota;
                         final.provinsi.value = savedAddress.provinsi; final.kodepos.value = savedAddress.kodepos;
                     }
-
-                    // Kunci tombol jika profil kosong
                     if (isProfileIncomplete) {
-                        btnSubmit.disabled = true;
-                        btnSubmit.innerText = 'Lengkapi Alamat Profil Dulu';
+                        btnSubmit.disabled = true; btnSubmit.innerText = 'Lengkapi Alamat Profil Dulu';
                     } else {
-                        btnSubmit.disabled = false;
-                        btnSubmit.innerText = 'Bayar Sekarang';
+                        btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
                     }
                 } else {
-                    cardSaved.classList.remove('selected');
-                    cardManual.classList.add('selected');
+                    cardSaved.classList.remove('selected'); cardManual.classList.add('selected');
                     manualFormDiv.classList.add('active');
-                    
                     final.label.value = "Alamat Baru Manual";
-                    syncManualToHidden(); // Update real-time dari ketikan user
-                    
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerText = 'Bayar Sekarang';
+                    syncManualToHidden();
+                    btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
                 }
             }
 
@@ -342,49 +327,103 @@
                 final.kodepos.value = document.getElementById('manual_kodepos').value;
             }
 
-            // Event Listener Alamat
             radioAddress.forEach(radio => radio.addEventListener('change', updateAddressUI));
             manualInputs.forEach(input => input.addEventListener('input', syncManualToHidden));
-            updateAddressUI(); // Init pertama kali
+            updateAddressUI();
 
-            // 4. LOGIKA HITUNG ONGKIR
             const shippingSelects = document.querySelectorAll('.shipping-select');
             const tipePengambilan = document.getElementById('tipe_pengambilan');
             
             function calculateTotal() {
                 let shippingCost = 0;
-                
                 if (tipePengambilan.value === 'pengiriman') {
-                    // Munculkan opsi kurir
                     document.querySelectorAll('.shipping-box').forEach(el => el.style.display = 'block');
-                    
                     shippingSelects.forEach(sel => {
-                        let valParts = sel.value.split('_'); // misal: reguler_15000
-                        if (valParts.length > 1) {
-                            shippingCost += parseInt(valParts[1]);
-                        }
+                        let valParts = sel.value.split('_');
+                        if (valParts.length > 1) shippingCost += parseInt(valParts[1]);
                     });
                 } else {
-                    // Sembunyikan opsi kurir jika ambil di toko
                     document.querySelectorAll('.shipping-box').forEach(el => el.style.display = 'none');
                     shippingCost = 0;
                 }
-
+                
+                let grandTotal = totalProduk + shippingCost;
                 document.getElementById('shipping-total-display').innerText = 'Rp' + shippingCost.toLocaleString('id-ID');
-                document.getElementById('grand-total-display').innerText = 'Rp' + (totalProduk + shippingCost).toLocaleString('id-ID');
+                document.getElementById('grand-total-display').innerText = 'Rp' + grandTotal.toLocaleString('id-ID');
+                document.getElementById('input_grand_total').value = grandTotal;
             }
 
             tipePengambilan.addEventListener('change', calculateTotal);
             shippingSelects.forEach(sel => sel.addEventListener('change', calculateTotal));
-            calculateTotal(); // Init pertama kali
-            
-            // 5. VALIDASI SEBELUM SUBMIT
-            document.getElementById('checkout-form').addEventListener('submit', function(e) {
+            calculateTotal();
+
+            // =========================================================================
+            // FUNGSI SUBMIT KE CONTROLLER VIA AJAX LALU PANGGIL POP-UP MIDTRANS
+            // =========================================================================
+            document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+                e.preventDefault(); // Cegah reload halaman
+
                 if (document.querySelector('input[name="address_type"]:checked').value === 'manual') {
                     if (!final.nama.value || !final.telepon.value || !final.alamat.value) {
-                        e.preventDefault();
-                        alert('Mohon isi Nama Penerima, Telepon, dan Alamat Lengkap untuk Alamat Manual!');
+                        Swal.fire('Perhatian', 'Mohon lengkapi formulir alamat manual Anda.', 'warning');
+                        return;
                     }
+                }
+
+                btnSubmit.disabled = true;
+                btnSubmit.innerText = 'Memproses...';
+
+                try {
+                    const formData = new FormData(this);
+
+                    // Tembak Data ke Controller
+                    const response = await fetch("{{ route('checkout.process') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success' && result.snap_token) {
+                        // PANGGIL POP-UP MIDTRANS SNAP DI SINI
+                        window.snap.pay(result.snap_token, {
+                            onSuccess: function(data){
+                                Swal.fire('Berhasil!', 'Pembayaran Anda telah diterima.', 'success').then(() => {
+                                    window.location.href = "{{ route('pesanan.index') }}";
+                                });
+                            },
+                            onPending: function(data){
+                                Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran sesuai instruksi.', 'info').then(() => {
+                                    window.location.href = "{{ route('pesanan.index') }}";
+                                });
+                            },
+                            onError: function(data){
+                                Swal.fire('Gagal!', 'Terjadi kesalahan saat memproses pembayaran.', 'error');
+                                btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
+                            },
+                            onClose: function(){
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Pembayaran Dibatalkan',
+                                    text: 'Anda menutup pop-up sebelum menyelesaikan pembayaran. Pesanan Anda berstatus Menunggu Pembayaran.',
+                                    confirmButtonText: 'Lihat Pesanan'
+                                }).then(() => {
+                                    window.location.href = "{{ route('pesanan.index') }}";
+                                });
+                            }
+                        });
+                    } else {
+                        Swal.fire('Gagal', result.message || 'Terjadi kesalahan sistem', 'error');
+                        btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire('Error', 'Sistem tidak dapat terhubung ke server.', 'error');
+                    btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
                 }
             });
         });

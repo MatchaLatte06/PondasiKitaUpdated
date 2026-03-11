@@ -102,7 +102,7 @@
                     {{-- Note: Rute untuk edit profil disiapkan menggunakan url() sementara --}}
                     {{-- Tombol Edit mengarah ke rute baru --}}
                     <a href="{{ route('profil.edit') }}" class="btn-primary"><i class="fa-solid fa-pen-to-square"></i> Edit Profil</a>
-                    <a href="#" class="btn-secondary" onclick="alert('Fitur Ganti Password sedang dibangun.')"><i class="fa-solid fa-key"></i> Ganti Password</a>
+                    <a href="{{ route('profil.password') }}" class="btn-secondary"><i class="fa-solid fa-key"></i> Ganti Password</a>
                 </div>
             </div>
         </div>
