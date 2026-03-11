@@ -2,85 +2,96 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Checkout - Pondasikita</title>
+    <title>Checkout Aman - Pondasikita</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/navbar_style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <style>
-        body { background-color: #f3f4f6; font-family: 'Inter', sans-serif; color: #1f2937; }
-        .checkout-container { max-width: 1100px; margin: 40px auto; padding: 0 15px; display: flex; gap: 30px; align-items: flex-start; }
-        
-        .checkout-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; color: #111827; }
-        
-        .main-col { flex: 1; display: flex; flex-direction: column; gap: 20px; }
-        .side-col { width: 350px; position: sticky; top: 90px; }
 
-        /* KOTAK KARTU (MODERN CARD) */
-        .card-box { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
-        .card-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 20px 0; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
-
-        /* ALAMAT OPTION (CARD STYLE) */
-        .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .address-card { border: 2px solid #e5e7eb; border-radius: 10px; padding: 15px; cursor: pointer; position: relative; transition: 0.2s; background: #f9fafb; }
-        .address-card:hover { border-color: #93c5fd; }
-        .address-card input[type="radio"] { position: absolute; opacity: 0; }
-        .address-card.selected { border-color: #3b82f6; background: #eff6ff; }
-        .address-card.selected::after { content: '\f058'; font-family: 'Font Awesome 5 Free'; font-weight: 900; color: #3b82f6; position: absolute; top: 15px; right: 15px; font-size: 1.2rem; }
-        .address-card h4 { margin: 0 0 5px 0; font-size: 1rem; color: #1f2937; }
-        .address-card p { margin: 0; font-size: 0.85rem; color: #6b7280; line-height: 1.4; }
-
-        /* FORM MANUAL ALAMAT */
-        .manual-form { display: none; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; margin-top: 10px;}
-        .manual-form.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #4b5563; }
-        .form-control { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; outline: none; transition: 0.2s; box-sizing: border-box; }
-        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-
-        /* LIST PRODUK */
-        .store-group { margin-bottom: 25px; }
-        .store-group h4 { font-size: 1rem; color: #10b981; margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;}
-        .item-row { display: flex; gap: 15px; padding: 15px; border: 1px solid #f1f5f9; border-radius: 8px; margin-bottom: 10px; }
-        .item-row img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; }
-        .item-info { flex: 1; }
-        .item-info h5 { margin: 0 0 5px 0; font-size: 0.95rem; }
-        .item-info p { margin: 0; font-size: 0.85rem; color: #6b7280; }
-        .item-price { font-weight: 700; color: #ef4444; }
-
-        /* PENGIRIMAN & CATATAN */
-        .shipping-box { background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 10px; }
-
-        /* RINGKASAN BELANJA (STICKY KANAN) */
-        .summary-row { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 12px; color: #4b5563; }
-        .summary-total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 800; color: #111827; padding-top: 15px; border-top: 1px dashed #d1d5db; margin-top: 10px; }
-        .btn-submit { width: 100%; background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; margin-top: 20px; cursor: pointer; transition: 0.2s; }
-        .btn-submit:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59,130,246,0.3); }
-        .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        @media (max-width: 992px) {
-            .checkout-container { flex-direction: column; }
-            .side-col { width: 100%; position: static; }
-            .address-grid { grid-template-columns: 1fr; }
-            .form-row { grid-template-columns: 1fr; }
+    {{-- Tailwind CSS CDN + Config Dewa --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        surface: '#fcfcfd',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 40px -4px rgba(0,0,0,0.03)',
+                        'float': '0 10px 30px -5px rgba(0,0,0,0.08)',
+                        'glow': '0 0 20px rgba(37,99,235,0.3)',
+                        'sticky': '0 -10px 40px rgba(0,0,0,0.08)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: 0, transform: 'translateY(15px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } }
+                    }
+                }
+            }
         }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f4f4f5; }
+
+        /* Remove Number Input Arrows */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Smooth Hide/Show for Manual Form */
+        .manual-form-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s ease-out;
+        }
+        .manual-form-wrapper.active {
+            grid-template-rows: 1fr;
+        }
+        .manual-form-inner { overflow: hidden; }
+
+        /* Card Address Active State */
+        .address-card.selected { border-color: #2563eb; background-color: #eff6ff; }
+        .address-card.selected .check-icon { opacity: 1; transform: scale(1); }
+        .address-card .check-icon { opacity: 0; transform: scale(0.5); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
-<body>
+<body class="text-zinc-800 antialiased pt-[80px] pb-32 lg:pb-12">
+
+    {{-- Navbar --}}
     @include('partials.navbar')
 
-    {{-- Form kita arahkan ke JS (Intercept) bukan langsung pindah halaman --}}
+    {{-- BREADCRUMB MINIMALIS --}}
+    <div class="bg-white border-b border-zinc-200 hidden md:block relative z-10 shadow-sm">
+        <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-3">
+            <nav class="flex text-xs font-semibold text-zinc-500 items-center gap-3">
+                <a href="{{ route('keranjang.index') }}" class="hover:text-black transition-colors flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Keranjang
+                </a>
+                <span class="w-1 h-1 rounded-full bg-zinc-300"></span>
+                <span class="text-zinc-900 font-bold"><i class="fas fa-lock text-emerald-500 mr-1"></i> Checkout Aman</span>
+            </nav>
+        </div>
+    </div>
+
+    {{-- MAIN FORM (Intercepted by JS) --}}
     <form id="checkout-form">
         @csrf
-        {{-- Data Tersembunyi (Hidden Inputs) --}}
+        {{-- Hidden Data --}}
         <input type="hidden" name="user_email" value="{{ $userEmail }}">
         <input type="hidden" name="total_produk_subtotal" value="{{ $totalProduk }}">
-        
-        {{-- Input Final Alamat untuk dikirim ke Backend --}}
+        <input type="hidden" name="grand_total" id="input_grand_total" value="{{ $totalProduk }}">
+
         <input type="hidden" name="shipping_label_alamat" id="final_label">
         <input type="hidden" name="shipping_nama_penerima" id="final_nama">
         <input type="hidden" name="shipping_telepon_penerima" id="final_telepon">
@@ -90,7 +101,6 @@
         <input type="hidden" name="shipping_provinsi" id="final_provinsi">
         <input type="hidden" name="shipping_kode_pos" id="final_kodepos">
 
-        {{-- Passing Data Produk --}}
         @if($isDirectPurchase)
             <input type="hidden" name="direct_purchase" value="1">
             <input type="hidden" name="product_id" value="{{ request('product_id') }}">
@@ -105,145 +115,256 @@
             @endforeach
         @endif
 
-        <div class="checkout-container">
-            {{-- KOLOM KIRI (Form & Produk) --}}
-            <div class="main-col">
-                <h1 class="checkout-title"><i class="fas fa-file-invoice-dollar text-blue-500"></i> Pengiriman & Pembayaran</h1>
+        <main class="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 lg:py-10">
 
-                {{-- KARTU 1: ALAMAT PENGIRIMAN --}}
-                <div class="card-box">
-                    <h3 class="card-title">1. Alamat Pengiriman</h3>
-                    
-                    <div class="address-grid">
-                        <label class="address-card selected" id="card-saved">
-                            <input type="radio" name="address_type" value="saved" checked>
-                            <h4><i class="fas fa-home text-blue-500"></i> Alamat Profil</h4>
-                            @if($alamatUser && !$isAlamatIncomplete)
-                                <p class="mt-2"><strong>{{ $alamatUser->nama_penerima }}</strong> ({{ $alamatUser->telepon_penerima }})</p>
-                                <p>{{ $alamatUser->alamat_lengkap }}</p>
-                                <p>{{ $alamatUser->district_name }}, {{ $alamatUser->city_name }}</p>
-                            @else
-                                <p class="mt-2 text-red-500"><i class="fas fa-exclamation-triangle"></i> Alamat profil Anda belum lengkap.</p>
-                            @endif
-                        </label>
+            <div class="mb-8">
+                <h1 class="text-3xl font-black text-black tracking-tight flex items-center gap-3">
+                    Pengiriman & Pembayaran
+                </h1>
+                <p class="text-sm font-medium text-zinc-500 mt-1">Selesaikan pesanan Anda dengan aman dan cepat.</p>
+            </div>
 
-                        <label class="address-card" id="card-manual">
-                            <input type="radio" name="address_type" value="manual">
-                            <h4><i class="fas fa-map-marker-alt text-blue-500"></i> Kirim ke Alamat Lain</h4>
-                            <p class="mt-2">Isi formulir alamat baru secara manual untuk pesanan ini.</p>
-                        </label>
-                    </div>
+            {{-- 12-COLUMN GRID LAYOUT --}}
+            <div class="flex flex-col lg:grid lg:grid-cols-12 gap-8 xl:gap-10 items-start">
 
-                    <div id="manual-address-form" class="manual-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Nama Penerima</label>
-                                <input type="text" class="form-control manual-input" id="manual_nama" placeholder="Nama Lengkap">
-                            </div>
-                            <div class="form-group">
-                                <label>No. Telepon Aktif</label>
-                                <input type="number" class="form-control manual-input" id="manual_telepon" placeholder="081234567xxx">
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Alamat Lengkap (Jalan, RT/RW, Patokan)</label>
-                            <textarea class="form-control manual-input" id="manual_alamat" rows="2"></textarea>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Kecamatan</label>
-                                <input type="text" class="form-control manual-input" id="manual_kecamatan">
-                            </div>
-                            <div class="form-group">
-                                <label>Kota/Kabupaten</label>
-                                <input type="text" class="form-control manual-input" id="manual_kota">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Provinsi</label>
-                                <input type="text" class="form-control manual-input" id="manual_provinsi">
-                            </div>
-                            <div class="form-group">
-                                <label>Kode Pos</label>
-                                <input type="number" class="form-control manual-input" id="manual_kodepos">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {{-- ======================================================= --}}
+                {{-- KOLOM KIRI (KONTEN UTAMA - Span 8) --}}
+                {{-- ======================================================= --}}
+                <div class="w-full lg:col-span-8 flex flex-col gap-8 animate-fade-in">
 
-                {{-- KARTU 2: PRODUK & PENGIRIMAN --}}
-                <div class="card-box">
-                    <h3 class="card-title">2. Detail Produk & Kurir</h3>
-                    
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label>Tipe Pengambilan</label>
-                        <select name="tipe_pengambilan" id="tipe_pengambilan" class="form-control" style="max-width: 300px; background: #f8fafc;">
-                            <option value="pengiriman">Dikirim Kurir ke Alamat</option>
-                            <option value="ambil_di_toko">Ambil Sendiri di Toko</option>
-                        </select>
-                    </div>
+                    {{-- 1. KARTU ALAMAT --}}
+                    <div class="bg-white rounded-[2rem] shadow-soft border border-zinc-200 p-6 sm:p-8 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
+                        <h2 class="text-xl font-black text-black mb-6">1. Alamat Tujuan</h2>
 
-                    @foreach($itemsPerToko as $tokoId => $toko)
-                        <div class="store-group">
-                            <h4><i class="fas fa-store"></i> {{ $toko['nama_toko'] }} <small style="color: #6b7280; font-weight: normal; margin-left: 5px;">({{ $toko['kota_toko'] }})</small></h4>
-                            
-                            @foreach($toko['items'] as $item)
-                                @php $subtotal = $item->harga * $item->jumlah; @endphp
-                                <div class="item-row">
-                                    <img src="{{ asset('assets/uploads/products/' . ($item->gambar_utama ?? 'default.jpg')) }}" onerror="this.src='{{ asset('assets/uploads/products/default.jpg') }}'">
-                                    <div class="item-info">
-                                        <h5>{{ $item->nama_barang }}</h5>
-                                        <p>{{ $item->jumlah }} x Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Opsi 1: Alamat Profil --}}
+                            <label id="card-saved" class="address-card selected relative flex flex-col p-5 border-2 border-zinc-200 rounded-2xl cursor-pointer transition-all duration-300 group">
+                                <input type="radio" name="address_type" value="saved" checked class="peer sr-only">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex items-center gap-2 text-zinc-900 font-bold">
+                                        <i class="fas fa-home text-blue-500 bg-blue-50 p-2 rounded-lg"></i> Alamat Profil
                                     </div>
-                                    <div class="item-price">Rp{{ number_format($subtotal, 0, ',', '.') }}</div>
+                                    <i class="fas fa-check-circle text-blue-600 text-xl check-icon"></i>
+                                </div>
+
+                                @if($alamatUser && !$isAlamatIncomplete)
+                                    <div class="text-sm text-zinc-600 space-y-1">
+                                        <p class="font-bold text-black">{{ $alamatUser->nama_penerima }} <span class="text-zinc-400 font-medium">({{ $alamatUser->telepon_penerima }})</span></p>
+                                        <p class="line-clamp-2">{{ $alamatUser->alamat_lengkap }}</p>
+                                        <p class="font-medium">{{ $alamatUser->district_name }}, {{ $alamatUser->city_name }}</p>
+                                    </div>
+                                @else
+                                    <div class="text-sm text-red-500 bg-red-50 p-3 rounded-xl mt-2 flex items-start gap-2">
+                                        <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                                        <span>Data alamat profil Anda belum lengkap. Silakan lengkapi atau pilih alamat manual.</span>
+                                    </div>
+                                @endif
+                            </label>
+
+                            {{-- Opsi 2: Alamat Manual --}}
+                            <label id="card-manual" class="address-card relative flex flex-col p-5 border-2 border-zinc-200 rounded-2xl cursor-pointer transition-all duration-300 group hover:border-blue-300 hover:bg-zinc-50">
+                                <input type="radio" name="address_type" value="manual" class="peer sr-only">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-center gap-2 text-zinc-900 font-bold">
+                                        <i class="fas fa-map-marker-alt text-zinc-500 bg-zinc-100 p-2 rounded-lg group-hover:text-blue-500 group-hover:bg-blue-50 transition-colors"></i> Kirim ke Alamat Lain
+                                    </div>
+                                    <i class="fas fa-check-circle text-blue-600 text-xl check-icon"></i>
+                                </div>
+                                <p class="text-xs text-zinc-500 font-medium mt-1">Masukkan alamat spesifik untuk pengiriman pesanan ini saja.</p>
+                            </label>
+                        </div>
+
+                        {{-- Form Manual (Hidden by default with smooth slide down) --}}
+                        <div id="manual-address-form" class="manual-form-wrapper mt-4">
+                            <div class="manual-form-inner bg-zinc-50 border border-zinc-200 rounded-2xl p-5 sm:p-6">
+                                <h4 class="text-sm font-black text-zinc-400 uppercase tracking-widest mb-4">Form Alamat Baru</h4>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+                                    <div class="relative group">
+                                        <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">Nama Penerima</label>
+                                        <input type="text" class="manual-input w-full bg-white border border-zinc-300 text-black text-sm font-semibold rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 px-4 py-3 transition-all outline-none" id="manual_nama" placeholder="Budi Santoso">
+                                    </div>
+                                    <div class="relative group">
+                                        <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">No. Telepon Aktif</label>
+                                        <input type="number" class="manual-input w-full bg-white border border-zinc-300 text-black text-sm font-semibold rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 px-4 py-3 transition-all outline-none" id="manual_telepon" placeholder="081234567890">
+                                    </div>
+                                </div>
+
+                                <div class="relative group mb-5">
+                                    <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">Alamat Lengkap</label>
+                                    <textarea class="manual-input custom-scrollbar w-full bg-white border border-zinc-300 text-black text-sm font-semibold rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 px-4 py-3 transition-all outline-none resize-none" id="manual_alamat" rows="2" placeholder="Nama Jalan, Gedung, RT/RW..."></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+                                    <div class="relative group">
+                                        <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">Kecamatan</label>
+                                        <input type="text" class="manual-input w-full bg-white border border-zinc-300 text-black text-sm font-semibold rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 px-4 py-3 transition-all outline-none" id="manual_kecamatan">
+                                    </div>
+                                    <div class="relative group">
+                                        <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">Kota / Kabupaten</label>
+                                        <input type="text" class="manual-input w-full bg-white border border-zinc-300 text-black text-sm font-semibold rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 px-4 py-3 transition-all outline-none" id="manual_kota">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div class="relative group">
+                                        <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">Provinsi</label>
+                                        <input type="text" class="manual-input w-full bg-white border border-zinc-300 text-black text-sm font-semibold rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 px-4 py-3 transition-all outline-none" id="manual_provinsi">
+                                    </div>
+                                    <div class="relative group">
+                                        <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">Kode Pos</label>
+                                        <input type="number" class="manual-input w-full bg-white border border-zinc-300 text-black text-sm font-semibold rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 px-4 py-3 transition-all outline-none" id="manual_kodepos">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 2. KARTU DAFTAR PRODUK & KURIR --}}
+                    <div class="bg-white rounded-[2rem] shadow-soft border border-zinc-200 p-6 sm:p-8 overflow-hidden">
+                        <div class="flex items-center justify-between mb-6 pb-4 border-b border-zinc-100">
+                            <h2 class="text-xl font-black text-black">2. Detail Pesanan</h2>
+                            <span class="bg-zinc-100 text-zinc-600 px-3 py-1 rounded-full text-xs font-bold">{{ $itemArray ? count($itemArray) : 1 }} Toko</span>
+                        </div>
+
+                        {{-- Tipe Pengambilan Master --}}
+                        <div class="mb-8">
+                            <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 ml-1">Metode Pengiriman Global</label>
+                            <div class="relative max-w-sm">
+                                <select name="tipe_pengambilan" id="tipe_pengambilan" class="w-full bg-blue-50 border border-blue-200 text-blue-700 text-sm font-bold rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/20 px-4 py-3.5 transition-all outline-none cursor-pointer appearance-none">
+                                    <option value="pengiriman">Diantar Kurir ke Alamat</option>
+                                    <option value="ambil_di_toko">Ambil Sendiri di Toko Fisik</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none"><i class="fas fa-chevron-down text-blue-500"></i></div>
+                            </div>
+                        </div>
+
+                        {{-- Loop Per Toko --}}
+                        <div class="space-y-8">
+                            @foreach($itemsPerToko as $tokoId => $toko)
+                                <div class="bg-zinc-50 border border-zinc-200 rounded-2xl overflow-hidden">
+                                    {{-- Toko Header --}}
+                                    <div class="bg-zinc-100 border-b border-zinc-200 px-5 py-3 flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-store text-emerald-600 bg-white p-1.5 rounded-md shadow-sm text-xs"></i>
+                                            <h4 class="font-black text-sm text-zinc-900">{{ $toko['nama_toko'] }}</h4>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-zinc-500 bg-white px-2 py-1 rounded-md border border-zinc-200">{{ $toko['kota_toko'] }}</span>
+                                    </div>
+
+                                    {{-- Items --}}
+                                    <div class="p-5 flex flex-col gap-4">
+                                        @foreach($toko['items'] as $item)
+                                            @php $subtotal = $item->harga * $item->jumlah; @endphp
+                                            <div class="flex gap-4">
+                                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white border border-zinc-200 overflow-hidden shrink-0">
+                                                    <img src="{{ asset('assets/uploads/products/' . ($item->gambar_utama ?? 'default.jpg')) }}" class="w-full h-full object-cover mix-blend-multiply" onerror="this.onerror=null; this.src='{{ asset('assets/uploads/products/default.jpg') }}';">
+                                                </div>
+                                                <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                                    <h5 class="text-sm font-bold text-zinc-800 line-clamp-1 mb-1">{{ $item->nama_barang }}</h5>
+                                                    <p class="text-xs font-semibold text-zinc-500 mb-2">{{ $item->jumlah }} x <span class="text-zinc-700">Rp{{ number_format($item->harga, 0, ',', '.') }}</span></p>
+                                                    <div class="text-sm font-black text-black">Rp{{ number_format($subtotal, 0, ',', '.') }}</div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    {{-- Kurir Box --}}
+                                    <div class="px-5 pb-5 shipping-box-wrapper" id="shipping-box-{{ $tokoId }}">
+                                        <div class="bg-white border border-blue-100 rounded-xl p-4">
+                                            <label class="block text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Pilih Kurir Toko Ini</label>
+                                            <div class="relative">
+                                                <select name="shipping[{{ $tokoId }}]" class="shipping-select w-full bg-transparent border-b-2 border-zinc-200 text-black text-sm font-bold pb-2 focus:border-blue-600 transition-all outline-none cursor-pointer appearance-none">
+                                                    <option value="reguler_15000">Reguler (2-3 Hari) — Rp 15.000</option>
+                                                    <option value="kargo_30000">Kargo Truk (Material Berat) — Rp 30.000</option>
+                                                </select>
+                                                <div class="absolute inset-y-0 right-0 pb-2 flex items-center pointer-events-none"><i class="fas fa-chevron-down text-zinc-400 text-xs"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             @endforeach
+                        </div>
 
-                            <div class="shipping-box" id="shipping-box-{{ $tokoId }}">
-                                <div class="form-group">
-                                    <label>Pilih Durasi Pengiriman</label>
-                                    <select name="shipping[{{ $tokoId }}]" class="form-control shipping-select" style="max-width: 100%;">
-                                        <option value="reguler_15000">Reguler (2-3 Hari) - Rp15.000</option>
-                                        <option value="kargo_30000">Kargo Truk (Khusus Material) - Rp30.000</option>
-                                    </select>
+                        {{-- Catatan Pesanan --}}
+                        <div class="mt-8 border-t border-zinc-100 pt-6">
+                            <label class="block text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-2 ml-1"><i class="fas fa-comment-alt mr-1"></i> Catatan Untuk Penjual</label>
+                            <input type="text" name="catatan" class="w-full bg-zinc-50 border border-zinc-200 text-black text-sm font-medium rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 px-4 py-3 transition-all outline-none" placeholder="Tinggalkan pesan mengenai warna, ukuran khusus, atau instruksi pengiriman...">
+                        </div>
+
+                    </div>
+                </div>
+
+                {{-- ======================================================= --}}
+                {{-- KOLOM KANAN (RINGKASAN - Span 4) --}}
+                {{-- ======================================================= --}}
+                <div class="w-full lg:col-span-4 lg:sticky lg:top-28 z-20 animate-fade-in" style="animation-delay: 0.1s;">
+                    <div class="bg-white rounded-[2rem] shadow-soft border border-zinc-200 overflow-hidden">
+
+                        {{-- Trust Banner --}}
+                        <div class="bg-emerald-50 border-b border-emerald-100 px-6 py-3 flex items-center justify-center gap-2">
+                            <i class="fas fa-shield-alt text-emerald-600 text-sm"></i>
+                            <span class="text-xs font-bold text-emerald-700 tracking-wide">Checkout Aman Terenkripsi 256-bit</span>
+                        </div>
+
+                        <div class="p-6 sm:p-8">
+                            <h3 class="text-lg font-black text-black mb-6">Ringkasan Pembayaran</h3>
+
+                            <div class="space-y-4 text-sm border-b border-dashed border-zinc-200 pb-6 mb-6">
+                                <div class="flex justify-between items-center text-zinc-500 font-medium">
+                                    <span>Total Harga Barang</span>
+                                    <span class="font-bold text-black">Rp{{ number_format($totalProduk, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-zinc-500 font-medium">
+                                    <span>Total Ongkos Kirim</span>
+                                    <span id="shipping-total-display" class="font-bold text-black">Rp0</span>
+                                </div>
+                                <div class="flex justify-between items-center text-zinc-500 font-medium">
+                                    <span>Biaya Layanan & Asuransi</span>
+                                    <span class="font-bold text-emerald-500">Gratis</span>
                                 </div>
                             </div>
+
+                            <div class="flex justify-between items-end mb-8">
+                                <span class="text-xs font-black text-zinc-400 uppercase tracking-widest">Total Tagihan</span>
+                                <span id="grand-total-display" class="text-3xl font-black text-black tracking-tight leading-none text-right">
+                                    Rp{{ number_format($totalProduk, 0, ',', '.') }}
+                                </span>
+                            </div>
+
+                            {{-- Tombol Bayar Desktop --}}
+                            <button type="submit" id="btn-submit-desktop" class="hidden lg:flex w-full bg-black hover:bg-blue-600 text-white font-black py-4 rounded-2xl transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(37,99,235,0.3)] hover:-translate-y-1 items-center justify-center gap-2">
+                                <i class="fas fa-lock text-sm"></i> Bayar Sekarang
+                            </button>
+
+                            <p class="text-[10px] text-zinc-400 text-center mt-4 font-medium leading-relaxed hidden lg:block">
+                                Dengan memproses pembayaran, Anda menyetujui Syarat & Ketentuan Pondasikita.
+                            </p>
                         </div>
-                    @endforeach
-
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label>Pesan Tambahan (Opsional)</label>
-                        <input type="text" name="catatan" class="form-control" placeholder="Silakan tinggalkan pesan untuk penjual...">
                     </div>
                 </div>
-            </div>
 
-            {{-- KOLOM KANAN (Ringkasan Lengket) --}}
-            <div class="side-col">
-                <div class="card-box">
-                    <h3 class="card-title">Ringkasan Belanja</h3>
-                    <div class="summary-row">
-                        <span>Total Harga Barang</span>
-                        <span>Rp{{ number_format($totalProduk, 0, ',', '.') }}</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Total Ongkos Kirim</span>
-                        <span id="shipping-total-display">Rp0</span>
-                    </div>
-                    <div class="summary-total">
-                        <span>Total Tagihan</span>
-                        <span id="grand-total-display">Rp{{ number_format($totalProduk, 0, ',', '.') }}</span>
-                    </div>
-                    <input type="hidden" name="grand_total" id="input_grand_total" value="{{ $totalProduk }}">
-                    <button type="submit" class="btn-submit" id="btn-submit">Bayar Sekarang</button>
-                </div>
             </div>
+        </main>
+
+        {{-- ======================================================= --}}
+        {{-- MOBILE STICKY BOTTOM BAR (Muncul di layar HP saja) --}}
+        {{-- ======================================================= --}}
+        <div class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl border-t border-zinc-200 p-4 pb-safe shadow-sticky z-50 lg:hidden flex items-center justify-between gap-4">
+            <div class="flex flex-col flex-1 min-w-0">
+                <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Total Pembayaran</span>
+                <span id="mobile-grand-total" class="text-xl font-black text-black truncate">Rp0</span>
+            </div>
+            <button type="submit" id="btn-submit-mobile" class="w-auto px-8 bg-black text-white font-black py-3.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-2 text-sm shadow-lg">
+                <i class="fas fa-lock text-xs"></i> Bayar
+            </button>
         </div>
+
     </form>
 
     @include('partials.footer')
-    
+
     {{-- ========================================================================= --}}
     {{-- PENGATURAN MIDTRANS SECARA DINAMIS DARI DATABASE --}}
     {{-- ========================================================================= --}}
@@ -282,37 +403,49 @@
             const cardManual = document.getElementById('card-manual');
             const manualFormDiv = document.getElementById('manual-address-form');
             const manualInputs = document.querySelectorAll('.manual-input');
-            const btnSubmit = document.getElementById('btn-submit');
-            
+
+            const btnSubmitDesktop = document.getElementById('btn-submit-desktop');
+            const btnSubmitMobile = document.getElementById('btn-submit-mobile');
+
             const final = {
                 label: document.getElementById('final_label'), nama: document.getElementById('final_nama'),
                 telepon: document.getElementById('final_telepon'), alamat: document.getElementById('final_alamat'),
                 kecamatan: document.getElementById('final_kecamatan'), kota: document.getElementById('final_kota'),
                 provinsi: document.getElementById('final_provinsi'), kodepos: document.getElementById('final_kodepos')
             };
-            
+
+            // Logika UI Pilihan Alamat
             function updateAddressUI() {
                 const selected = document.querySelector('input[name="address_type"]:checked').value;
                 if (selected === 'saved') {
                     cardSaved.classList.add('selected'); cardManual.classList.remove('selected');
                     manualFormDiv.classList.remove('active');
+
                     if (savedAddress) {
                         final.label.value = savedAddress.label; final.nama.value = savedAddress.nama;
                         final.telepon.value = savedAddress.telepon; final.alamat.value = savedAddress.alamat;
                         final.kecamatan.value = savedAddress.kecamatan; final.kota.value = savedAddress.kota;
                         final.provinsi.value = savedAddress.provinsi; final.kodepos.value = savedAddress.kodepos;
                     }
+
                     if (isProfileIncomplete) {
-                        btnSubmit.disabled = true; btnSubmit.innerText = 'Lengkapi Alamat Profil Dulu';
+                        [btnSubmitDesktop, btnSubmitMobile].forEach(btn => {
+                            if(btn) { btn.disabled = true; btn.innerText = 'Lengkapi Alamat Profil Dulu'; }
+                        });
                     } else {
-                        btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
+                        btnSubmitDesktop.innerHTML = '<i class="fas fa-lock text-sm"></i> Bayar Sekarang';
+                        btnSubmitMobile.innerHTML = '<i class="fas fa-lock text-xs"></i> Bayar';
+                        [btnSubmitDesktop, btnSubmitMobile].forEach(btn => { if(btn) btn.disabled = false; });
                     }
                 } else {
                     cardSaved.classList.remove('selected'); cardManual.classList.add('selected');
                     manualFormDiv.classList.add('active');
                     final.label.value = "Alamat Baru Manual";
                     syncManualToHidden();
-                    btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
+
+                    btnSubmitDesktop.innerHTML = '<i class="fas fa-lock text-sm"></i> Bayar Sekarang';
+                    btnSubmitMobile.innerHTML = '<i class="fas fa-lock text-xs"></i> Bayar';
+                    [btnSubmitDesktop, btnSubmitMobile].forEach(btn => { if(btn) btn.disabled = false; });
                 }
             }
 
@@ -331,25 +464,38 @@
             manualInputs.forEach(input => input.addEventListener('input', syncManualToHidden));
             updateAddressUI();
 
+            // Logika Perhitungan Kurir
             const shippingSelects = document.querySelectorAll('.shipping-select');
             const tipePengambilan = document.getElementById('tipe_pengambilan');
-            
+
             function calculateTotal() {
                 let shippingCost = 0;
                 if (tipePengambilan.value === 'pengiriman') {
-                    document.querySelectorAll('.shipping-box').forEach(el => el.style.display = 'block');
+                    // Pakai opacity/height untuk hide and show biar mulus, bukan sekadar display none
+                    document.querySelectorAll('.shipping-box-wrapper').forEach(el => {
+                        el.style.display = 'block';
+                        el.style.opacity = '1';
+                    });
                     shippingSelects.forEach(sel => {
                         let valParts = sel.value.split('_');
                         if (valParts.length > 1) shippingCost += parseInt(valParts[1]);
                     });
                 } else {
-                    document.querySelectorAll('.shipping-box').forEach(el => el.style.display = 'none');
+                    document.querySelectorAll('.shipping-box-wrapper').forEach(el => {
+                        el.style.display = 'none';
+                        el.style.opacity = '0';
+                    });
                     shippingCost = 0;
                 }
-                
+
                 let grandTotal = totalProduk + shippingCost;
+
                 document.getElementById('shipping-total-display').innerText = 'Rp' + shippingCost.toLocaleString('id-ID');
                 document.getElementById('grand-total-display').innerText = 'Rp' + grandTotal.toLocaleString('id-ID');
+
+                const mobileTotal = document.getElementById('mobile-grand-total');
+                if(mobileTotal) mobileTotal.innerText = 'Rp' + grandTotal.toLocaleString('id-ID');
+
                 document.getElementById('input_grand_total').value = grandTotal;
             }
 
@@ -358,25 +504,36 @@
             calculateTotal();
 
             // =========================================================================
-            // FUNGSI SUBMIT KE CONTROLLER VIA AJAX LALU PANGGIL POP-UP MIDTRANS
+            // AJAX SUBMIT & MIDTRANS POPUP
             // =========================================================================
             document.getElementById('checkout-form').addEventListener('submit', async function(e) {
-                e.preventDefault(); // Cegah reload halaman
+                e.preventDefault();
 
                 if (document.querySelector('input[name="address_type"]:checked').value === 'manual') {
                     if (!final.nama.value || !final.telepon.value || !final.alamat.value) {
-                        Swal.fire('Perhatian', 'Mohon lengkapi formulir alamat manual Anda.', 'warning');
+                        Swal.fire({
+                            icon: 'warning', title: 'Data Belum Lengkap',
+                            text: 'Mohon isi setidaknya Nama, No. Telepon, dan Alamat Lengkap pada form alamat manual.',
+                            customClass: { popup: 'rounded-2xl', confirmButton: 'bg-black text-white px-6 py-2 rounded-xl' }
+                        });
                         return;
                     }
                 }
 
-                btnSubmit.disabled = true;
-                btnSubmit.innerText = 'Memproses...';
+                // Loading State
+                const originalDesktopText = btnSubmitDesktop.innerHTML;
+                const originalMobileText = btnSubmitMobile ? btnSubmitMobile.innerHTML : '';
+
+                [btnSubmitDesktop, btnSubmitMobile].forEach(btn => {
+                    if(btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Memproses...';
+                    }
+                });
 
                 try {
                     const formData = new FormData(this);
 
-                    // Tembak Data ke Controller
                     const response = await fetch("{{ route('checkout.process') }}", {
                         method: 'POST',
                         headers: {
@@ -389,41 +546,49 @@
                     const result = await response.json();
 
                     if (result.status === 'success' && result.snap_token) {
-                        // PANGGIL POP-UP MIDTRANS SNAP DI SINI
+                        // BUKA MIDTRANS SNAP POP-UP
                         window.snap.pay(result.snap_token, {
                             onSuccess: function(data){
-                                Swal.fire('Berhasil!', 'Pembayaran Anda telah diterima.', 'success').then(() => {
-                                    window.location.href = "{{ route('pesanan.index') }}";
-                                });
+                                Swal.fire({
+                                    icon: 'success', title: 'Pembayaran Sukses!', text: 'Terima kasih atas pesanan Anda.',
+                                    customClass: { popup: 'rounded-2xl', confirmButton: 'bg-blue-600 text-white px-6 py-2 rounded-xl' }
+                                }).then(() => { window.location.href = "{{ route('pesanan.index') }}"; });
                             },
                             onPending: function(data){
-                                Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran sesuai instruksi.', 'info').then(() => {
-                                    window.location.href = "{{ route('pesanan.index') }}";
-                                });
+                                Swal.fire({
+                                    icon: 'info', title: 'Menunggu Pembayaran', text: 'Silakan selesaikan instruksi pembayaran yang diberikan.',
+                                    customClass: { popup: 'rounded-2xl', confirmButton: 'bg-black text-white px-6 py-2 rounded-xl' }
+                                }).then(() => { window.location.href = "{{ route('pesanan.index') }}"; });
                             },
                             onError: function(data){
-                                Swal.fire('Gagal!', 'Terjadi kesalahan saat memproses pembayaran.', 'error');
-                                btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
+                                Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Sistem menolak pembayaran Anda.', customClass: { popup: 'rounded-2xl' } });
+                                restoreButtons();
                             },
                             onClose: function(){
                                 Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Pembayaran Dibatalkan',
-                                    text: 'Anda menutup pop-up sebelum menyelesaikan pembayaran. Pesanan Anda berstatus Menunggu Pembayaran.',
-                                    confirmButtonText: 'Lihat Pesanan'
-                                }).then(() => {
-                                    window.location.href = "{{ route('pesanan.index') }}";
-                                });
+                                    icon: 'warning', title: 'Dibatalkan', text: 'Anda menutup layar pembayaran. Pesanan Anda berstatus "Menunggu Pembayaran".',
+                                    confirmButtonText: 'Lihat Pesanan Saya',
+                                    customClass: { popup: 'rounded-3xl', confirmButton: 'bg-black text-white px-6 py-3 rounded-xl font-bold' }
+                                }).then(() => { window.location.href = "{{ route('pesanan.index') }}"; });
                             }
                         });
                     } else {
-                        Swal.fire('Gagal', result.message || 'Terjadi kesalahan sistem', 'error');
-                        btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
+                        Swal.fire({ icon: 'error', title: 'Gagal Memproses', text: result.message || 'Terjadi kesalahan pada sistem toko.', customClass: { popup: 'rounded-2xl' } });
+                        restoreButtons();
                     }
                 } catch (error) {
                     console.error(error);
-                    Swal.fire('Error', 'Sistem tidak dapat terhubung ke server.', 'error');
-                    btnSubmit.disabled = false; btnSubmit.innerText = 'Bayar Sekarang';
+                    Swal.fire({ icon: 'error', title: 'Koneksi Terputus', text: 'Periksa jaringan internet Anda dan coba lagi.', customClass: { popup: 'rounded-2xl' } });
+                    restoreButtons();
+                }
+
+                function restoreButtons() {
+                    btnSubmitDesktop.innerHTML = originalDesktopText;
+                    btnSubmitDesktop.disabled = false;
+                    if(btnSubmitMobile) {
+                        btnSubmitMobile.innerHTML = originalMobileText;
+                        btnSubmitMobile.disabled = false;
+                    }
                 }
             });
         });

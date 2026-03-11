@@ -6,252 +6,307 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- Tailwind CSS CDN --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+                        }
+                    },
+                    boxShadow: {
+                        'card': '0 4px 20px -2px rgba(0,0,0,0.05)',
+                        'floating': '0 -10px 40px -10px rgba(0,0,0,0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/navbar_style.css') }}">
 
     <style>
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; color: #334155; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+        body { font-family: 'Inter', sans-serif; background-color: #f4f4f5; }
 
-        /* BREADCRUMB */
-        .breadcrumb { font-size: 0.85rem; margin: 20px 0; color: #64748b; }
-        .breadcrumb a { color: #3b82f6; text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
+        /* Hide scrollbar for horizontal strips */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* =======================================
-           LAYOUT 3 KOLOM ENTERPRISE (Kiri, Tengah, Kanan)
-           ======================================= */
-        .product-grid-layout {
-            display: grid;
-            grid-template-columns: 350px 1fr 300px;
-            gap: 30px;
-            align-items: start; 
-            margin-bottom: 50px;
-        }
+        /* Remove Number Input Arrows */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
 
-        @media (max-width: 992px) {
-            .product-grid-layout { grid-template-columns: 1fr; } 
-        }
-
-        /* --- KOLOM KIRI (GALERI FOTO) --- */
-        .col-gallery { position: sticky; top: 90px; }
-        .main-image-box { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; aspect-ratio: 1/1; margin-bottom: 15px; }
-        .main-image-box img { width: 100%; height: 100%; object-fit: cover; }
-        .thumb-strip { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
-        .thumb-box { width: 60px; height: 60px; border-radius: 8px; border: 2px solid transparent; overflow: hidden; cursor: pointer; opacity: 0.6; transition: 0.2s; }
-        .thumb-box.active { border-color: #3b82f6; opacity: 1; }
-        .thumb-box:hover { opacity: 1; }
-        .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* --- KOLOM TENGAH (INFO & DESKRIPSI) --- */
-        .col-info { background: transparent; }
-        .p-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0 0 10px 0; line-height: 1.4; }
-
-        .p-meta { display: flex; align-items: center; gap: 15px; font-size: 0.9rem; color: #64748b; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;}
-        .p-meta-item { display: flex; align-items: center; gap: 5px; }
-        .star-icon { color: #f59e0b; }
-        .p-price-area { margin-bottom: 25px; }
-        .p-price { font-size: 2rem; font-weight: 900; color: #ef4444; margin: 0; }
-
-        /* Tabs Style untuk Spesifikasi & Deskripsi */
-        .content-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 25px; margin-bottom: 20px; }
-        .card-header-title { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid #f1f5f9; }
-
-        .spec-table { width: 100%; font-size: 0.9rem; }
-        .spec-table td { padding: 10px 0; border-bottom: 1px dashed #e2e8f0; }
-        .spec-table td:first-child { width: 150px; color: #64748b; font-weight: 600; }
-        .spec-table td:last-child { color: #1e293b; font-weight: 500; }
-
-        .desc-text { font-size: 0.95rem; line-height: 1.7; color: #334155; }
-
-        /* Review Styles */
-        .review-item { padding: 20px 0; border-bottom: 1px dashed #e2e8f0; }
-        .review-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .reviewer-name { font-weight: 700; font-size: 0.95rem; color: #0f172a; margin-bottom: 4px; }
-        .review-stars { color: #f59e0b; font-size: 0.8rem; margin-bottom: 8px; }
-        .review-date { font-size: 0.75rem; color: #94a3b8; margin-left: 10px; }
-        .review-text { font-size: 0.9rem; color: #334155; line-height: 1.5; margin: 0; }
-
-        /* --- KOLOM KANAN (STICKY ACTION CARD & TOKO) --- */
-        .col-action { position: sticky; top: 90px; display: flex; flex-direction: column; gap: 20px; }
-
-        /* Toko Widget */
-        .store-widget { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; display: flex; align-items: center; gap: 15px; }
-        .store-avatar { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .store-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .store-initials { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 18px; }
-        .store-info h4 { margin: 0 0 4px 0; font-size: 1rem; font-weight: 700; color: #0f172a; }
-        .store-info p { margin: 0; font-size: 0.75rem; color: #64748b; }
-        .btn-visit { display: inline-block; margin-top: 8px; font-size: 0.75rem; color: #3b82f6; border: 1px solid #3b82f6; padding: 4px 12px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.2s; }
-        .btn-visit:hover { background: #3b82f6; color: white; }
-
-        /* Action Box (Beli) */
-        .action-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .action-box h3 { font-size: 1rem; font-weight: 800; color: #0f172a; margin: 0 0 15px 0; }
-
-        .qty-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .qty-controls { display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
-        .qty-btn { background: white; border: none; width: 35px; height: 35px; font-size: 1.2rem; color: #475569; cursor: pointer; transition: 0.2s; }
-        .qty-btn:hover { background: #f1f5f9; color: #0f172a; }
-        .qty-input { width: 50px; height: 35px; border: none; border-left: 1px solid #cbd5e1; border-right: 1px solid #cbd5e1; text-align: center; font-weight: 700; font-size: 0.95rem; outline: none; }
-        .stock-info { font-size: 0.8rem; color: #64748b; }
-
-        .subtotal-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .subtotal-area span { font-size: 0.9rem; color: #64748b; font-weight: 600; }
-        .subtotal-value { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
-
-        .btn-add-cart { width: 100%; background: white; border: 1px solid #3b82f6; color: #3b82f6; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
-        .btn-add-cart:hover { background: #eff6ff; }
-        .btn-buy-now { width: 100%; background: #3b82f6; border: none; color: white; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
-        .btn-buy-now:hover { background: #2563eb; }
-
-        .out-of-stock-btn { width: 100%; background: #e2e8f0; color: #94a3b8; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: not-allowed; }
+        /* Prose formatting for DB text */
+        .prose-desc p { margin-bottom: 1em; }
+        .prose-desc ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
     </style>
 </head>
-<body>
+<body class="text-zinc-800 antialiased pt-[80px] pb-24 lg:pb-0"> {{-- Padding bottom added for mobile sticky checkout --}}
 
+    {{-- Include Navbar --}}
     @include('partials.navbar')
 
-    <main class="container">
-
-        {{-- BREADCRUMB --}}
-        <div class="breadcrumb">
-            <a href="{{ url('/') }}">Beranda</a> <i class="fas fa-chevron-right" style="font-size: 10px; margin: 0 8px;"></i>
-            <a href="{{ url('/kategori/' . ($product->kategori_id ?? '')) }}">{{ $product->nama_kategori ?? 'Kategori' }}</a> <i class="fas fa-chevron-right" style="font-size: 10px; margin: 0 8px;"></i>
-            <span style="color: #0f172a; font-weight: 600;">{{ Str::limit($product->nama_barang, 30) }}</span>
+    {{-- BREADCRUMB --}}
+    <div class="bg-white border-b border-zinc-200 shadow-sm relative z-10 hidden md:block">
+        <div class="max-w-[1250px] mx-auto px-4 lg:px-8 py-3">
+            <nav class="flex text-sm text-zinc-500 font-medium items-center gap-2">
+                <a href="{{ url('/') }}" class="hover:text-blue-600 transition-colors">Beranda</a>
+                <i class="fas fa-chevron-right text-[10px] text-zinc-400"></i>
+                <a href="{{ url('/kategori/' . ($product->kategori_id ?? '')) }}" class="hover:text-blue-600 transition-colors">{{ $product->nama_kategori ?? 'Kategori' }}</a>
+                <i class="fas fa-chevron-right text-[10px] text-zinc-400"></i>
+                <span class="text-zinc-900 font-semibold truncate max-w-[300px]">{{ $product->nama_barang }}</span>
+            </nav>
         </div>
+    </div>
 
-        {{-- ENTERPRISE 3-COLUMN GRID --}}
-        <div class="product-grid-layout">
+    {{-- MAIN LAYOUT: 12-COLUMN GRID ENTERPRISE --}}
+    <main class="max-w-[1250px] mx-auto px-4 lg:px-8 py-6 lg:py-10">
 
-            {{-- 1. KOLOM KIRI (FOTO) --}}
-            <div class="col-gallery">
-                <div class="main-image-box">
-                    <img src="{{ asset('assets/uploads/products/' . $gallery_images[0]) }}" id="mainProductImage" onerror="this.src='{{ asset('assets/uploads/products/default.jpg') }}'">
+        <div class="flex flex-col lg:grid lg:grid-cols-12 gap-8 items-start">
+
+            {{-- ========================================== --}}
+            {{-- KOLOM 1 (KIRI): GALERI FOTO (Col-span-4) --}}
+            {{-- ========================================== --}}
+            <div class="w-full lg:col-span-4 lg:sticky lg:top-28">
+                {{-- Main Image --}}
+                <div class="w-full aspect-square bg-white rounded-3xl border border-zinc-200 shadow-card overflow-hidden mb-4 p-2 relative group">
+                    <img src="{{ asset('assets/uploads/products/' . $gallery_images[0]) }}" id="mainProductImage" class="w-full h-full object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105" onerror="this.src='{{ asset('assets/uploads/products/default.jpg') }}'">
+
+                    {{-- Zoom Hint --}}
+                    <div class="absolute bottom-4 right-4 bg-black/50 backdrop-blur-md text-white w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-search-plus text-xs"></i>
+                    </div>
                 </div>
-                <div class="thumb-strip">
+
+                {{-- Thumbnail Strip --}}
+                <div class="flex gap-3 overflow-x-auto no-scrollbar py-1">
                     @foreach ($gallery_images as $index => $img)
-                        <div class="thumb-box {{ $index == 0 ? 'active' : '' }}" onclick="changeImage(this, '{{ asset('assets/uploads/products/' . $img) }}')">
-                            <img src="{{ asset('assets/uploads/products/' . $img) }}" onerror="this.src='{{ asset('assets/uploads/products/default.jpg') }}'">
-                        </div>
+                        <button type="button" onclick="changeImage(this, '{{ asset('assets/uploads/products/' . $img) }}')" class="thumb-btn shrink-0 w-16 h-16 rounded-xl bg-white border-2 overflow-hidden transition-all duration-200 {{ $index == 0 ? 'border-blue-600 ring-2 ring-blue-600/30 opacity-100' : 'border-zinc-200 opacity-60 hover:opacity-100 hover:border-blue-300' }}">
+                            <img src="{{ asset('assets/uploads/products/' . $img) }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('assets/uploads/products/default.jpg') }}'">
+                        </button>
                     @endforeach
                 </div>
             </div>
 
-            {{-- 2. KOLOM TENGAH (INFO PRODUK) --}}
-            <div class="col-info">
-                <h1 class="p-title">{{ $product->nama_barang }}</h1>
+            {{-- ========================================== --}}
+            {{-- KOLOM 2 (TENGAH): INFO PRODUK (Col-span-5) --}}
+            {{-- ========================================== --}}
+            <div class="w-full lg:col-span-5 flex flex-col gap-6">
 
-                <div class="p-meta">
-                    <div class="p-meta-item">
-                        <i class="fas fa-star star-icon"></i>
-                        <strong style="color: #0f172a;">{{ number_format($avg_rating, 1) }}</strong>
+                {{-- Head Info --}}
+                <div class="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 shadow-card">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-widest mb-4">
+                        {{ $product->nama_kategori ?? 'Material' }}
                     </div>
-                    <div class="p-meta-item">
-                        <a href="#reviews" style="color: #64748b; text-decoration: underline;">{{ $jumlah_ulasan }} Penilaian</a>
+
+                    <h1 class="text-2xl sm:text-3xl font-black text-zinc-900 leading-[1.3] mb-4">
+                        {{ $product->nama_barang }}
+                    </h1>
+
+                    {{-- Rating Meta --}}
+                    <div class="flex flex-wrap items-center gap-4 text-sm font-medium text-zinc-500 pb-6 border-b border-zinc-100">
+                        <div class="flex items-center gap-1.5 text-zinc-800">
+                            <i class="fas fa-star text-yellow-500"></i>
+                            <span class="font-bold">{{ number_format($avg_rating, 1) }}</span>
+                        </div>
+                        <div class="w-1 h-1 bg-zinc-300 rounded-full"></div>
+                        <a href="#reviews" class="hover:text-blue-600 transition-colors underline decoration-dotted underline-offset-4">
+                            {{ $jumlah_ulasan }} Ulasan
+                        </a>
+                        <div class="w-1 h-1 bg-zinc-300 rounded-full"></div>
+                        <div>Terjual <span class="font-bold text-zinc-800">200+</span></div>
                     </div>
-                    <div class="p-meta-item">
-                        Terjual <strong style="color: #0f172a;">200+</strong>
+
+                    {{-- Price Area --}}
+                    <div class="pt-6">
+                        <div class="text-4xl font-black text-black tracking-tight mb-1 flex items-end gap-2" id="basePriceDisplay">
+                            Rp{{ number_format($product->harga, 0, ',', '.') }}
+                            @if($product->satuan_unit)
+                                <span class="text-sm font-bold text-zinc-400 mb-1.5">/ {{ $product->satuan_unit }}</span>
+                            @endif
+                        </div>
+
+                        {{-- B2B Tag --}}
+                        <div class="mt-4 bg-zinc-50 border border-zinc-200 rounded-xl p-3 flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                            <p class="text-xs text-zinc-600 leading-relaxed">Harga sudah termasuk PPN. Pembelian skala grosir (B2B) dapat menghubungi penjual untuk negosiasi harga khusus.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="p-price-area">
-                    <h2 class="p-price" id="basePrice" data-price="{{ $product->harga }}">Rp {{ number_format($product->harga, 0, ',', '.') }}</h2>
-                    @if($product->satuan_unit)
-                        <span style="font-size: 0.85rem; color: #64748b;">Per {{ $product->satuan_unit }}</span>
-                    @endif
-                </div>
+                {{-- Detail Tabs: Spesifikasi --}}
+                <div class="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 shadow-card">
+                    <h3 class="text-lg font-black text-zinc-900 mb-6 flex items-center gap-2">
+                        <i class="fas fa-list-ul text-blue-600"></i> Spesifikasi Material
+                    </h3>
 
-                {{-- Spesifikasi Card --}}
-                <div class="content-card">
-                    <h3 class="card-header-title">Spesifikasi Material</h3>
-                    <table class="spec-table">
-                        <tr><td>Kategori</td><td>{{ $product->nama_kategori ?? 'Lainnya' }}</td></tr>
-                        <tr><td>Kondisi</td><td>Baru</td></tr>
-                        <tr><td>Min. Pemesanan</td><td>1 {{ $product->satuan_unit }}</td></tr>
-                        <tr><td>Berat</td><td>{{ $product->berat_kg ?? '1' }} kg</td></tr>
-                    </table>
-                </div>
-
-                {{-- Deskripsi Card --}}
-                <div class="content-card">
-                    <h3 class="card-header-title">Deskripsi Produk</h3>
-                    <div class="desc-text">
-                        {!! nl2br(e($product->deskripsi)) ?: '<i>Tidak ada deskripsi produk.</i>' !!}
+                    <div class="border border-zinc-200 rounded-2xl overflow-hidden">
+                        <table class="w-full text-sm text-left">
+                            <tbody class="divide-y divide-zinc-200">
+                                <tr class="bg-zinc-50">
+                                    <td class="py-3 px-4 font-semibold text-zinc-500 w-1/3">Kondisi</td>
+                                    <td class="py-3 px-4 font-bold text-zinc-900"><span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs">Baru</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-semibold text-zinc-500">Min. Pesanan</td>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">1 {{ $product->satuan_unit }}</td>
+                                </tr>
+                                <tr class="bg-zinc-50">
+                                    <td class="py-3 px-4 font-semibold text-zinc-500">Berat Est.</td>
+                                    <td class="py-3 px-4 font-bold text-zinc-900">{{ $product->berat_kg ?? '1' }} kg</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-semibold text-zinc-500">Kategori Utama</td>
+                                    <td class="py-3 px-4 font-bold text-blue-600 cursor-pointer hover:underline">{{ $product->nama_kategori ?? 'Lainnya' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                {{-- Ulasan Card --}}
-                <div class="content-card" id="reviews">
-                    <h3 class="card-header-title">Ulasan Pembeli ({{ $jumlah_ulasan }})</h3>
-                    @if ($jumlah_ulasan > 0)
-                        @foreach ($reviews as $ulasan)
-                            <div class="review-item">
-                                <div class="review-stars">
-                                    @for ($i = 0; $i < 5; $i++)
-                                        <i class="fas fa-star" style="color: {{ $i < $ulasan->rating ? '#f59e0b' : '#e2e8f0' }};"></i>
-                                    @endfor
-                                    <span class="review-date">{{ \Carbon\Carbon::parse($ulasan->created_at)->format('d M Y') }}</span>
+                {{-- Detail Tabs: Deskripsi --}}
+                <div class="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 shadow-card">
+                    <h3 class="text-lg font-black text-zinc-900 mb-6 flex items-center gap-2">
+                        <i class="fas fa-file-alt text-blue-600"></i> Deskripsi Produk
+                    </h3>
+                    <div class="text-sm text-zinc-700 leading-[1.8] prose-desc">
+                        {!! nl2br(e($product->deskripsi)) ?: '<i class="text-zinc-400">Penjual tidak menyertakan deskripsi lengkap.</i>' !!}
+                    </div>
+                </div>
+
+                {{-- Ulasan Section --}}
+                <div id="reviews" class="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 shadow-card scroll-mt-28">
+                    <div class="flex items-center justify-between mb-8">
+                        <h3 class="text-lg font-black text-zinc-900 flex items-center gap-2">
+                            <i class="fas fa-comments text-blue-600"></i> Ulasan Pembeli
+                        </h3>
+                        <span class="bg-zinc-100 text-zinc-600 font-bold px-3 py-1 rounded-full text-xs">{{ $jumlah_ulasan }} Ulasan</span>
+                    </div>
+
+                    <div class="space-y-6">
+                        @if ($jumlah_ulasan > 0)
+                            @foreach ($reviews as $ulasan)
+                                <div class="pb-6 border-b border-zinc-100 last:border-0 last:pb-0">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-zinc-200 text-zinc-500 font-bold flex items-center justify-center text-xs">
+                                                {{ strtoupper(substr($ulasan->username, 0, 1)) }}
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-sm text-zinc-900">{{ $ulasan->username }}</div>
+                                                <div class="text-[10px] text-zinc-400">{{ \Carbon\Carbon::parse($ulasan->created_at)->format('d M Y') }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex text-yellow-500 text-[10px]">
+                                            @for ($i = 0; $i < 5; $i++)
+                                                <i class="fas fa-star {{ $i < $ulasan->rating ? '' : 'text-zinc-200' }}"></i>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-zinc-700 leading-relaxed pl-11">{{ $ulasan->ulasan }}</p>
                                 </div>
-                                <div class="reviewer-name">{{ $ulasan->username }}</div>
-                                <p class="review-text">{{ $ulasan->ulasan }}</p>
+                            @endforeach
+                        @else
+                            <div class="text-center py-10">
+                                <i class="fas fa-comment-slash text-4xl text-zinc-200 mb-3"></i>
+                                <p class="text-zinc-500 text-sm font-medium">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>
                             </div>
-                        @endforeach
-                    @else
-                        <p style="color: #94a3b8; font-size: 0.9rem;">Belum ada ulasan untuk produk ini. Jadilah yang pertama!</p>
-                    @endif
+                        @endif
+                    </div>
                 </div>
+
             </div>
 
-            {{-- 3. KOLOM KANAN (STICKY ACTION) --}}
-            <div class="col-action">
+            {{-- ========================================== --}}
+            {{-- KOLOM 3 (KANAN): CHECKOUT CARD (Col-span-3) --}}
+            {{-- ========================================== --}}
+            <div class="w-full lg:col-span-3 lg:sticky lg:top-28 flex flex-col gap-6 relative z-20">
 
-                {{-- Widget Toko --}}
-                <div class="store-widget">
-                    <div class="store-avatar">
-                        @if (!empty($product->logo_toko) && file_exists(public_path('assets/uploads/logos/' . $product->logo_toko)))
-                            <img src="{{ asset('assets/uploads/logos/' . $product->logo_toko) }}" alt="Logo">
-                        @else
-                            <div class="store-initials" style="background-color: {{ $storeColor }};">{{ $storeInitials }}</div>
-                        @endif
-                    </div>
-                    <div class="store-info">
-                        <h4><i class="fas fa-check-circle" style="color: #10b981; font-size: 0.85rem;"></i> {{ $product->nama_toko }}</h4>
-                        <p><i class="fas fa-map-marker-alt"></i> {{ $product->nama_kota_toko ?? 'Indonesia' }}</p>
-                        <a href="{{ url('pages/toko?slug=' . $product->slug_toko) }}" class="btn-visit">Kunjungi Toko</a>
+                @php
+                    $colors = ['#18181b', '#27272a', '#3f3f46', '#09090b'];
+                    $storeColor = $colors[crc32($product->nama_toko) % count($colors)];
+                    $words = explode(" ", $product->nama_toko);
+                    $acronym = ""; foreach ($words as $w) { $acronym .= mb_substr($w, 0, 1); }
+                    $storeInitials = strtoupper(substr($acronym, 0, 2)) ?: "TK";
+                @endphp
+
+                {{-- Profil Toko Widget --}}
+                <div class="bg-white rounded-3xl border border-zinc-200 p-5 shadow-card group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl overflow-hidden shadow-sm shrink-0">
+                            @if (!empty($product->logo_toko) && file_exists(public_path('assets/uploads/logos/' . $product->logo_toko)))
+                                <img src="{{ asset('assets/uploads/logos/' . $product->logo_toko) }}" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex justify-center items-center text-white font-black text-lg" style="background-color: {{ $storeColor }};">
+                                    {{ $storeInitials }}
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-black text-sm text-zinc-900 truncate mb-1 flex items-center gap-1.5">
+                                <i class="fas fa-check-circle text-blue-500"></i> {{ $product->nama_toko }}
+                            </h4>
+                            <p class="text-[11px] font-semibold text-zinc-500 truncate mb-2">
+                                <i class="fas fa-map-marker-alt text-zinc-400"></i> {{ $product->nama_kota_toko ?? 'Indonesia' }}
+                            </p>
+                            <a href="{{ url('pages/toko?slug=' . $product->slug_toko) }}" class="inline-block text-[10px] font-bold bg-zinc-100 text-zinc-700 hover:bg-black hover:text-white px-3 py-1.5 rounded-lg transition-colors">
+                                Kunjungi Toko
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                {{-- Action Box (Keranjang & Beli) --}}
-                <div class="action-box">
-                    <h3>Atur Jumlah dan Catatan</h3>
+                {{-- Form Checkout (Sticky di Mobile bawah) --}}
+                <div class="fixed bottom-0 left-0 w-full lg:relative bg-white lg:rounded-3xl border-t lg:border border-zinc-200 p-4 lg:p-6 shadow-floating lg:shadow-card z-50 lg:z-auto">
+                    <h3 class="hidden lg:block font-black text-lg text-zinc-900 mb-4">Atur Jumlah</h3>
 
-                    <form id="formTambahKeranjang">
+                    <form id="formTambahKeranjang" class="flex flex-col lg:block gap-4">
                         <input type="hidden" name="barang_id" value="{{ $product->id }}">
 
-                        <div class="qty-wrapper">
-                            <div class="qty-controls">
-                                <button type="button" class="qty-btn" onclick="updateQty(-1)">-</button>
-                                <input type="number" class="qty-input" name="jumlah" id="inputQty" value="1" min="1" max="{{ $product->stok }}" readonly>
-                                <button type="button" class="qty-btn" onclick="updateQty(1)">+</button>
+                        {{-- Control Qty & Subtotal wrapper for mobile flex --}}
+                        <div class="flex justify-between items-center lg:block">
+                            {{-- Input QTY Enterprise --}}
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center bg-white border-2 border-zinc-200 rounded-xl p-1">
+                                    <button type="button" class="w-8 h-8 flex justify-center items-center text-zinc-500 hover:bg-zinc-100 rounded-lg transition-colors font-black" onclick="updateQty(-1)">-</button>
+                                    <input type="number" class="w-10 text-center font-black text-sm text-zinc-900 outline-none" name="jumlah" id="inputQty" value="1" min="1" max="{{ $product->stok }}" readonly>
+                                    <button type="button" class="w-8 h-8 flex justify-center items-center text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-black" onclick="updateQty(1)">+</button>
+                                </div>
+                                <div class="text-xs font-bold text-zinc-400 lg:mt-2 hidden sm:block">
+                                    Sisa: <span class="text-zinc-700">{{ $product->stok }}</span>
+                                </div>
                             </div>
-                            <div class="stock-info">Sisa Stok: <strong>{{ $product->stok }}</strong></div>
+
+                            {{-- Subtotal Display --}}
+                            <div class="lg:mt-6 lg:mb-6 text-right lg:text-left">
+                                <span class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1 lg:mb-2">Subtotal</span>
+                                <div class="text-xl lg:text-2xl font-black text-black leading-none" id="subtotalDisplay">
+                                    Rp{{ number_format($product->harga, 0, ',', '.') }}
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="subtotal-area">
-                            <span>Subtotal</span>
-                            <div class="subtotal-value" id="subtotalDisplay">Rp {{ number_format($product->harga, 0, ',', '.') }}</div>
+                        {{-- Action Buttons --}}
+                        <div class="flex lg:flex-col gap-2 pt-2 lg:pt-0">
+                            @if ($product->stok > 0)
+                                <button type="button" id="btnKeranjang" class="flex-1 lg:w-full bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-black py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-sm">
+                                    <i class="fas fa-plus"></i> <span class="hidden sm:inline">Keranjang</span>
+                                </button>
+                                <button type="button" id="btnBeliLangsung" class="flex-1 lg:w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl transition-all shadow-[0_4px_20px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 text-sm">
+                                    Beli Langsung
+                                </button>
+                            @else
+                                <button type="button" class="w-full bg-zinc-200 text-zinc-400 font-black py-3.5 rounded-xl cursor-not-allowed text-sm" disabled>
+                                    Stok Habis
+                                </button>
+                            @endif
                         </div>
-
-                        @if ($product->stok > 0)
-                            <button type="button" class="btn-add-cart" id="btnKeranjang"><i class="fas fa-plus"></i> Keranjang</button>
-                            
-                            {{-- PERBAIKAN: Tombol Beli Langsung Diubah ID-nya --}}
-                            <button type="button" class="btn-buy-now" id="btnBeliLangsung">Beli Langsung</button>
-                        @else
-                            <button type="button" class="out-of-stock-btn" disabled>Stok Habis</button>
-                        @endif
                     </form>
                 </div>
 
@@ -270,37 +325,42 @@
         const isLoggedIn = @json(auth()->check());
         const loginUrl = "{{ route('login') }}";
 
-        // Fungsi Penahan Aksi (Meminta Login)
         function requireLogin(event) {
             if (!isLoggedIn) {
                 if(event) event.preventDefault();
-                
                 Swal.fire({
                     icon: 'info',
-                    title: 'Kamu Belum Masuk',
-                    text: 'Silakan masuk atau daftar akun dahulu untuk melanjutkan belanja.',
-                    confirmButtonText: 'Masuk Sekarang',
+                    title: 'Akses Dibatasi',
+                    text: 'Silakan masuk ke akun Anda terlebih dahulu untuk melakukan transaksi B2B.',
+                    confirmButtonText: 'Login Sekarang',
                     showCancelButton: true,
-                    cancelButtonText: 'Nanti Saja',
-                    confirmButtonColor: '#2563eb',
-                    cancelButtonColor: '#94a3b8',
-                    reverseButtons: true
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#000000',
+                    cancelButtonColor: '#cbd5e1',
+                    customClass: { popup: 'rounded-3xl' }
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = loginUrl;
-                    }
+                    if (result.isConfirmed) window.location.href = loginUrl;
                 });
-                return false; // Berhenti di sini
+                return false;
             }
-            return true; // Lanjut jika sudah login
+            return true;
         }
 
-
-        // --- 2. IMAGE GALLERY SWITCHER ---
-        function changeImage(element, imgUrl) {
+        // --- 2. IMAGE GALLERY LOGIC ---
+        function changeImage(btn, imgUrl) {
+            // Ganti src gambar utama
             document.getElementById('mainProductImage').src = imgUrl;
-            document.querySelectorAll('.thumb-box').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+
+            // Reset semua border thumbnail
+            const allThumbs = document.querySelectorAll('.thumb-btn');
+            allThumbs.forEach(el => {
+                el.classList.remove('border-blue-600', 'ring-2', 'ring-blue-600/30', 'opacity-100');
+                el.classList.add('border-zinc-200', 'opacity-60');
+            });
+
+            // Beri highlight pada thumbnail yg diklik
+            btn.classList.remove('border-zinc-200', 'opacity-60');
+            btn.classList.add('border-blue-600', 'ring-2', 'ring-blue-600/30', 'opacity-100');
         }
 
         // --- 3. QUANTITY & SUBTOTAL LOGIC ---
@@ -310,7 +370,7 @@
         const subtotalDisplay = document.getElementById('subtotalDisplay');
 
         function formatRupiah(angka) {
-            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return 'Rp' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
         function updateQty(change) {
@@ -319,18 +379,28 @@
 
             if (newVal >= 1 && newVal <= maxStock) {
                 inputQty.value = newVal;
-                subtotalDisplay.innerText = formatRupiah(basePrice * newVal);
+                // Animasi ringan saat angka ganti
+                subtotalDisplay.style.opacity = 0.5;
+                setTimeout(() => {
+                    subtotalDisplay.innerText = formatRupiah(basePrice * newVal);
+                    subtotalDisplay.style.opacity = 1;
+                }, 100);
             }
         }
 
         // --- 4. AJAX ADD TO CART ---
         document.getElementById('btnKeranjang')?.addEventListener('click', function(e) {
-            if (!requireLogin(e)) return; // Cek Login Dulu
+            if (!requireLogin(e)) return;
 
             let form = document.getElementById('formTambahKeranjang');
             let formData = new FormData(form);
 
-            fetch('{{ route("keranjang.tambah") }}', { 
+            const btn = this;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            btn.disabled = true;
+
+            fetch('{{ route("keranjang.tambah") }}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -340,35 +410,38 @@
             })
             .then(response => response.json())
             .then(data => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+
                 if(data.status === 'success') {
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
                         icon: 'success',
-                        title: data.message || 'Berhasil dimasukkan ke keranjang!',
+                        title: data.message || 'Masuk Keranjang!',
                         showConfirmButton: false,
-                        timer: 2500
+                        timer: 2000,
+                        customClass: { popup: 'rounded-xl' }
                     });
-                    
-                    // Opsional: Refresh halaman setelah 1 detik untuk update angka keranjang di Navbar
                     setTimeout(() => { window.location.reload(); }, 1000);
                 } else {
                     Swal.fire('Gagal', data.message || 'Terjadi kesalahan.', 'error');
                 }
             })
             .catch(error => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
                 Swal.fire('Oops!', 'Gagal menyambung ke server.', 'error');
             });
         });
 
-        // --- 5. DIRECT BUY (BELI LANGSUNG) ---
+        // --- 5. DIRECT BUY ---
         document.getElementById('btnBeliLangsung')?.addEventListener('click', function(e) {
-            if (!requireLogin(e)) return; // Cek Login Dulu
+            if (!requireLogin(e)) return;
 
-            // Jika sudah login, lempar langsung ke rute Checkout beserta ID dan Jumlah
             let qty = inputQty.value;
             let productId = "{{ $product->id }}";
-            
+
             window.location.href = `{{ route('checkout') }}?product_id=${productId}&jumlah=${qty}`;
         });
     </script>
