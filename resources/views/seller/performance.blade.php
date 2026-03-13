@@ -12,7 +12,7 @@
         height: 350px;
         width: 100%;
     }
-    
+
     .filter-bar {
         display: flex;
         align-items: center;
@@ -22,10 +22,10 @@
         border: 1px solid #e5e7eb;
         border-radius: 12px;
         margin-bottom: 1.5rem;
-        flex-wrap: wrap; 
+        flex-wrap: wrap;
     }
-    
-    .filter-bar .form-select, 
+
+    .filter-bar .form-select,
     .filter-bar .form-control {
         width: auto;
         border-color: #d1d5db;
@@ -36,7 +36,7 @@
         border-bottom: 2px solid #e5e7eb;
         margin-bottom: 1.5rem;
     }
-    
+
     .main-performance-tabs .nav-link {
         color: #6b7280;
         font-weight: 600;
@@ -45,9 +45,9 @@
         padding: 0.75rem 1.5rem;
         background: transparent;
     }
-    
+
     .main-performance-tabs .nav-link:hover { color: #111827; }
-    
+
     .main-performance-tabs .nav-link.active {
         color: #111827;
         border-bottom-color: #111827;
@@ -113,7 +113,7 @@
     }
     .channel-list-item:last-child { border-bottom: none; padding-bottom: 0; }
     .channel-list-item span { font-weight: 600; color: #111827; }
-    
+
     /* Grid Metrik Pembeli */
     .buyer-metrics-grid {
         display: grid;
@@ -145,7 +145,7 @@
         width: 180px !important;
         height: 180px !important;
     }
-    
+
     .donut-center-text {
         position: absolute;
         top: 50%; left: 50%;
@@ -178,7 +178,7 @@
     <h3 class="page-title d-flex align-items-center m-0">
         <div class="page-title-icon-mono me-3">
             <i class="mdi mdi-chart-box-outline"></i>
-        </div> 
+        </div>
         <div class="d-flex align-items-center" style="font-size: 1.6rem;">
             <a href="{{ route('seller.dashboard') }}" class="header-path-link">Dashboard</a>
             <i class="mdi mdi-chevron-right header-path-separator"></i>
@@ -207,10 +207,10 @@
 </ul>
 
 <div class="tab-content" id="performanceTabContent">
-    
+
     {{-- TAB 1: TINJAUAN UTAMA --}}
     <div class="tab-pane fade show active" id="tinjauan-content" role="tabpanel">
-        
+
         {{-- Kotak Kriteria --}}
         <div class="key-criteria-grid">
             <div class="criteria-box">
@@ -260,10 +260,10 @@
                 </div>
             </div>
         </div>
-        
+
         {{-- Area Saluran & Pembeli --}}
         <div class="row g-4 mb-4">
-            
+
             {{-- Saluran Penjualan --}}
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm h-100" style="border-radius: 16px;">
@@ -295,15 +295,15 @@
                     </div>
                 </div>
             </div>
-            
+
             {{-- Statistik Pembeli --}}
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm h-100" style="border-radius: 16px;">
                     <div class="card-body p-4 d-flex flex-column justify-content-center">
                         <h5 class="card-title fw-bold border-bottom pb-3 mb-4 w-100 text-start" style="color: #111827;">Statistik Pembeli</h5>
-                        
+
                         <div class="buyer-stats-container d-flex w-100 align-items-center gap-4">
-                            
+
                             {{-- Donut Chart Wrapper --}}
                             <div class="donut-wrapper">
                                 <canvas id="buyerDonutChart"></canvas>
@@ -312,7 +312,7 @@
                                     <div class="label">Pembeli<br>Setia</div>
                                 </div>
                             </div>
-                            
+
                             {{-- Metrik Pembeli Grid --}}
                             <div class="buyer-metrics-grid">
                                 <div class="metric-item"><span>Total Pembeli</span><p>{{ number_format($pembeli['total_pembeli']) }}</p></div>
@@ -320,14 +320,14 @@
                                 <div class="metric-item"><span>Potensi Balik</span><p>{{ number_format($pembeli['potensi_pembeli']) }}</p></div>
                                 <div class="metric-item"><span>Retention</span><p>{{ $pembeli['tingkat_pembeli_berulang'] }}%</p></div>
                             </div>
-                            
+
                         </div>
 
                     </div>
                 </div>
             </div>
         </div>
-        
+
     </div>
 
     {{-- TAB 2: ANALITIK PRODUK --}}
@@ -349,7 +349,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    
+
     // --- 1. SETUP DATA CHART UTAMA (LINE) ---
     const chartLabels = @json($chart_labels);
     const chartData = {
@@ -357,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function() {
         pesanan: @json($chart_data['pesanan']),
         pengunjung: @json($chart_data['pengunjung'])
     };
-    
+
     const datasetConfigs = {
         penjualan: { label: 'Total Penjualan (Rp)', borderColor: '#111827', backgroundColor: 'rgba(17, 24, 39, 0.08)' },
         pesanan: { label: 'Pesanan', borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.1)' },
@@ -372,7 +372,7 @@ document.addEventListener("DOMContentLoaded", function() {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
-            tension: 0.4, 
+            tension: 0.4,
             fill: true,
             plugins: {
                 legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
@@ -422,26 +422,26 @@ document.addEventListener("DOMContentLoaded", function() {
             labels: ['Pembeli Baru', 'Pembeli Setia'],
             datasets: [{
                 data: [{{ $pembeli_donut_chart['baru'] }}, {{ $pembeli_donut_chart['berulang'] }}],
-                backgroundColor: ['#e5e7eb', '#111827'], 
-                borderWidth: 0, 
-                borderRadius: 4, 
-                cutout: '75%', 
+                backgroundColor: ['#e5e7eb', '#111827'],
+                borderWidth: 0,
+                borderRadius: 4,
+                cutout: '75%',
                 hoverOffset: 4
             }]
         },
-        options: { 
+        options: {
             responsive: false, // KUNCI UTAMA: Matikan responsive auto-resize agar tidak membesar
-            maintainAspectRatio: true, 
-            plugins: { 
-                legend: { display: false }, 
-                tooltip: { 
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
                     backgroundColor: '#111827',
                     padding: 10,
                     callbacks: {
                         label: function(context) { return " " + context.label + ": " + context.raw; }
                     }
-                } 
-            } 
+                }
+            }
         }
     });
 });

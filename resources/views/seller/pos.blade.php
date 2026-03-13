@@ -1,197 +1,291 @@
 @extends('layouts.seller')
 
-@section('title', 'Mesin Kasir (POS)')
+@section('title', 'Terminal Kasir - Pondasikita')
 
 @section('content')
+
+{{-- HANYA MENGGUNAKAN FONT ICON --}}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-    /* CSS LANGSUNG DI BODY AGAR ANTI GAGAL */
+    /* =========================================================
+       CSS TINGKAT DEWA (NATIVE/VANILLA) - ANTI MERUSAK SIDEBAR
+       ========================================================= */
     :root {
-        --pos-dark: #0f172a;
-        --pos-light: #f8fafc;
-        --pos-border: #cbd5e1;
-        --pos-primary: #0284c7;
-        --pos-success: #059669;
+        --pos-dark: #09090b;
+        --pos-dark-panel: #18181b;
+        --pos-white: #ffffff;
+        --pos-bg: #f4f4f5;
+        --pos-border: #e4e4e7;
+        --pos-border-dark: #27272a;
+        --pos-primary: #2563eb;
+        --pos-primary-hover: #1d4ed8;
+        --pos-primary-light: #eff6ff;
+        --pos-text-main: #09090b;
+        --pos-text-muted: #71717a;
+        --pos-text-light: #a1a1aa;
+
+        --pos-radius-xl: 24px;
+        --pos-radius-lg: 16px;
+        --pos-radius-md: 12px;
+
+        --pos-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+        --pos-shadow-glow: 0 0 20px rgba(37,99,235,0.4);
     }
+
+    /* MATIKAN SCROLL BODY UTAMA */
+    body { overflow: hidden !important; }
 
     .pos-wrapper {
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        height: calc(100vh - 100px);
+        font-family: 'Inter', sans-serif;
+        /* Tinggi dihitung pas dengan layar dikurangi header seller */
+        height: calc(100vh - 90px);
+        padding: 20px;
         display: flex;
         gap: 20px;
+        background-color: var(--pos-bg);
+        box-sizing: border-box;
         overflow: hidden;
     }
 
-    /* PANEL KIRI: KATALOG BARANG */
+    .font-digital {
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: -1px;
+    }
+
+    /* KIRI: KATALOG */
     .pos-catalog {
-        flex: 2;
-        background: white;
-        border-radius: 12px;
+        flex: 6;
+        background: var(--pos-white);
+        border-radius: var(--pos-radius-xl);
+        box-shadow: var(--pos-shadow);
         border: 1px solid var(--pos-border);
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
-    
+
     .catalog-header {
-        padding: 16px 20px;
-        background: #f1f5f9;
-        border-bottom: 2px solid var(--pos-border);
-    }
-    
-    .search-barcode {
-        font-family: monospace;
-        font-size: 16px;
-        font-weight: 700;
-        border: 2px solid #94a3b8;
-        border-radius: 8px;
-        padding: 12px 16px;
-    }
-    .search-barcode:focus {
-        border-color: var(--pos-primary);
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
-        outline: none;
-    }
-
-    .table-container { flex: 1; overflow-y: auto; }
-    .pos-table { width: 100%; border-collapse: collapse; }
-    .pos-table th { 
-        position: sticky; 
-        top: 0; 
-        background: #e2e8f0; 
-        color: #334155; 
-        font-size: 11px; 
-        text-transform: uppercase; 
-        padding: 12px 16px; 
-        text-align: left; 
-        z-index: 10;
-        border-bottom: 2px solid #cbd5e1;
-    }
-    .pos-table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-    .pos-table tbody tr { cursor: pointer; transition: 0.1s; }
-    .pos-table tbody tr:hover { background-color: #eff6ff; }
-    
-    .sku-badge { background: white; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 13px; font-weight: bold; color: #475569; }
-    .p-name { font-weight: 700; color: var(--pos-dark); font-size: 14px; margin-bottom: 2px; }
-    .p-price { font-weight: 800; color: var(--pos-primary); font-size: 15px; }
-
-    /* PANEL KANAN: KERANJANG TRANSAKSI */
-    .pos-cart {
-        flex: 1;
-        min-width: 360px;
-        max-width: 400px;
-        background: white;
-        border-radius: 12px;
-        border: 1px solid var(--pos-border);
+        padding: 20px;
+        border-bottom: 1px solid var(--pos-border);
         display: flex;
-        flex-direction: column;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        gap: 15px;
+        flex-shrink: 0;
     }
-    
-    .cart-header { background: var(--pos-dark); color: white; padding: 16px 20px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
-    .cart-items { flex: 1; overflow-y: auto; background: #fafafa; padding: 12px; }
-    
-    .cart-item-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .qty-group { display: flex; align-items: center; background: #f1f5f9; border-radius: 6px; border: 1px solid #cbd5e1; overflow: hidden; }
-    .qty-btn { border: none; background: transparent; width: 28px; height: 28px; font-weight: bold; cursor: pointer; color: #475569; }
-    .qty-btn:hover { background: #e2e8f0; }
-    .qty-input { width: 35px; border: none; background: transparent; text-align: center; font-weight: bold; font-size: 14px; outline: none; pointer-events: none; }
-    
-    .cart-footer { background: white; border-top: 2px dashed #cbd5e1; padding: 20px; border-radius: 0 0 12px 12px; }
-    .total-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-    
-    .btn-cash { background: white; border: 1px solid #cbd5e1; color: #475569; font-weight: 700; font-size: 14px; padding: 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; width: 100%; }
-    .btn-cash:hover { background: var(--pos-dark); color: white; border-color: var(--pos-dark); }
-    
-    .btn-checkout { background: var(--pos-success); color: white; font-size: 16px; font-weight: 800; padding: 16px; border-radius: 8px; border: none; width: 100%; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
-    .btn-checkout:hover { background: #047857; }
-    .btn-checkout:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    /* Custom Scrollbar */
-    .table-container::-webkit-scrollbar, .cart-items::-webkit-scrollbar { width: 8px; }
-    .table-container::-webkit-scrollbar-thumb, .cart-items::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .search-wrapper { position: relative; flex: 1; }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--pos-text-light); font-size: 18px; }
+    .search-input {
+        width: 100%; padding: 14px 16px 14px 45px;
+        border: 2px solid var(--pos-border); border-radius: var(--pos-radius-lg);
+        font-size: 14px; font-weight: 700; color: var(--pos-text-main); font-family: 'JetBrains Mono', monospace;
+        outline: none; transition: all 0.2s; box-sizing: border-box;
+    }
+    .search-input:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+
+    .filter-wrapper { position: relative; width: 250px; }
+    .filter-select {
+        width: 100%; height: 100%; padding: 0 40px 0 16px;
+        border: 2px solid var(--pos-border); border-radius: var(--pos-radius-lg);
+        font-size: 14px; font-weight: 700; color: var(--pos-text-main); font-family: 'Inter', sans-serif;
+        outline: none; transition: all 0.2s; appearance: none; cursor: pointer; box-sizing: border-box;
+    }
+    .filter-select:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+    .filter-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--pos-text-light); pointer-events: none; }
+
+    .catalog-body { flex: 1; overflow-y: auto; position: relative; min-height: 0; }
+    .pos-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .pos-table th {
+        position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px);
+        padding: 16px 24px; font-size: 10px; font-weight: 900; color: var(--pos-text-muted);
+        text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--pos-border); z-index: 10;
+    }
+    .pos-table td { padding: 16px 24px; border-bottom: 1px solid #f4f4f5; vertical-align: middle; transition: background 0.2s; }
+    .pos-table tr { cursor: pointer; }
+    .pos-table tr:hover td { background-color: var(--pos-primary-light); }
+
+    .sku-badge { background: #f4f4f5; color: var(--pos-text-muted); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--pos-border); }
+    .pos-table tr:hover .sku-badge { background: #dbeafe; color: var(--pos-primary); border-color: #bfdbfe; }
+    .item-name { font-size: 14px; font-weight: 700; color: var(--pos-text-main); margin: 0; }
+    .pos-table tr:hover .item-name { color: var(--pos-primary); }
+    .stock-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 900; border: 1px solid transparent; }
+    .stock-safe { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    .stock-low { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .item-price { font-size: 14px; font-weight: 900; color: var(--pos-text-main); }
+
+    /* KANAN: KASIR */
+    .pos-cart {
+        flex: 4; min-width: 380px; max-width: 450px;
+        background: var(--pos-dark); border-radius: var(--pos-radius-xl);
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid var(--pos-border-dark);
+        display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    .cart-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--pos-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: var(--pos-shadow-glow); }
+    .header-title { color: white; font-size: 16px; font-weight: 900; margin: 0 0 2px 0; }
+    .header-subtitle { color: #60a5fa; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+    .btn-reset { background: var(--pos-dark-panel); color: var(--pos-text-light); border: 1px solid var(--pos-border-dark); padding: 8px 12px; border-radius: var(--pos-radius-md); font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+    .btn-reset:hover { background: #27272a; color: white; }
+    .btn-reset:active { transform: scale(0.95); }
+
+    .customer-box { padding: 16px 20px; background: var(--pos-dark); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+    .customer-input-wrapper { position: relative; }
+    .customer-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--pos-text-muted); }
+    .customer-input { width: 100%; padding: 12px 16px 12px 40px; background: var(--pos-dark-panel); border: 1px solid var(--pos-border-dark); border-radius: var(--pos-radius-md); color: white; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; outline: none; transition: 0.2s; box-sizing: border-box; }
+    .customer-input:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.3); }
+
+    .cart-body { flex: 1; overflow-y: auto; padding: 16px 20px; background: var(--pos-dark); min-height: 0; }
+    .empty-state { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--pos-text-muted); }
+    .empty-icon { font-size: 60px; margin-bottom: 16px; opacity: 0.5; }
+    .empty-text { font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+
+    .cart-item { background: var(--pos-dark-panel); border: 1px solid var(--pos-border-dark); border-radius: var(--pos-radius-lg); padding: 16px; margin-bottom: 12px; }
+    .cart-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; padding-right: 20px; position: relative; }
+    .cart-item-name { color: white; font-size: 13px; font-weight: 700; margin: 0; line-height: 1.4; }
+    .btn-remove { position: absolute; right: 0; top: 0; background: transparent; border: none; color: var(--pos-text-muted); cursor: pointer; transition: 0.2s; font-size: 12px; padding: 4px; }
+    .btn-remove:hover { color: #ef4444; }
+    .cart-item-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+    .qty-control { display: flex; align-items: center; background: black; border-radius: var(--pos-radius-md); padding: 4px; border: 1px solid var(--pos-border-dark); }
+    .qty-btn { width: 28px; height: 28px; background: transparent; border: none; color: var(--pos-text-muted); font-weight: 900; font-size: 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+    .qty-btn:hover { color: white; background: rgba(255,255,255,0.1); }
+    .qty-btn.plus { color: var(--pos-primary); }
+    .qty-btn.plus:hover { background: rgba(37,99,235,0.2); }
+    .qty-input { width: 36px; background: transparent; border: none; color: white; font-weight: 900; font-size: 12px; text-align: center; font-family: 'JetBrains Mono', monospace; outline: none; }
+    .item-subtotal-box { text-align: right; }
+    .item-price-unit { display: block; color: var(--pos-text-muted); font-size: 9px; font-weight: 900; letter-spacing: 1px; margin-bottom: 2px; }
+    .item-subtotal { color: #60a5fa; font-size: 14px; font-weight: 900; }
+
+    .cart-footer { background: var(--pos-white); padding: 24px; border-radius: 32px 32px 0 0; flex-shrink: 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.15); z-index: 20; }
+    .total-screen { background: var(--pos-bg); border-radius: var(--pos-radius-lg); padding: 16px; margin-bottom: 20px; border: 1px solid var(--pos-border); box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: flex-end; transition: transform 0.15s; }
+    .total-label { color: var(--pos-text-light); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; padding-bottom: 4px; }
+    .total-value-wrapper { display: flex; align-items: flex-start; gap: 4px; }
+    .total-currency { font-size: 14px; font-weight: 700; color: var(--pos-text-main); margin-top: 4px; }
+    .total-value { font-size: 36px; font-weight: 900; color: var(--pos-text-main); line-height: 1; letter-spacing: -2px; }
+
+    .payment-input-wrapper { position: relative; margin-bottom: 16px; }
+    .payment-currency { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-weight: 900; color: var(--pos-text-light); }
+    .payment-input { width: 100%; padding: 14px 16px 14px 48px; border: 2px solid var(--pos-border); border-radius: var(--pos-radius-lg); font-size: 24px; font-weight: 900; color: var(--pos-text-main); text-align: right; outline: none; transition: 0.2s; box-sizing: border-box; }
+    .payment-input:focus { border-color: var(--pos-primary); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+
+    .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+    .keypad-btn { background: #f4f4f5; border: 1px solid var(--pos-border); border-bottom: 4px solid #d4d4d8; color: var(--pos-text-main); font-weight: 900; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 12px 0; border-radius: var(--pos-radius-md); cursor: pointer; outline: none; }
+    .keypad-btn:hover { background: #e4e4e7; }
+
+    .change-row { display: flex; justify-content: space-between; align-items: center; padding: 0 8px; margin-bottom: 24px; }
+    .change-label { font-size: 10px; font-weight: 900; color: var(--pos-text-light); text-transform: uppercase; letter-spacing: 1px; }
+    .change-value { font-size: 20px; font-weight: 900; color: var(--pos-text-light); }
+    .change-value.success { color: var(--pos-primary); }
+    .change-value.error { color: #ef4444; }
+
+    .btn-checkout { width: 100%; background: var(--pos-primary); color: white; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; padding: 18px; border-radius: var(--pos-radius-lg); border: none; cursor: pointer; transition: 0.2s; box-shadow: var(--pos-shadow-glow); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-checkout:hover { background: var(--pos-primary-hover); transform: translateY(-2px); }
+    .btn-checkout:active { transform: translateY(0); box-shadow: none; }
+    .btn-checkout:disabled { background: var(--pos-border); color: var(--pos-text-light); box-shadow: none; cursor: not-allowed; transform: none; }
+
+    /* Custom Scrollbar Styles */
+    .catalog-body::-webkit-scrollbar, .cart-body::-webkit-scrollbar { width: 6px; }
+    .catalog-body::-webkit-scrollbar-track, .cart-body::-webkit-scrollbar-track { background: transparent; }
+    .catalog-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .cart-body::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
 </style>
 
 <div class="pos-wrapper">
-    {{-- KIRI: KATALOG BARANG --}}
+
+    {{-- KIRI: KATALOG --}}
     <div class="pos-catalog">
         <div class="catalog-header">
-            <div class="row g-2">
-                <div class="col-md-8">
-                    <input type="text" id="search-input" class="form-control search-barcode w-100" placeholder="Klik disini & Scan Barcode (F2)..." autocomplete="off" autofocus>
-                </div>
-                <div class="col-md-4">
-                    <select id="category-filter" class="form-select form-select-lg fw-bold w-100" style="height: 100%;">
-                        <option value="all">SEMUA KATEGORI</option>
-                    </select>
-                </div>
+            <div class="search-wrapper">
+                <i class="fas fa-barcode search-icon"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Scan Barcode (F2)..." autocomplete="off" autofocus>
+            </div>
+            <div class="filter-wrapper">
+                <select id="category-filter" class="filter-select">
+                    <option value="all">Semua Kategori</option>
+                </select>
+                <i class="fas fa-chevron-down filter-icon"></i>
             </div>
         </div>
 
-        <div class="table-container">
+        <div class="catalog-body">
             <table class="pos-table">
                 <thead>
                     <tr>
-                        <th width="15%">KODE / SKU</th>
-                        <th width="50%">NAMA MATERIAL</th>
-                        <th width="15%" class="text-center">STOK</th>
-                        <th width="20%" class="text-end">HARGA (Rp)</th>
+                        <th width="20%">SKU Item</th>
+                        <th width="45%">Material</th>
+                        <th width="15%" style="text-align: center;">Stok</th>
+                        <th width="20%" style="text-align: right;">Harga</th>
                     </tr>
                 </thead>
                 <tbody id="product-table-body">
-                    <tr><td colspan="4" class="text-center py-5 fw-bold text-muted">Memuat data gudang...</td></tr>
+                    <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--pos-text-light); font-weight: 700; font-size: 14px;"><i class="fas fa-circle-notch fa-spin" style="margin-right: 8px;"></i> Sinkronisasi Gudang...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    {{-- KANAN: KASIR TRANSAKSI --}}
+    {{-- KANAN: KASIR --}}
     <div class="pos-cart">
         <div class="cart-header">
-            <h5 class="m-0 fw-bold fs-6"><i class="mdi mdi-cash-register me-2"></i>Transaksi Kasir</h5>
-            <button id="clear-cart-btn" class="btn btn-sm btn-outline-light border-0 py-0"><i class="mdi mdi-trash-can"></i> Reset</button>
-        </div>
-        
-        <div class="p-3 bg-white border-bottom">
-            <input type="text" id="customer-name" class="form-control fw-bold bg-light" placeholder="Nama Pelanggan (Umum)">
+            <div class="header-left">
+                <div class="header-icon"><i class="fas fa-cash-register"></i></div>
+                <div>
+                    <h2 class="header-title">Terminal Kasir</h2>
+                    <p class="header-subtitle"><i class="fas fa-circle" style="font-size: 5px; animation: pulse 2s infinite; margin-right: 4px;"></i> Online</p>
+                </div>
+            </div>
+            <button id="clear-cart-btn" class="btn-reset"><i class="fas fa-rotate-right"></i> Reset</button>
         </div>
 
-        <div class="cart-items" id="cart-items">
-            <div id="empty-cart-message" class="text-center py-5 text-muted mt-4">
-                <i class="mdi mdi-barcode-scan" style="font-size: 3rem; opacity: 0.2;"></i>
-                <p class="mt-2 fw-bold" style="font-size: 13px;">Belum ada barang masuk.<br>Gunakan Scanner / Klik dari daftar.</p>
+        <div class="customer-box">
+            <div class="customer-input-wrapper">
+                <i class="fas fa-user customer-icon"></i>
+                <input type="text" id="customer-name" class="customer-input" placeholder="Nama Pelanggan (Opsional)">
+            </div>
+        </div>
+
+        <div class="cart-body" id="cart-items">
+            <div id="empty-cart-message" class="empty-state">
+                <i class="fas fa-barcode empty-icon"></i>
+                <p class="empty-text">Menunggu Scan Barcode</p>
             </div>
         </div>
 
         <div class="cart-footer">
-            <div class="total-box d-flex justify-content-between align-items-center">
-                <span class="fw-bold text-muted">TOTAL TAGIHAN</span>
-                <span id="total-price" class="fs-2 fw-bold" style="color: var(--pos-dark);">0</span>
-            </div>
-
-            <div class="mb-3">
-                <div class="input-group mb-2">
-                    <span class="input-group-text bg-light fw-bold border-secondary">Rp</span>
-                    <input type="number" id="amount-paid" class="form-control form-control-lg fw-bold fs-4 text-end border-secondary" placeholder="0">
-                </div>
-                <div class="row g-2">
-                    <div class="col-4"><button type="button" class="btn-cash" data-amount="exact">Uang Pas</button></div>
-                    <div class="col-4"><button type="button" class="btn-cash" data-amount="50000">50 Rb</button></div>
-                    <div class="col-4"><button type="button" class="btn-cash" data-amount="100000">100 Rb</button></div>
+            <div class="total-screen" id="total-screen">
+                <span class="total-label">Total Tagihan</span>
+                <div class="total-value-wrapper">
+                    <span class="total-currency">Rp</span>
+                    <span id="total-price" class="total-value font-digital">0</span>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3 px-1 border-bottom pb-3">
-                <span class="fw-bold text-muted">KEMBALIAN</span>
-                <span id="change-due" class="fs-4 fw-bold text-danger">Rp 0</span>
+            <div class="payment-input-wrapper">
+                <span class="payment-currency">Rp</span>
+                <input type="number" id="amount-paid" class="payment-input font-digital" placeholder="0">
+            </div>
+
+            <div class="keypad-grid">
+                <button type="button" class="keypad-btn" data-amount="exact">Pas</button>
+                <button type="button" class="keypad-btn" data-amount="50000">50K</button>
+                <button type="button" class="keypad-btn" data-amount="100000">100K</button>
+            </div>
+
+            <div class="change-row">
+                <span class="change-label">Kembalian</span>
+                <span id="change-due" class="change-value font-digital">Rp 0</span>
             </div>
 
             <button id="process-payment-btn" class="btn-checkout" disabled>
-                <i class="mdi mdi-printer me-1"></i> CETAK STRUK (F9)
+                <i class="fas fa-print"></i> Bayar & Cetak (F9)
             </button>
         </div>
     </div>
+
 </div>
+
 @endsection
 
 @push('scripts')
@@ -201,17 +295,13 @@ document.addEventListener('DOMContentLoaded', function() {
     let allProducts = [];
     let cart = [];
     let currentTotal = 0;
-    
+
     const formatRp = (num) => new Intl.NumberFormat('id-ID').format(num);
 
-    // 1. Fetch API Data
     function loadProducts() {
         fetch("{{ route('seller.pos.api.products') }}")
             .then(res => res.json())
-            .then(data => {
-                allProducts = data;
-                renderProducts(allProducts);
-            });
+            .then(data => { allProducts = data; renderProducts(allProducts); });
     }
 
     function loadCategories() {
@@ -223,64 +313,47 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // 2. Render Daftar Barang (Padat & Rapi)
     function renderProducts(products) {
         const tbody = document.getElementById('product-table-body');
-        tbody.innerHTML = ''; 
-        
+        tbody.innerHTML = '';
+
         if(products.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger fw-bold">Barang tidak ditemukan</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:#ef4444; font-weight:700;"><i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i>Data tidak ditemukan</td></tr>`;
             return;
         }
 
         products.forEach(p => {
             let sku = p.kode_barang ? p.kode_barang : 'SKU-'+String(p.id).padStart(4, '0');
-            let stockClass = p.stok <= 5 ? 'text-danger' : 'text-success';
-            
+            let stockClass = p.stok <= 5 ? 'stock-low' : 'stock-safe';
+
             let html = `
                 <tr onclick="addToCart(${p.id})">
-                    <td><span class="sku-badge">${sku}</span></td>
-                    <td>
-                        <div class="p-name">${p.nama_barang}</div>
-                    </td>
-                    <td class="text-center fw-bold ${stockClass}">${p.stok}</td>
-                    <td class="text-end p-price">${formatRp(p.harga)}</td>
+                    <td><span class="sku-badge font-digital">${sku}</span></td>
+                    <td><p class="item-name">${p.nama_barang}</p></td>
+                    <td style="text-align: center;"><span class="stock-badge ${stockClass}">${p.stok}</span></td>
+                    <td style="text-align: right;"><span class="item-price font-digital">Rp ${formatRp(p.harga)}</span></td>
                 </tr>
             `;
             tbody.insertAdjacentHTML('beforeend', html);
         });
     }
 
-    // 3. Sistem Pencarian & Scanner Barcode (Sangat Responsif)
     const searchInput = document.getElementById('search-input');
-    
     searchInput.addEventListener('input', filterProducts);
-    
-    // Logika Scanner Barcode (Scanner otomatis menekan 'Enter' setelah scan)
+
     searchInput.addEventListener('keypress', function(e) {
         if(e.key === 'Enter') {
             e.preventDefault();
             let keyword = this.value.toLowerCase().trim();
-            
-            // Cari kecocokan persis pada KODE BARANG terlebih dahulu
+
             let matchedProduct = allProducts.find(p => (p.kode_barang && p.kode_barang.toLowerCase() === keyword));
-            
-            // Jika tidak ada di kode, cari kecocokan persis di nama
-            if(!matchedProduct) {
-                matchedProduct = allProducts.find(p => p.nama_barang.toLowerCase() === keyword);
-            }
+            if(!matchedProduct) matchedProduct = allProducts.find(p => p.nama_barang.toLowerCase() === keyword);
 
             if(matchedProduct) {
                 addToCart(matchedProduct.id);
-                this.value = ''; // Kosongkan input setelah sukses scan
-                filterProducts(); 
+                this.value = ''; filterProducts();
             } else {
-                // Jika barcode tidak ditemukan di database
-                Swal.fire({
-                    toast: true, position: 'top-end', icon: 'error',
-                    title: 'Barcode/Barang tidak ditemukan!',
-                    showConfirmButton: false, timer: 1500
-                });
+                Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Tidak Ditemukan!', showConfirmButton: false, timer: 1500 });
                 this.value = '';
             }
         }
@@ -291,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterProducts() {
         let keyword = searchInput.value.toLowerCase();
         let categoryId = document.getElementById('category-filter').value;
-        
+
         let filtered = allProducts.filter(p => {
             let matchCat = categoryId === 'all' || p.kategori_id == categoryId;
             let kode = p.kode_barang ? p.kode_barang.toLowerCase() : '';
@@ -301,36 +374,24 @@ document.addEventListener('DOMContentLoaded', function() {
         renderProducts(filtered);
     }
 
-    // Hotkeys Kasir
     document.addEventListener('keydown', function(e) {
         if(e.key === 'F2') { e.preventDefault(); searchInput.focus(); }
         if(e.key === 'F9') { e.preventDefault(); document.getElementById('process-payment-btn').click(); }
     });
 
-    // 4. Manajemen Keranjang
     window.addToCart = function(productId) {
         let product = allProducts.find(p => p.id === productId);
         if(!product) return;
 
         let existing = cart.find(item => item.id === productId);
         if(existing) {
-            if(existing.qty < product.stok) {
-                existing.qty++;
-                playBeep();
-            } else {
-                Swal.fire({toast: true, position: 'top-end', icon: 'warning', title: 'Stok Fisik Habis!', showConfirmButton: false, timer: 1500});
-            }
+            if(existing.qty < product.stok) existing.qty++;
+            else Swal.fire({toast: true, position: 'top-end', icon: 'warning', title: 'Stok Fisik Habis!', showConfirmButton: false, timer: 1500});
         } else {
             cart.push({ id: product.id, nama_barang: product.nama_barang, harga: product.harga, qty: 1, stok: product.stok });
-            playBeep();
         }
         updateCartDisplay();
     };
-
-    function playBeep() {
-        // Efek suara scan barcode (opsional jika ingin tambah audio file)
-        // new Audio('beep.mp3').play().catch(e => {}); 
-    }
 
     window.updateQty = function(productId, change) {
         let item = cart.find(i => i.id === productId);
@@ -346,11 +407,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateCartDisplay() {
         const container = document.getElementById('cart-items');
         const emptyMsg = document.getElementById('empty-cart-message');
-        document.querySelectorAll('.cart-item-card').forEach(e => e.remove());
+        document.querySelectorAll('.cart-item').forEach(e => e.remove());
         currentTotal = 0;
 
         if(cart.length === 0) {
-            emptyMsg.style.display = 'block';
+            emptyMsg.style.display = 'flex';
             document.getElementById('process-payment-btn').disabled = true;
         } else {
             emptyMsg.style.display = 'none';
@@ -359,34 +420,41 @@ document.addEventListener('DOMContentLoaded', function() {
             cart.forEach(item => {
                 currentTotal += (item.harga * item.qty);
                 let html = `
-                    <div class="cart-item-card">
-                        <div style="flex-grow: 1; padding-right: 10px;">
-                            <h6 style="font-size:13px; font-weight:800; margin:0 0 4px 0; color:#0f172a;">${item.nama_barang}</h6>
-                            <span style="font-size:13px; color:#0284c7; font-weight:700;">Rp ${formatRp(item.harga)}</span>
+                    <div class="cart-item">
+                        <div class="cart-item-header">
+                            <h6 class="cart-item-name">${item.nama_barang}</h6>
+                            <button onclick="updateQty(${item.id}, -${item.qty})" class="btn-remove"><i class="fas fa-times"></i></button>
                         </div>
-                        <div class="d-flex flex-column align-items-end">
-                            <div class="qty-group mb-1">
+                        <div class="cart-item-footer">
+                            <div class="qty-control">
                                 <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
                                 <input type="text" class="qty-input" value="${item.qty}" readonly>
-                                <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+                                <button class="qty-btn plus" onclick="updateQty(${item.id}, 1)">+</button>
                             </div>
-                            <span class="fw-bold text-dark" style="font-size:14px;">${formatRp(item.harga * item.qty)}</span>
+                            <div class="item-subtotal-box">
+                                <span class="item-price-unit font-digital">Rp${formatRp(item.harga)}</span>
+                                <span class="item-subtotal font-digital">Rp${formatRp(item.harga * item.qty)}</span>
+                            </div>
                         </div>
                     </div>
                 `;
                 container.insertAdjacentHTML('beforeend', html);
             });
         }
+
+        const screenEl = document.getElementById('total-screen');
+        screenEl.style.transform = 'scale(1.02)';
         document.getElementById('total-price').innerText = formatRp(currentTotal);
+        setTimeout(() => screenEl.style.transform = 'scale(1)', 150);
+
         calculateChange();
     }
 
-    // 5. Pembayaran & Kembalian
     const amountInput = document.getElementById('amount-paid');
     const changeDisplay = document.getElementById('change-due');
 
     amountInput.addEventListener('input', calculateChange);
-    document.querySelectorAll('.btn-cash').forEach(btn => {
+    document.querySelectorAll('.keypad-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             let val = this.getAttribute('data-amount');
             amountInput.value = val === 'exact' ? currentTotal : val;
@@ -397,72 +465,63 @@ document.addEventListener('DOMContentLoaded', function() {
     function calculateChange() {
         let paid = parseInt(amountInput.value) || 0;
         let change = paid - currentTotal;
-        if(currentTotal === 0) { changeDisplay.innerText = "Rp 0"; return; }
-        
-        if(change < 0) {
-            changeDisplay.innerText = "UANG KURANG";
-            changeDisplay.className = "fs-4 fw-bold text-danger";
-        } else {
-            changeDisplay.innerText = "Rp " + formatRp(change);
-            changeDisplay.className = "fs-4 fw-bold text-success";
-        }
-    }
-
-    // 6. Checkout ke Database
-    document.getElementById('process-payment-btn').addEventListener('click', function() {
-        let paid = parseInt(amountInput.value) || 0;
-        if(paid < currentTotal) {
-            Swal.fire('Pembayaran Gagal', 'Jumlah uang tunai kurang dari total tagihan.', 'error');
+        if(currentTotal === 0) {
+            changeDisplay.innerText = "Rp 0";
+            changeDisplay.className = "change-value font-digital";
             return;
         }
 
-        // Tampilkan loading button
-        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> MEMPROSES...';
-        this.disabled = true;
+        if(change < 0) {
+            changeDisplay.innerText = "UANG KURANG";
+            changeDisplay.className = "change-value font-digital error";
+        } else {
+            changeDisplay.innerText = "Rp " + formatRp(change);
+            changeDisplay.className = "change-value font-digital success";
+        }
+    }
 
-        let payload = {
-            customer_name: document.getElementById('customer-name').value || 'Pelanggan Walk-in',
-            payment_method: 'Tunai Kasir',
-            total: currentTotal,
-            cart: cart
-        };
+    document.getElementById('process-payment-btn').addEventListener('click', function() {
+        let paid = parseInt(amountInput.value) || 0;
+        if(paid < currentTotal) { Swal.fire({icon: 'error', title: 'Uang Tidak Cukup', text: 'Jumlah uang tunai kurang.'}); return; }
+
+        this.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> MEMPROSES...';
+        this.disabled = true;
 
         fetch("{{ route('seller.pos.api.checkout') }}", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                customer_name: document.getElementById('customer-name').value || 'Pelanggan Walk-in',
+                payment_method: 'Tunai Kasir',
+                total: currentTotal,
+                cart: cart
+            })
         })
         .then(res => res.json())
         .then(data => {
             if(data.status === 'success') {
                 Swal.fire({
-                    title: 'TRANSAKSI LUNAS!',
-                    html: `Kembalian: <b class="text-success fs-2 d-block my-2">Rp ${formatRp(paid - currentTotal)}</b><span class="text-muted">No. Struk: ${data.invoice}</span>`,
-                    icon: 'success',
-                    confirmButtonText: '<i class="mdi mdi-printer"></i> Selesai & Cetak Baru',
-                    confirmButtonColor: '#0f172a',
-                    allowOutsideClick: false
+                    title: 'LUNAS!',
+                    html: `<div style="background:#f4f4f5; padding:15px; border-radius:12px; margin:15px 0;">
+                            <span style="font-size:10px; font-weight:900; color:#71717a;">KEMBALIAN</span>
+                            <b style="font-size:32px; color:#2563eb; display:block; font-family:monospace;">Rp ${formatRp(paid - currentTotal)}</b>
+                           </div><span style="font-size:10px; color:#a1a1aa; font-weight:bold;">No. Struk: ${data.invoice}</span>`,
+                    icon: 'success', confirmButtonText: '<i class="fas fa-print"></i> Cetak & Selesai', confirmButtonColor: '#09090b', allowOutsideClick: false
                 }).then(() => {
-                    // Reset POS untuk pelanggan berikutnya
                     cart = []; amountInput.value = ''; document.getElementById('customer-name').value = '';
-                    updateCartDisplay(); loadProducts(); searchInput.focus();
-                    document.getElementById('process-payment-btn').innerHTML = '<i class="mdi mdi-printer me-1"></i> CETAK STRUK (F9)';
+                    updateCartDisplay(); loadProducts(); searchInput.focus(); resetBtn();
                 });
-            } else {
-                Swal.fire('Error Database', data.message, 'error');
-                document.getElementById('process-payment-btn').innerHTML = '<i class="mdi mdi-printer me-1"></i> CETAK STRUK (F9)';
-                document.getElementById('process-payment-btn').disabled = false;
-            }
-        }).catch(err => {
-            Swal.fire('Koneksi Terputus', 'Periksa koneksi internet Anda.', 'error');
-            document.getElementById('process-payment-btn').innerHTML = '<i class="mdi mdi-printer me-1"></i> CETAK STRUK (F9)';
-            document.getElementById('process-payment-btn').disabled = false;
-        });
+            } else { Swal.fire('Error', data.message, 'error'); resetBtn(); }
+        }).catch(() => { Swal.fire('Offline', 'Periksa internet.', 'error'); resetBtn(); });
+
+        function resetBtn() {
+            const btn = document.getElementById('process-payment-btn');
+            btn.innerHTML = '<i class="fas fa-print"></i> Bayar & Cetak (F9)';
+            btn.disabled = false;
+        }
     });
 
-    // Inisialisasi awal
-    loadProducts();
-    loadCategories();
+    loadProducts(); loadCategories();
 });
 </script>
 @endpush

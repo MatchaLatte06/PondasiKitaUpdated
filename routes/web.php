@@ -45,13 +45,13 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/pages/semua_toko', 'semuaToko')->name('toko.index');
     Route::get('/pages/toko', 'detailToko')->name('toko.detail');
     Route::get('/pages/search', 'search')->name('search');
-    
+
     // Keranjang Belanja
     Route::get('/pages/keranjang', 'keranjang')->name('keranjang.index');
     Route::post('/api/keranjang/tambah', 'tambahKeranjang')->name('keranjang.tambah');
     Route::post('/api/keranjang/update', 'updateKeranjang')->name('keranjang.update');
     Route::post('/api/keranjang/hapus', 'hapusKeranjang')->name('keranjang.hapus');
-    
+
     // Checkout
     Route::match(['get', 'post'], '/checkout', 'checkout')->name('checkout');
     Route::post('/checkout/proses', 'prosesCheckout')->name('checkout.process');
@@ -65,10 +65,7 @@ Route::controller(PageController::class)->group(function () {
 
     // Status Pesanan & Lacak
     Route::get('/pesanan-saya', 'pesanan')->name('pesanan.index');
-    Route::get('/pesanan-saya/lacak/{kode_pesanan}', 'lacakPesanan')->name('pesanan.lacak');
-
-    // Tambahkan ini di bagian route yang memiliki middleware 'auth'
-    Route::get('/pesanan/{kode_invoice}', [PageController::class, 'lacakPesanan'])->name('pesanan.lacak');
+    Route::get('/pesanan/{kode_invoice}', 'lacakPesanan')->name('pesanan.lacak');
 });
 
 // 3. AUTHENTICATION (CUSTOMER & SELLER)
@@ -76,7 +73,7 @@ Route::controller(AuthController::class)->group(function () {
     // Customer
     Route::get('/login', 'showLogin')->name('login');
     Route::post('/login', 'login')->name('login.process');
-    Route::get('/register', 'showRegister')->name('register'); 
+    Route::get('/register', 'showRegister')->name('register');
     Route::post('/register', 'register')->name('register.process');
 
     // Seller
@@ -191,20 +188,27 @@ Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->grou
         Route::post('/settings/sync-komerce', [AdminSettingController::class, 'syncKomerce'])->name('settings.syncKomerce');
         Route::get('/logistics', [AdminLogisticSettingController::class, 'index'])->name('logistics.index');
         Route::post('/logistics/update', [AdminLogisticSettingController::class, 'update'])->name('logistics.update');
+
     });
 });
 
 // 6. API & AJAX & WEBHOOKS
 Route::get('/api/cities/{province_id}', [AuthController::class, 'getCities']);
-Route::get('/api/districts/{city_id}', [AuthController::class, 'getDistricts']);
+Route::get('/api/districts/{city_id}', [PageController::class, 'getDistrictsOnDemand']);
+
+// ---> RUTE BARU UNTUK AUTO-SYNC KECAMATAN <---
+Route::post('/api/get-or-create-district', [PageController::class, 'getOrCreateDistrict'])->name('api.get.create.district');
+
 Route::post('/api/chat', function() {
     return response()->json(['reply' => 'Halo! Saya POTA (Versi Laravel).']);
 })->name('api.chat');
 
+// --- ROUTE SYNC RAJAONGKIR (Dinonaktifkan agar limit Komerce tidak jebol) ---
+// Route::get('/sync-rajaongkir', [PageController::class, 'syncRajaOngkir']);
+
 // --- ROUTE WEBHOOK MIDTRANS ---
 // Route ini akan ditembak otomatis oleh server Midtrans saat pembayaran lunas/batal
 Route::post('/webhook/midtrans', [WebhookController::class, 'midtransHandler'])->name('webhook.midtrans');
-
 
 // 7. EXTRA
 Route::get('/auth/google', function() { return "Fitur Login Google"; });
