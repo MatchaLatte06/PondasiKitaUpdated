@@ -2,228 +2,200 @@
 
 @section('title', 'Manajemen Pesanan')
 
-@section('content')
+@push('styles')
 <style>
-    /* === B2B INDUSTRIAL SELLER THEME === */
-    :root {
-        --b2b-primary: #1e293b;
-        --b2b-accent: #2563eb;
-        --b2b-border: #e2e8f0;
-        --b2b-bg: #f8fafc;
-        --text-main: #0f172a;
-        --text-muted: #64748b;
-    }
-
-    body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
-
-    /* HEADER */
-    .page-title-box { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-    .icon-wrapper { background: var(--b2b-primary); color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .page-title h3 { margin: 0; font-size: 22px; font-weight: 800; color: var(--text-main); }
-    .page-title p { margin: 0; font-size: 14px; color: var(--text-muted); font-weight: 500; }
-
-    /* FILTER TABS (MODERN PILL) */
-    .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--b2b-border); scrollbar-width: none; }
-    .filter-tabs::-webkit-scrollbar { display: none; }
-    .f-tab { padding: 10px 20px; border-radius: 8px; color: var(--text-muted); font-weight: 600; font-size: 14px; text-decoration: none; transition: 0.2s; white-space: nowrap; border: 1px solid transparent; }
-    .f-tab:hover { background: var(--b2b-bg); color: var(--text-main); }
-    .f-tab.active { background: var(--b2b-primary); color: white; border-color: var(--b2b-primary); box-shadow: 0 4px 6px rgba(30, 41, 59, 0.2); }
-
-    /* TOOLBAR (SEARCH & MASS ACTION) */
-    .order-toolbar { background: white; padding: 16px; border-radius: 12px; border: 1px solid var(--b2b-border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .search-box { display: flex; flex-grow: 1; max-width: 450px; }
-    .search-box input { border-radius: 8px 0 0 8px; border: 1px solid var(--b2b-border); border-right: none; box-shadow: none; font-weight: 500; }
-    .search-box input:focus { border-color: var(--b2b-accent); outline: none; }
-    .search-box button { border-radius: 0 8px 8px 0; background: var(--b2b-bg); border: 1px solid var(--b2b-border); color: var(--text-muted); padding: 0 20px; transition: 0.2s; }
-    .search-box button:hover { background: var(--b2b-border); color: var(--text-main); }
-    
-    .btn-mass { background: var(--b2b-primary); color: white; font-weight: 700; border: none; padding: 10px 24px; border-radius: 8px; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-    .btn-mass:hover:not(:disabled) { background: #0f172a; transform: translateY(-2px); }
-    .btn-mass:disabled { background: #cbd5e1; cursor: not-allowed; }
-
-    /* ORDER CARD (PENGGANTI TABEL KUNO) */
-    .order-card { background: white; border-radius: 16px; border: 1px solid var(--b2b-border); margin-bottom: 20px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.2s; }
-    .order-card:hover { border-color: #94a3b8; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-    
-    .oc-header { background: var(--b2b-bg); padding: 16px 24px; border-bottom: 1px solid var(--b2b-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-    .oc-inv { font-family: monospace; font-size: 16px; font-weight: 800; color: var(--b2b-accent); display: flex; align-items: center; gap: 8px; }
-    .oc-buyer { font-weight: 700; color: var(--text-main); font-size: 14px; display: flex; align-items: center; gap: 6px; }
-    .oc-date { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-
-    .oc-body { display: flex; flex-direction: column; }
-    .oc-item { display: flex; padding: 20px 24px; border-bottom: 1px dashed var(--b2b-border); gap: 20px; align-items: center; flex-wrap: wrap; }
-    .oc-item:last-child { border-bottom: none; }
-    
-    /* Custom B2B Checkbox */
-    .b2b-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--b2b-accent); }
-    
-    .item-product { display: flex; gap: 16px; flex: 2; min-width: 250px; }
-    .item-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; border: 1px solid var(--b2b-border); }
-    .item-detail h6 { font-size: 15px; font-weight: 700; color: var(--text-main); margin: 0 0 6px 0; line-height: 1.4; }
-    .item-qty { font-size: 13px; font-weight: 600; color: var(--text-muted); background: var(--b2b-bg); padding: 4px 10px; border-radius: 6px; display: inline-block; border: 1px solid var(--b2b-border); }
-
-    .item-price { flex: 1; text-align: center; min-width: 120px; }
-    .price-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block; }
-    .price-val { font-size: 16px; font-weight: 800; color: var(--text-main); }
-
-    .item-status { flex: 1; text-align: center; min-width: 150px; }
-    .badge-status { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; border: 1px solid transparent; }
-    .st-bayar { background: #fef3c7; color: #b45309; border-color: #fde68a; }
-    .st-proses { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-    .st-siap { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-    .st-kirim { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
-    .st-selesai { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
-    .st-batal { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
-
-    .item-action { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 8px; }
-    .action-select { border-radius: 8px; font-size: 13px; font-weight: 600; border-color: var(--b2b-border); color: var(--text-main); padding: 8px; cursor: pointer; }
-    .action-select:focus { border-color: var(--b2b-accent); box-shadow: none; }
-    .btn-update { background: white; border: 1px solid var(--b2b-primary); color: var(--b2b-primary); font-weight: 700; font-size: 13px; border-radius: 8px; padding: 8px; transition: 0.2s; }
-    .btn-update:hover { background: var(--b2b-primary); color: white; }
-    .btn-detail { background: var(--b2b-bg); border: 1px solid var(--b2b-border); color: var(--text-muted); font-weight: 700; font-size: 13px; border-radius: 8px; padding: 8px; text-decoration: none; text-align: center; transition: 0.2s; display: block; }
-    .btn-detail:hover { background: var(--b2b-border); color: var(--text-main); }
+    /* Sembunyikan scrollbar untuk Tab Menu agar terlihat clean seperti aplikasi Native */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
+@endpush
 
-{{-- Notifikasi --}}
-@if(session('success'))
-    <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4 fw-bold" style="background: #ecfccb; color: #b45309;">
-        <i class="mdi mdi-check-decagram me-2 fs-5 align-middle"></i> {{ session('success') }}
-    </div>
-@endif
+@section('content')
+<div class="min-h-screen bg-slate-50 p-4 md:p-6 lg:p-8 font-sans text-slate-900 space-y-6">
 
-<div class="page-title-box">
-    <div class="icon-wrapper"><i class="mdi mdi-clipboard-text-outline"></i></div>
-    <div class="page-title">
-        <h3>Manajemen Pesanan</h3>
-        <p>Proses invoice pembeli, atur pengiriman, dan kelola logistik toko material Anda.</p>
-    </div>
-</div>
-
-{{-- TABS FILTER --}}
-<div class="filter-tabs" id="statusTabs">
-    <a href="#" class="f-tab active" data-status="">Semua Pesanan</a>
-    <a href="#" class="f-tab" data-status="menunggu_pembayaran">Belum Dibayar</a>
-    <a href="#" class="f-tab" data-status="diproses">Perlu Diproses</a>
-    <a href="#" class="f-tab" data-status="siap_kirim">Siap Kirim / Angkut</a>
-    <a href="#" class="f-tab" data-status="dikirim">Sedang Dikirim</a>
-    <a href="#" class="f-tab" data-status="sampai_tujuan">Selesai</a>
-    <a href="#" class="f-tab" data-status="dibatalkan">Dibatalkan</a>
-</div>
-
-{{-- TOOLBAR --}}
-<div class="order-toolbar">
-    <div class="search-box">
-        <input type="text" id="orderSearchInput" class="form-control" placeholder="Cari No. Invoice atau Nama Pembeli...">
-        <button type="button"><i class="mdi mdi-magnify fs-5"></i></button>
-    </div>
-    
-    <form action="{{ route('seller.orders.massUpdate') }}" method="POST" id="mass-shipping-form" class="m-0">
-        @csrf
-        <div class="d-flex align-items-center gap-3">
-            <label class="d-flex align-items-center gap-2 fw-bold text-dark" style="cursor: pointer;">
-                <input type="checkbox" id="select-all-orders" class="b2b-checkbox"> Pilih Semua
-            </label>
-            <button type="button" id="btn-mass-shipping" class="btn-mass" disabled>
-                <i class="mdi mdi-truck-fast"></i> Proses Kirim (<span id="selected-count">0</span>)
-            </button>
+    {{-- Notifikasi Sukses --}}
+    @if(session('success'))
+        <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 px-5 py-4 rounded-2xl shadow-sm mb-6 animate-[fadeIn_0.3s_ease-out]">
+            <i class="mdi mdi-check-decagram text-2xl"></i>
+            <span class="font-bold">{{ session('success') }}</span>
         </div>
-    </form>
-</div>
+    @endif
 
-{{-- KONTEN PESANAN --}}
-<div id="orders-container">
-    @if($groupedOrders->isEmpty())
-        <div class="text-center py-5 bg-white rounded-4 border">
-            <i class="mdi mdi-package-variant-closed mb-3" style="font-size: 5rem; color: #cbd5e1;"></i>
-            <h4 class="fw-bold text-dark">Gudang Sedang Sepi</h4>
-            <p class="text-muted">Belum ada pesanan yang masuk ke toko Anda.</p>
+    {{-- HEADER PAGE --}}
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0">
+            <i class="mdi mdi-clipboard-text-outline text-2xl"></i>
         </div>
-    @else
-        <div id="dynamic-empty-state" style="display: none;" class="text-center py-5 bg-white rounded-4 border mb-4">
-            <i class="mdi mdi-clipboard-search-outline mb-3" style="font-size: 4rem; color: #cbd5e1;"></i>
-            <h5 class="fw-bold text-dark">Tidak Ada Data</h5>
-            <p class="text-muted" id="empty-state-text">Tidak ada pesanan pada status ini.</p>
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Manajemen Pesanan</h1>
+            <p class="text-sm font-medium text-slate-500">Proses invoice pembeli, atur pengiriman, dan kelola logistik toko.</p>
+        </div>
+    </div>
+
+    {{-- FILTER TABS (Pill Style) --}}
+    <div class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar border-b border-slate-200" id="statusTabs">
+        <button class="f-tab bg-slate-900 text-white border-transparent px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all shadow-md shadow-slate-900/20" data-status="">Semua Pesanan</button>
+        <button class="f-tab bg-transparent text-slate-500 hover:bg-slate-200 hover:text-slate-900 border-transparent px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all" data-status="menunggu_pembayaran">Belum Dibayar</button>
+        <button class="f-tab bg-transparent text-slate-500 hover:bg-slate-200 hover:text-slate-900 border-transparent px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all" data-status="diproses">Perlu Diproses</button>
+        <button class="f-tab bg-transparent text-slate-500 hover:bg-slate-200 hover:text-slate-900 border-transparent px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all" data-status="siap_kirim">Siap Kirim / Angkut</button>
+        <button class="f-tab bg-transparent text-slate-500 hover:bg-slate-200 hover:text-slate-900 border-transparent px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all" data-status="dikirim">Sedang Dikirim</button>
+        <button class="f-tab bg-transparent text-slate-500 hover:bg-slate-200 hover:text-slate-900 border-transparent px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all" data-status="sampai_tujuan">Selesai</button>
+        <button class="f-tab bg-transparent text-slate-500 hover:bg-slate-200 hover:text-slate-900 border-transparent px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all" data-status="dibatalkan">Dibatalkan</button>
+    </div>
+
+    {{-- TOOLBAR (Search & Mass Action) --}}
+    <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+
+        {{-- Search Box --}}
+        <div class="relative w-full md:max-w-md group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="mdi mdi-magnify text-slate-400 group-focus-within:text-blue-500 transition-colors text-lg"></i>
+            </div>
+            <input type="text" id="orderSearchInput" class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all" placeholder="Cari No. Invoice atau Nama Pembeli...">
         </div>
 
-        @foreach($groupedOrders as $invoice => $items)
-            <div class="order-card order-group" data-invoice="{{ $invoice }}">
-                {{-- Header Invoice --}}
-                <div class="oc-header">
-                    <div class="d-flex flex-wrap gap-4 align-items-center">
-                        <div class="oc-inv"><i class="mdi mdi-receipt-text"></i> {{ $invoice }}</div>
-                        <div class="oc-buyer"><i class="mdi mdi-account-hard-hat"></i> {{ $items[0]->nama_pelanggan }}</div>
-                    </div>
-                    <div class="oc-date"><i class="mdi mdi-calendar-clock me-1"></i> {{ date('d M Y, H:i', strtotime($items[0]->tanggal_transaksi)) }} WIB</div>
+        {{-- Mass Action --}}
+        <form action="{{ route('seller.orders.massUpdate') }}" method="POST" id="mass-shipping-form" class="w-full md:w-auto">
+            @csrf
+            <div class="flex items-center justify-between md:justify-end gap-4 bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-xl border border-slate-200 md:border-none">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <input type="checkbox" id="select-all-orders" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer transition-colors">
+                    <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900">Pilih Semua</span>
+                </label>
+                <button type="button" id="btn-mass-shipping" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl shadow-sm shadow-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" disabled>
+                    <i class="mdi mdi-truck-fast text-lg leading-none"></i>
+                    <span>Proses Kirim (<span id="selected-count">0</span>)</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {{-- AREA KONTEN PESANAN --}}
+    <div id="orders-container" class="space-y-6">
+
+        @if($groupedOrders->isEmpty())
+            {{-- EMPTY STATE: Beneran Kosong dari DB --}}
+            <div class="bg-white border border-slate-200 rounded-3xl py-20 px-6 text-center shadow-sm flex flex-col items-center justify-center">
+                <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                    <i class="mdi mdi-package-variant-closed text-5xl text-slate-300"></i>
                 </div>
+                <h4 class="text-xl font-black text-slate-900 mb-2">Gudang Sedang Sepi</h4>
+                <p class="text-sm font-medium text-slate-500 max-w-md">Belum ada pesanan yang masuk ke toko Anda. Perbanyak promosi untuk menarik pelanggan!</p>
+            </div>
+        @else
+            {{-- EMPTY STATE DYNAMIC: Muncul saat filter tab kosong --}}
+            <div id="dynamic-empty-state" class="hidden bg-white border border-slate-200 rounded-3xl py-16 px-6 text-center shadow-sm">
+                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-5">
+                    <i class="mdi mdi-clipboard-search-outline text-4xl text-slate-300"></i>
+                </div>
+                <h5 class="text-lg font-black text-slate-900 mb-1">Tidak Ada Data</h5>
+                <p class="text-sm font-medium text-slate-500" id="empty-state-text">Tidak ada pesanan pada status ini.</p>
+            </div>
 
-                {{-- Isi Item --}}
-                <div class="oc-body">
-                    @foreach($items as $item)
-                        @php
-                            $status = $item->status_pesanan_item;
-                            $badgeClass = 'st-proses'; $statusText = 'Diproses';
-                            
-                            if($status == 'menunggu_pembayaran') { $badgeClass = 'st-bayar'; $statusText = 'Belum Bayar'; }
-                            elseif($status == 'siap_kirim') { $badgeClass = 'st-siap'; $statusText = 'Siap Angkut'; }
-                            elseif($status == 'dikirim') { $badgeClass = 'st-kirim'; $statusText = 'Dikirim'; }
-                            elseif($status == 'sampai_tujuan') { $badgeClass = 'st-selesai'; $statusText = 'Selesai'; }
-                            elseif(in_array($status, ['dibatalkan', 'ditolak'])) { $badgeClass = 'st-batal'; $statusText = 'Batal'; }
-                        @endphp
+            @foreach($groupedOrders as $invoice => $items)
+                {{-- KARTU ORDER (GROUP PER INVOICE) --}}
+                <div class="order-group bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300 overflow-hidden" data-invoice="{{ $invoice }}">
 
-                        <div class="oc-item order-item-row" data-invoice="{{ $invoice }}" data-status="{{ $status }}">
-                            
-                            {{-- Checkbox --}}
-                            <div style="width: 30px;">
-                                @if($status == 'siap_kirim')
-                                    <input type="checkbox" name="detail_ids[]" value="{{ $item->detail_id }}" class="b2b-checkbox order-checkbox" form="mass-shipping-form">
-                                @endif
+                    {{-- Header Invoice --}}
+                    <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="font-mono text-base font-black text-blue-600 flex items-center gap-2">
+                                <i class="mdi mdi-receipt-text text-lg"></i> {{ $invoice }}
                             </div>
-
-                            {{-- Info Barang --}}
-                            <div class="item-product">
-                                <img src="{{ asset('assets/uploads/products/' . ($item->gambar_utama ?? 'default.jpg')) }}" class="item-img" alt="Material">
-                                <div class="item-detail">
-                                    <h6>{{ $item->nama_barang }}</h6>
-                                    <div class="item-qty">Qty: {{ $item->jumlah }}</div>
-                                </div>
-                            </div>
-
-                            {{-- Harga --}}
-                            <div class="item-price">
-                                <span class="price-label">Subtotal</span>
-                                <span class="price-val">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
-                            </div>
-
-                            {{-- Status --}}
-                            <div class="item-status">
-                                <span class="badge-status {{ $badgeClass }}">{{ $statusText }}</span>
-                            </div>
-
-                            {{-- Aksi --}}
-                            <div class="item-action">
-                                @if(in_array($status, ['diproses', 'siap_kirim']))
-                                    <form action="{{ route('seller.orders.updateStatus') }}" method="POST" class="update-status-form m-0 d-flex flex-column gap-2">
-                                        @csrf
-                                        <input type="hidden" name="detail_id" value="{{ $item->detail_id }}">
-                                        <select name="status_baru" class="form-select action-select">
-                                            <option value="diproses" {{ $status == 'diproses' ? 'selected' : '' }}>1. Siapkan Barang</option>
-                                            <option value="siap_kirim" {{ $status == 'siap_kirim' ? 'selected' : '' }}>2. Siap Diangkut</option>
-                                            <option value="dikirim" {{ $status == 'dikirim' ? 'selected' : '' }}>3. Kirim via Armada</option>
-                                            <option value="ditolak">Tolak Pesanan (Habis)</option>
-                                        </select>
-                                        <button type="button" class="btn-update w-100 btn-submit-single"><i class="mdi mdi-check-circle-outline"></i> Simpan Status</button>
-                                    </form>
-                                @else
-                                    {{-- Nanti ganti # dengan rute detail pesanan jika sudah dibuat --}}
-                                    <a href="#" class="btn-detail w-100"><i class="mdi mdi-file-find-outline"></i> Lihat Rincian</a>
-                                @endif
+                            <div class="hidden sm:block w-1 h-1 bg-slate-300 rounded-full"></div>
+                            <div class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                <i class="mdi mdi-account-hard-hat text-slate-400 text-lg"></i> {{ $items[0]->nama_pelanggan }}
                             </div>
                         </div>
-                    @endforeach
+                        <div class="text-xs font-bold text-slate-500 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
+                            <i class="mdi mdi-calendar-clock text-slate-400"></i> {{ date('d M Y, H:i', strtotime($items[0]->tanggal_transaksi)) }} WIB
+                        </div>
+                    </div>
+
+                    {{-- Isi Item Order --}}
+                    <div class="divide-y divide-slate-100">
+                        @foreach($items as $item)
+                            @php
+                                $status = $item->status_pesanan_item;
+                                $badgeClass = 'bg-blue-50 text-blue-600 border-blue-200';
+                                $statusText = 'Diproses';
+
+                                if($status == 'menunggu_pembayaran') { $badgeClass = 'bg-amber-50 text-amber-600 border-amber-200'; $statusText = 'Belum Bayar'; }
+                                elseif($status == 'siap_kirim') { $badgeClass = 'bg-emerald-50 text-emerald-600 border-emerald-200'; $statusText = 'Siap Angkut'; }
+                                elseif($status == 'dikirim') { $badgeClass = 'bg-indigo-50 text-indigo-600 border-indigo-200'; $statusText = 'Dikirim'; }
+                                elseif($status == 'sampai_tujuan') { $badgeClass = 'bg-slate-100 text-slate-600 border-slate-300'; $statusText = 'Selesai'; }
+                                elseif(in_array($status, ['dibatalkan', 'ditolak'])) { $badgeClass = 'bg-red-50 text-red-600 border-red-200'; $statusText = 'Batal'; }
+                            @endphp
+
+                            <div class="order-item-row flex flex-col lg:flex-row items-start lg:items-center gap-5 p-6" data-status="{{ $status }}">
+
+                                {{-- Checkbox --}}
+                                <div class="hidden lg:flex w-8 justify-center flex-shrink-0">
+                                    @if($status == 'siap_kirim')
+                                        <input type="checkbox" name="detail_ids[]" value="{{ $item->detail_id }}" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer order-checkbox" form="mass-shipping-form">
+                                    @endif
+                                </div>
+
+                                {{-- Info Barang --}}
+                                <div class="flex items-start gap-4 flex-1 min-w-[280px]">
+                                    {{-- Checkbox Mobile --}}
+                                    @if($status == 'siap_kirim')
+                                        <input type="checkbox" name="detail_ids[]" value="{{ $item->detail_id }}" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer order-checkbox lg:hidden mt-2" form="mass-shipping-form">
+                                    @endif
+
+                                    <img src="{{ asset('assets/uploads/products/' . ($item->gambar_utama ?? 'default.jpg')) }}" class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border border-slate-200 flex-shrink-0" alt="Material">
+                                    <div>
+                                        <h6 class="text-sm md:text-base font-bold text-slate-900 mb-2 leading-snug">{{ $item->nama_barang }}</h6>
+                                        <span class="inline-flex items-center bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-md border border-slate-200">
+                                            Qty: {{ $item->jumlah }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {{-- Harga --}}
+                                <div class="w-full lg:w-32 flex flex-row lg:flex-col justify-between lg:justify-center items-center lg:items-end">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest lg:mb-1">Subtotal</span>
+                                    <span class="text-base font-black text-slate-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                                </div>
+
+                                {{-- Status Badge --}}
+                                <div class="w-full lg:w-40 flex justify-start lg:justify-center items-center">
+                                    <span class="px-3 py-1.5 rounded-lg border text-xs font-black uppercase tracking-wide {{ $badgeClass }}">
+                                        {{ $statusText }}
+                                    </span>
+                                </div>
+
+                                {{-- Form Aksi --}}
+                                <div class="w-full lg:w-56 flex-shrink-0">
+                                    @if(in_array($status, ['diproses', 'siap_kirim']))
+                                        <form action="{{ route('seller.orders.updateStatus') }}" method="POST" class="flex flex-col gap-2">
+                                            @csrf
+                                            <input type="hidden" name="detail_id" value="{{ $item->detail_id }}">
+                                            <select name="status_baru" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                                                <option value="diproses" {{ $status == 'diproses' ? 'selected' : '' }}>1. Siapkan Barang</option>
+                                                <option value="siap_kirim" {{ $status == 'siap_kirim' ? 'selected' : '' }}>2. Siap Diangkut</option>
+                                                <option value="dikirim" {{ $status == 'dikirim' ? 'selected' : '' }}>3. Kirim via Armada</option>
+                                                <option value="ditolak">Tolak Pesanan (Habis)</option>
+                                            </select>
+                                            <button type="button" class="w-full flex items-center justify-center gap-1.5 bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 text-sm font-bold rounded-xl px-3 py-2 transition-colors btn-submit-single">
+                                                <i class="mdi mdi-check-circle-outline text-lg leading-none"></i> Simpan
+                                            </button>
+                                        </form>
+                                    @else
+                                        {{-- Dummy Link untuk Rincian --}}
+                                        <a href="#" class="w-full flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 text-sm font-bold rounded-xl px-3 py-2.5 transition-colors">
+                                            <i class="mdi mdi-file-find-outline text-lg leading-none"></i> Lihat Rincian
+                                        </a>
+                                    @endif
+                                </div>
+
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-        @endforeach
-    @endif
+            @endforeach
+        @endif
+    </div>
 </div>
 @endsection
 
@@ -231,7 +203,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    
+
     // --- 1. FILTER TABS LOGIC ---
     const tabs = document.querySelectorAll('.f-tab');
     const orderGroups = document.querySelectorAll('.order-group');
@@ -251,8 +223,16 @@ document.addEventListener('DOMContentLoaded', function() {
     tabs.forEach(tab => {
         tab.addEventListener('click', function(e) {
             e.preventDefault();
-            tabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
+
+            // Reset Style Semua Tab ke Inactive
+            tabs.forEach(t => {
+                t.classList.remove('bg-slate-900', 'text-white', 'shadow-md', 'shadow-slate-900/20');
+                t.classList.add('bg-transparent', 'text-slate-500', 'hover:bg-slate-200', 'hover:text-slate-900');
+            });
+
+            // Set Style Tab Aktif
+            this.classList.remove('bg-transparent', 'text-slate-500', 'hover:bg-slate-200', 'hover:text-slate-900');
+            this.classList.add('bg-slate-900', 'text-white', 'shadow-md', 'shadow-slate-900/20');
 
             let filterStatus = this.getAttribute('data-status');
             let visibleCount = 0;
@@ -269,25 +249,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 items.forEach(item => {
                     let itemStatus = item.getAttribute('data-status');
                     if (filterStatus === '' || itemStatus === filterStatus) {
-                        item.style.display = 'flex';
+                        item.classList.remove('hidden');
                         groupHasVisibleItem = true;
                         visibleCount++;
                     } else {
-                        item.style.display = 'none';
+                        item.classList.add('hidden');
                     }
                 });
 
-                // Sembunyikan Header Invoice jika semua item didalamnya tersembunyi
-                group.style.display = groupHasVisibleItem ? 'block' : 'none';
+                // Sembunyikan Header Invoice jika semua item di dalamnya tersembunyi
+                if (groupHasVisibleItem) {
+                    group.classList.remove('hidden');
+                } else {
+                    group.classList.add('hidden');
+                }
             });
 
             // Tampilkan Empty State Jika Kosong
             if (emptyState) {
                 if (visibleCount === 0) {
-                    emptyState.style.display = 'block';
-                    emptyText.innerHTML = `Gudang bersih! Tidak ada pesanan dengan status <strong>${this.innerText}</strong>.`;
+                    emptyState.classList.remove('hidden');
+                    emptyText.innerHTML = `Tidak ada pesanan dengan status <strong>${this.innerText}</strong>.`;
                 } else {
-                    emptyState.style.display = 'none';
+                    emptyState.classList.add('hidden');
                 }
             }
         });
@@ -299,9 +283,13 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('keyup', function() {
             let keyword = this.value.toLowerCase();
             orderGroups.forEach(group => {
-                // Cari di text header (Invoice & Nama) atau di nama barang
+                // Cari di text keseluruhan (Invoice & Nama)
                 let textContent = group.textContent.toLowerCase();
-                group.style.display = textContent.includes(keyword) ? 'block' : 'none';
+                if (textContent.includes(keyword)) {
+                    group.classList.remove('hidden');
+                } else {
+                    group.classList.add('hidden');
+                }
             });
         });
     }
@@ -318,10 +306,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if(selectAllCb) {
         selectAllCb.addEventListener('change', function() {
-            // Hanya ceklis item yang VISIBLE di layar
+            // Hanya ceklis item yang TIDAK memiliki class 'hidden'
             checkboxes.forEach(cb => {
                 let row = cb.closest('.order-item-row');
-                if(row.style.display !== 'none') {
+                if(!row.classList.contains('hidden')) {
                     cb.checked = this.checked;
                 }
             });
@@ -337,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- 4. SWEETALERT CONFIRMATION ---
-    
+
     // Konfirmasi Kirim Massal
     if(massBtn) {
         massBtn.addEventListener('click', function(e) {
@@ -347,9 +335,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: "Pastikan truk/armada sudah siap mengangkut pesanan yang dipilih.",
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#1e293b',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Ya, Angkut!'
+                confirmButtonColor: '#0f172a', // Slate 900
+                cancelButtonColor: '#94a3b8',  // Slate 400
+                confirmButtonText: 'Ya, Angkut!',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'rounded-3xl' } // UI Border radius SWAL
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('mass-shipping-form').submit();
@@ -364,15 +354,17 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             let form = this.closest('form');
             let select = form.querySelector('select').options[form.querySelector('select').selectedIndex].text;
-            
+
             Swal.fire({
                 title: 'Update Status?',
                 text: `Ubah status item ini menjadi: ${select}?`,
                 icon: 'info',
                 showCancelButton: true,
-                confirmButtonColor: '#2563eb',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Ya, Simpan'
+                confirmButtonColor: '#2563eb', // Blue 600
+                cancelButtonColor: '#94a3b8',  // Slate 400
+                confirmButtonText: 'Ya, Simpan',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'rounded-3xl' }
             }).then((result) => {
                 if (result.isConfirmed) {
                     form.submit();

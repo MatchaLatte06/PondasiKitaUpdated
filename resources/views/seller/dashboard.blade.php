@@ -3,239 +3,182 @@
 @section('title', 'Dashboard Seller')
 
 @section('content')
-{{-- KITA TARUH CSS LANGSUNG DI SINI AGAR DIJAMIN TERBACA OLEH BROWSER --}}
-<style>
-    /* RESET & DASAR */
-    .seller-dashboard-wrapper {
-        font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        color: #1e293b;
-    }
-    .seller-dashboard-wrapper a { text-decoration: none !important; }
-    .seller-dashboard-wrapper p, .seller-dashboard-wrapper h3, .seller-dashboard-wrapper h5 { margin: 0; padding: 0; }
+<div class="min-h-screen bg-slate-50 p-4 md:p-6 lg:p-8 font-sans text-slate-900 space-y-6">
 
-    /* HEADER DASHBOARD */
-    .sd-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border-radius: 16px;
-        padding: 24px 30px;
-        color: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
-    }
-    .sd-hero-title { font-size: 24px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 12px; }
-    .sd-hero-icon { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; color: #3b82f6; }
-    .sd-hero-subtitle { color: #94a3b8; font-size: 14px; }
-    
-    .sd-tier-badge {
-        background: rgba(16, 185, 129, 0.1);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        color: #10b981;
-        padding: 8px 16px;
-        border-radius: 12px;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
+    {{-- 1. HERO SECTION (Clean White Premium) --}}
+    <div class="relative bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6 overflow-hidden">
+        {{-- Efek Glow Halus di Pojok Kanan Atas --}}
+        <div class="absolute -right-20 -top-20 w-72 h-72 bg-blue-50 rounded-full blur-3xl pointer-events-none"></div>
 
-    /* SECTION TITLE */
-    .sd-section-title { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-
-    /* ACTION GRID (YANG PERLU DILAKUKAN) */
-    .sd-action-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-    .sd-action-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        border: 1px solid #e2e8f0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-    }
-    .sd-action-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: transparent; transition: 0.3s; }
-    
-    .sd-action-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-    .sd-action-card.c-blue:hover { border-color: #3b82f6; } .sd-action-card.c-blue:hover::before { background: #3b82f6; }
-    .sd-action-card.c-green:hover { border-color: #10b981; } .sd-action-card.c-green:hover::before { background: #10b981; }
-    .sd-action-card.c-orange:hover { border-color: #f59e0b; } .sd-action-card.c-orange:hover::before { background: #f59e0b; }
-    
-    .sd-action-val { font-size: 36px; font-weight: 900; line-height: 1; margin-bottom: 8px; }
-    .sd-action-label { font-size: 13px; font-weight: 700; text-transform: uppercase; color: #64748b; display: flex; align-items: center; gap: 6px; }
-
-    /* MAIN LAYOUT GRID (KIRI & KANAN) */
-    .sd-main-layout {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 24px;
-    }
-    @media (max-width: 992px) { .sd-main-layout { grid-template-columns: 1fr; } }
-
-    /* CARD UMUM */
-    .sd-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 24px; display: flex; flex-direction: column; height: 100%; }
-    
-    /* METRIC BOXES DALAM GRAFIK */
-    .sd-metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
-    .sd-metric-box { background: #f8fafc; border-radius: 12px; padding: 16px; border: 1px solid #f1f5f9; }
-    .sd-metric-box .m-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .sd-metric-box .m-val { font-size: 20px; font-weight: 800; color: #0f172a; }
-
-    /* LIST TOP PRODUK */
-    .sd-list { list-style: none; padding: 0; margin: 0; }
-    .sd-list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px dashed #e2e8f0; }
-    .sd-list-item:last-child { border-bottom: none; }
-    .sd-list-name { font-size: 14px; font-weight: 700; color: #1e293b; }
-    .sd-list-qty { font-size: 12px; font-weight: 700; background: #eff6ff; color: #3b82f6; padding: 4px 10px; border-radius: 6px; }
-
-    /* INFO BOX B2B */
-    .sd-info-box { background: white; border-radius: 16px; border: 1px solid #3b82f6; overflow: hidden; margin-top: 24px; }
-    .sd-info-header { background: #3b82f6; color: white; padding: 12px 20px; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-    .sd-info-body { padding: 20px; display: flex; gap: 15px; align-items: flex-start; }
-</style>
-
-<div class="seller-dashboard-wrapper">
-    
-    {{-- 1. HEADER --}}
-    <div class="sd-hero">
-        <div>
-            <h3 class="sd-hero-title">
-                <div class="sd-hero-icon"><i class="mdi mdi-storefront-outline"></i></div>
-                {{ $toko->nama_toko }}
-            </h3>
-            <p class="sd-hero-subtitle">Monitor performa operasional gudang dan penjualan material Anda secara real-time.</p>
+        <div class="relative z-10 flex items-center gap-5">
+            <div class="w-16 h-16 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shadow-inner">
+                <i class="mdi mdi-storefront text-3xl"></i>
+            </div>
+            <div>
+                <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight mb-1">{{ $toko->nama_toko }}</h3>
+                <p class="text-sm font-medium text-slate-500">Monitor performa operasional dan analitik penjualan Anda hari ini.</p>
+            </div>
         </div>
-        <div>
-            <div class="sd-tier-badge">
-                <i class="mdi mdi-shield-check fs-5"></i> 
+
+        <div class="relative z-10">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl font-bold text-sm tracking-widest uppercase">
+                <i class="mdi mdi-shield-check text-lg"></i>
                 {{ str_replace('_', ' ', strtoupper($toko->tier_toko ?? 'REGULAR')) }}
             </div>
         </div>
     </div>
 
-    {{-- 2. STATUS OPERASIONAL --}}
-    <div class="sd-section-title">
-        <i class="mdi mdi-forklift text-muted fs-4"></i> Status Operasional Gudang
-    </div>
-    
-    <div class="sd-action-grid">
-        <a href="{{ route('seller.orders.index', ['status' => 'diproses']) }}" class="sd-action-card c-blue">
-            <div class="sd-action-val" style="color: #3b82f6;">{{ $perlu_diproses }}</div>
-            <p class="sd-action-label"><i class="mdi mdi-package-variant"></i> Pesanan Masuk</p>
-        </a>
-        
-        <a href="{{ route('seller.orders.index', ['status' => 'dikirim']) }}" class="sd-action-card c-green">
-            <div class="sd-action-val" style="color: #10b981;">{{ $telah_diproses }}</div>
-            <p class="sd-action-label"><i class="mdi mdi-truck-fast"></i> Siap Angkut / Kirim</p>
-        </a>
-        
-        <a href="{{ route('seller.orders.return') }}" class="sd-action-card c-orange">
-            <div class="sd-action-val" style="color: #f59e0b;">{{ $pengembalian }}</div>
-            <p class="sd-action-label"><i class="mdi mdi-alert-octagon"></i> Komplain Pembeli</p>
-        </a>
-        
-        <div class="sd-action-card" style="background: #f8fafc; border: 1px dashed #cbd5e1; cursor: default;">
-            <div class="sd-action-val" style="color: #ef4444;">{{ $dibatalkan }}</div>
-            <p class="sd-action-label"><i class="mdi mdi-cancel"></i> Dibatalkan Sistem</p>
+    {{-- 2. STATUS OPERASIONAL (Bento Action Cards) --}}
+    <div>
+        <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <i class="mdi mdi-forklift text-lg text-slate-300"></i> Status Operasional
+        </h4>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {{-- Card 1: Pesanan Masuk --}}
+            <a href="{{ route('seller.orders.index', ['status' => 'diproses']) }}" class="group bg-white border border-slate-200 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-300 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></div>
+                <div class="text-3xl md:text-4xl font-black text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">{{ $perlu_diproses }}</div>
+                <div class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                    <div class="p-1 bg-blue-50 text-blue-500 rounded-md"><i class="mdi mdi-package-variant text-base leading-none"></i></div>
+                    Pesanan Masuk
+                </div>
+            </a>
+
+            {{-- Card 2: Siap Kirim --}}
+            <a href="{{ route('seller.orders.index', ['status' => 'dikirim']) }}" class="group bg-white border border-slate-200 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/10 hover:border-emerald-300 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></div>
+                <div class="text-3xl md:text-4xl font-black text-slate-800 mb-2 group-hover:text-emerald-600 transition-colors">{{ $telah_diproses }}</div>
+                <div class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                    <div class="p-1 bg-emerald-50 text-emerald-500 rounded-md"><i class="mdi mdi-truck-fast text-base leading-none"></i></div>
+                    Siap Kirim
+                </div>
+            </a>
+
+            {{-- Card 3: Komplain --}}
+            <a href="{{ route('seller.orders.return') }}" class="group bg-white border border-slate-200 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/10 hover:border-amber-300 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-amber-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></div>
+                <div class="text-3xl md:text-4xl font-black text-slate-800 mb-2 group-hover:text-amber-500 transition-colors">{{ $pengembalian }}</div>
+                <div class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                    <div class="p-1 bg-amber-50 text-amber-500 rounded-md"><i class="mdi mdi-alert-octagon text-base leading-none"></i></div>
+                    Komplain
+                </div>
+            </a>
+
+            {{-- Card 4: Batal --}}
+            <div class="bg-slate-50 border border-slate-200/60 rounded-2xl p-5 cursor-default opacity-80">
+                <div class="text-3xl md:text-4xl font-black text-slate-400 mb-2">{{ $dibatalkan }}</div>
+                <div class="text-xs font-bold text-slate-400 uppercase flex items-center gap-2">
+                    <div class="p-1 bg-slate-200 text-slate-500 rounded-md"><i class="mdi mdi-cancel text-base leading-none"></i></div>
+                    Dibatalkan
+                </div>
+            </div>
         </div>
     </div>
 
-    {{-- 3. LAYOUT UTAMA (KIRI KANAN) --}}
-    <div class="sd-main-layout">
-        
-        {{-- KOLOM KIRI: GRAFIK & ANALITIK --}}
-        <div>
-            <div class="sd-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div class="sd-section-title" style="margin: 0;">
-                        <i class="mdi mdi-finance text-success fs-4"></i> Analitik Pendapatan
-                    </div>
-                    <select id="chartFilter" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: bold; outline: none;">
+    {{-- 3. MAIN GRID (Kiri 2, Kanan 1) --}}
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        {{-- BAGIAN KIRI: ANALITIK & CHART --}}
+        <div class="xl:col-span-2 space-y-6">
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+
+                {{-- Header Chart --}}
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h4 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                        <div class="p-1.5 bg-emerald-50 text-emerald-500 rounded-lg"><i class="mdi mdi-finance text-lg leading-none"></i></div>
+                        Analitik Pendapatan
+                    </h4>
+                    <select id="chartFilter" class="bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-4 py-2 hover:bg-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer transition-colors">
                         <option value="tahun" selected>Tahun {{ Carbon\Carbon::now()->year }}</option>
                         <option value="bulan">Bulan Ini</option>
                     </select>
                 </div>
 
-                <div class="sd-metric-grid">
-                    <div class="sd-metric-box">
-                        <p class="m-label">Total Omzet (Kotor)</p>
-                        <p class="m-val" style="color: #3b82f6;">Rp {{ number_format($total_penjualan ?? 0, 0, ',', '.') }}</p>
+                {{-- Metric Bento Boxes --}}
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-blue-100 transition-colors">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Omzet</div>
+                        <div class="text-lg md:text-xl font-black text-blue-600 truncate">Rp {{ number_format($total_penjualan ?? 0, 0, ',', '.') }}</div>
                     </div>
-                    <div class="sd-metric-box">
-                        <p class="m-label">Transaksi Berhasil</p>
-                        <p class="m-val">{{ number_format($total_pesanan ?? 0) }} <span style="font-size:14px; font-weight:normal; color:#64748b;">Invoice</span></p>
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-slate-200 transition-colors">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Transaksi Berhasil</div>
+                        <div class="text-lg md:text-xl font-black text-slate-800">{{ number_format($total_pesanan ?? 0) }} <span class="text-xs text-slate-400 font-medium">Inv</span></div>
                     </div>
-                    <div class="sd-metric-box">
-                        <p class="m-label">Kapasitas Produk Aktif</p>
-                        <p class="m-val">{{ number_format($total_produk_aktif ?? 0) }} <span style="font-size:14px; font-weight:normal; color:#64748b;">SKU</span></p>
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-slate-200 transition-colors">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">SKU Aktif</div>
+                        <div class="text-lg md:text-xl font-black text-slate-800">{{ number_format($total_produk_aktif ?? 0) }}</div>
                     </div>
-                    <div class="sd-metric-box">
-                        <p class="m-label">Rasio Konversi</p>
-                        <p class="m-val" style="color: #10b981;">{{ $konversi }}%</p>
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-emerald-100 transition-colors">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Konversi</div>
+                        <div class="text-lg md:text-xl font-black text-emerald-500">{{ $konversi }}%</div>
                     </div>
                 </div>
 
-                <div style="position: relative; height: 300px; width: 100%;">
+                {{-- Canvas Container --}}
+                <div class="w-full h-[300px] relative">
                     <canvas id="penjualanChart"></canvas>
                 </div>
             </div>
         </div>
 
-        {{-- KOLOM KANAN: TOP PRODUK & INFO --}}
-        <div>
-            {{-- MATERIAL TERLARIS --}}
-            <div class="sd-card">
-                <div class="sd-section-title">
-                    <i class="mdi mdi-podium-gold text-warning fs-4"></i> Material Terlaris
+        {{-- BAGIAN KANAN: TOP PRODUK & INFO --}}
+        <div class="space-y-6">
+
+            {{-- Material Terlaris --}}
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col h-full">
+                <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2 border-b border-slate-100 pb-4">
+                    <i class="mdi mdi-podium-gold text-amber-500 text-lg"></i> Material Terlaris
+                </h4>
+
+                <div class="flex-1">
+                    @if(count($top_produk_keys) > 0)
+                        <div class="space-y-4">
+                            @foreach($top_produk_keys as $index => $nama)
+                                <div class="flex justify-between items-center group">
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        {{-- Rank Badge --}}
+                                        <div class="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 text-xs font-black group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
+                                            {{ $index + 1 }}
+                                        </div>
+                                        <span class="text-sm font-bold text-slate-700 truncate group-hover:text-blue-600 transition-colors">{{ $nama }}</span>
+                                    </div>
+                                    <div class="text-xs font-black bg-blue-50 text-blue-600 px-3 py-1 rounded-lg whitespace-nowrap ml-2">
+                                        {{ $top_produk_values[$index] }} Terjual
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="h-full flex flex-col items-center justify-center py-10 opacity-60">
+                            <i class="mdi mdi-package-variant-closed text-5xl text-slate-300 mb-3 block"></i>
+                            <span class="text-sm font-bold text-slate-500">Belum ada penjualan</span>
+                        </div>
+                    @endif
                 </div>
-                
-                @if(count($top_produk_keys) > 0)
-                    <ul class="sd-list">
-                        @foreach($top_produk_keys as $index => $nama)
-                            <li class="sd-list-item">
-                                <span class="sd-list-name">{{ Str::limit($nama, 30) }}</span>
-                                <span class="sd-list-qty">{{ $top_produk_values[$index] }} Terjual</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                @else
-                    <div style="text-align: center; padding: 40px 0; color: #94a3b8;">
-                        <i class="mdi mdi-package-variant-closed" style="font-size: 40px; opacity: 0.5;"></i>
-                        <p style="font-size: 13px; font-weight: 600; margin-top: 10px;">Belum ada data penjualan.</p>
-                    </div>
-                @endif
             </div>
 
-            {{-- INFO DISTRIBUTOR (B2B) --}}
-            <div class="sd-info-box">
-                <div class="sd-info-header">
-                    <i class="mdi mdi-bullhorn-outline fs-5"></i> Info Keagenan
-                </div>
-                <div class="sd-info-body">
-                    <div style="background: #eff6ff; color: #3b82f6; padding: 10px; border-radius: 10px; flex-shrink: 0;">
-                        <i class="mdi mdi-truck-flatbed fs-3"></i>
-                    </div>
-                    <div>
-                        <p style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: #0f172a;">Pengiriman Armada Sendiri</p>
-                        <p style="font-size: 12px; color: #64748b; line-height: 1.5;">Pastikan Anda telah mengatur "Armada Toko" di menu Pengaturan Pengiriman agar pembeli dapat memesan material berat/curah.</p>
+            {{-- Info B2B Premium Box --}}
+            <div class="bg-blue-50 border border-blue-200 rounded-3xl overflow-hidden relative shadow-sm">
+                <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+                <div class="p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0 shadow-inner">
+                            <i class="mdi mdi-truck-flatbed text-2xl"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-black text-slate-900 mb-1">Armada Sendiri (B2B)</h5>
+                            <p class="text-xs font-medium text-slate-600 leading-relaxed">
+                                Aktifkan "Armada Toko" di Pengaturan Pengiriman untuk memudahkan pembeli memesan material curah/berat.
+                            </p>
+                            <a href="{{ route('seller.pengaturan.pengiriman') }}" class="inline-flex items-center gap-1 mt-3 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors bg-white px-3 py-1.5 rounded-lg border border-blue-100 shadow-sm hover:shadow">
+                                Atur Sekarang <i class="mdi mdi-arrow-right"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
-
     </div>
 </div>
 @endsection
@@ -243,89 +186,116 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const dataChart = {
-            bulan: {
-                labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
-                data: [0, 0, 0, 0] 
-            },
-            tahun: {
-                labels: {!! json_encode($labels_bulan ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']) !!},
-                data: {!! json_encode(isset($penjualan_tahunan) ? array_values($penjualan_tahunan) : [0,0,0,0,0,0,0,0,0,0,0,0]) !!}
-            }
-        };
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Setup Data dari Backend
+    const dataChart = {
+        bulan: {
+            labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+            data: [0, 0, 0, 0]
+        },
+        tahun: {
+            labels: {!! json_encode($labels_bulan ?? ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']) !!},
+            data: {!! json_encode(isset($penjualan_tahunan) ? array_values($penjualan_tahunan) : [0,0,0,0,0,0,0,0,0,0,0,0]) !!}
+        }
+    };
 
-        const ctx = document.getElementById('penjualanChart').getContext('2d');
-        
-        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)'); 
-        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+    const ctx = document.getElementById('penjualanChart').getContext('2d');
 
-        let myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: dataChart.tahun.labels,
-                datasets: [{
-                    label: 'Omzet (Rp)',
-                    data: dataChart.tahun.data,
-                    backgroundColor: gradient,
-                    borderColor: '#3b82f6',
-                    borderWidth: 3,
-                    tension: 0.4, 
-                    fill: true,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#3b82f6',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
+    // 2. Logic Gradient (Sangat Premium di Light Mode)
+    let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.25)'); // Light Blue Transparan
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)'); // Menghilang ke putih
+
+    // 3. Konfigurasi Chart Tingkat Dewa
+    let myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dataChart.tahun.labels,
+            datasets: [{
+                label: 'Omzet',
+                data: dataChart.tahun.data,
+                backgroundColor: gradient,
+                borderColor: '#3b82f6', // Biru Solid
+                borderWidth: 3,
+                tension: 0.4, // Kurva membulat mulus
+                fill: true,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#3b82f6',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: '#3b82f6',
+                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index',
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        padding: 12,
-                        titleFont: { size: 13 },
-                        bodyFont: { size: 14, weight: 'bold' },
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
-                            }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a', // Tooltip gelap agar kontras
+                    titleColor: '#94a3b8',
+                    bodyColor: '#ffffff',
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
                         }
                     }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { borderDash: [4, 4], color: '#e2e8f0' },
-                        ticks: {
-                            color: '#64748b',
-                            callback: function(value) {
-                                if(value >= 1000000) return 'Rp ' + (value/1000000) + 'Jt';
-                                if(value >= 1000) return 'Rp ' + (value/1000) + 'k';
-                                return 'Rp ' + value;
-                            }
-                        }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#f1f5f9', // Garis grid sangat tipis
+                        drawBorder: false,
+                        borderDash: [5, 5]
                     },
-                    x: { 
-                        grid: { display: false },
-                        ticks: { color: '#64748b', font: { weight: 'bold' } }
+                    ticks: {
+                        color: '#64748b',
+                        font: { size: 11, family: 'Inter, sans-serif', weight: '600' },
+                        padding: 10,
+                        // Logic god-tier untuk format Y-Axis (K, Jt, M)
+                        callback: function(value) {
+                            if(value >= 1000000000) return 'Rp ' + (value/1000000000).toFixed(1) + 'M';
+                            if(value >= 1000000) return 'Rp ' + (value/1000000).toFixed(1) + 'Jt';
+                            if(value >= 1000) return 'Rp ' + (value/1000) + 'k';
+                            return 'Rp ' + value;
+                        }
                     }
                 },
-                interaction: { intersect: false, mode: 'index' }
+                x: {
+                    grid: { display: false, drawBorder: false },
+                    ticks: {
+                        color: '#64748b',
+                        font: { size: 11, family: 'Inter, sans-serif', weight: '700' },
+                        padding: 10
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
             }
-        });
-
-        document.getElementById('chartFilter').addEventListener('change', function(e) {
-            const selectedPeriod = e.target.value;
-            myChart.data.labels = dataChart[selectedPeriod].labels;
-            myChart.data.datasets[0].data = dataChart[selectedPeriod].data;
-            myChart.update();
-        });
+        }
     });
+
+    // 4. Update Data Instan Mulus Tanpa Reload
+    document.getElementById('chartFilter').addEventListener('change', function(e) {
+        const period = e.target.value;
+        myChart.data.labels = dataChart[period].labels;
+        myChart.data.datasets[0].data = dataChart[period].data;
+        myChart.update();
+    });
+});
 </script>
 @endpush

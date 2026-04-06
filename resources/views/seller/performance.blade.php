@@ -4,339 +4,177 @@
 
 @push('styles')
 <style>
-    /* ========================================= */
-    /* ==  STYLE PERFORMA TOKO (MONOCHROME)   == */
-    /* ========================================= */
-    .chart-container {
-        position: relative;
-        height: 350px;
-        width: 100%;
-    }
-
-    .filter-bar {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        background-color: #f9fafb;
-        padding: 1rem 1.5rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-    }
-
-    .filter-bar .form-select,
-    .filter-bar .form-control {
-        width: auto;
-        border-color: #d1d5db;
-        border-radius: 8px;
-    }
-
-    .main-performance-tabs {
-        border-bottom: 2px solid #e5e7eb;
-        margin-bottom: 1.5rem;
-    }
-
-    .main-performance-tabs .nav-link {
-        color: #6b7280;
-        font-weight: 600;
-        border: none;
-        border-bottom: 3px solid transparent;
-        padding: 0.75rem 1.5rem;
-        background: transparent;
-    }
-
-    .main-performance-tabs .nav-link:hover { color: #111827; }
-
-    .main-performance-tabs .nav-link.active {
-        color: #111827;
-        border-bottom-color: #111827;
-    }
-
-    /* Kriteria Card */
-    .key-criteria-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    .criteria-box {
-        background-color: #ffffff;
-        padding: 1.5rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-    .criteria-box:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        border-color: #111827;
-    }
-    .criteria-box .title {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #6b7280;
-        text-transform: uppercase;
-        margin-bottom: 0.75rem;
-    }
-    .criteria-box .value {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: #111827;
-        margin: 0 0 0.5rem 0;
-    }
-    .criteria-box .comparison {
-        font-size: 0.85rem;
-        color: #6b7280;
-        border-top: 1px dashed #e5e7eb;
-        padding-top: 0.75rem;
-        margin-top: 0.5rem;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    /* Checkbox Kustom Monokrom */
-    .criteria-selection .form-check-input { cursor: pointer; }
-    .criteria-selection .form-check-input:checked {
-        background-color: #111827;
-        border-color: #111827;
-    }
-
-    /* List Card Saluran */
-    .channel-list-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.1rem 0;
-        border-bottom: 1px dashed #e5e7eb;
-    }
-    .channel-list-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .channel-list-item span { font-weight: 600; color: #111827; }
-
-    /* Grid Metrik Pembeli */
-    .buyer-metrics-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        flex-grow: 1;
-    }
-    .metric-item {
-        background: #f9fafb;
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-        text-align: center;
-    }
-    .metric-item span { color: #6b7280; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
-    .metric-item p { font-weight: 800; font-size: 1.25rem; margin: 0; color: #111827; }
-
-    /* ========================================= */
-    /* PERBAIKAN CHART DONUT AGAR TIDAK ERROR    */
-    /* ========================================= */
-    .donut-wrapper {
-        position: relative;
-        width: 180px !important;  /* KUNCI 1: Paksa Ukuran */
-        height: 180px !important; /* KUNCI 1: Paksa Ukuran */
-        flex: 0 0 180px;          /* KUNCI 2: Mencegah Flexbox melarkan elemen */
-        margin: 0 auto;
-    }
-    .donut-wrapper canvas {
-        width: 180px !important;
-        height: 180px !important;
-    }
-
-    .donut-center-text {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        width: 100%;
-        pointer-events: none; /* KUNCI 3: Agar tidak menghalangi tooltip chart saat dihover */
-    }
-    .donut-center-text .value { font-size: 1.5rem; font-weight: 800; color: #111827; line-height: 1; margin-bottom: 4px;}
-    .donut-center-text .label { font-size: 0.75rem; color: #6b7280; line-height: 1.2; font-weight: 600; }
-
-    /* Tombol Outline */
-    .btn-mono-outline {
-        background: transparent; color: #111827; border: 1px solid #d1d5db;
-        border-radius: 8px; font-weight: 600; padding: 0.5rem 1rem;
-        text-decoration: none; display: inline-block; transition: 0.2s;
-    }
-    .btn-mono-outline:hover { background: #111827; color: white; border-color: #111827; }
-
-    @media (max-width: 768px) {
-        .filter-bar { flex-direction: column; align-items: stretch; }
-        .filter-bar .ms-auto { margin-left: 0 !important; text-align: center;}
-        .buyer-stats-container { flex-direction: column; text-align: center; gap: 1.5rem; }
-    }
+    /* Hindari canvas resize bug di Chart.js */
+    .chart-donut-wrapper { width: 180px; height: 180px; flex-shrink: 0; }
 </style>
 @endpush
 
 @section('content')
-<div class="page-header mb-4">
-    <h3 class="page-title d-flex align-items-center m-0">
-        <div class="page-title-icon-mono me-3">
-            <i class="mdi mdi-chart-box-outline"></i>
-        </div>
-        <div class="d-flex align-items-center" style="font-size: 1.6rem;">
-            <a href="{{ route('seller.dashboard') }}" class="header-path-link">Dashboard</a>
-            <i class="mdi mdi-chevron-right header-path-separator"></i>
-            <span class="header-path-current">Performa Toko</span>
-        </div>
-    </h3>
-</div>
+<div class="min-h-screen bg-slate-50 p-4 md:p-6 lg:p-8 font-sans">
 
-{{-- Filter & Navigasi --}}
-<div class="filter-bar shadow-sm">
-    <span class="fw-bold text-secondary"><i class="mdi mdi-calendar text-muted me-1"></i> Periode Data:</span>
-    <input type="date" class="form-control fw-bold" value="{{ date('Y-m-d') }}">
-    <select class="form-select fw-bold text-secondary">
-        <option>Semua Status Pesanan</option>
-        <option>Pesanan Selesai Saja</option>
-    </select>
-    <div class="ms-auto d-flex gap-2">
-        <a href="#" class="btn-mono-outline"><i class="mdi mdi-flash text-warning me-1"></i> Data Real-Time</a>
-        <a href="#" class="btn-mono-outline"><i class="mdi mdi-download me-1"></i> Unduh Laporan</a>
+    {{-- Header --}}
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                <i class="mdi mdi-chart-box text-blue-600"></i> Performa Toko
+            </h1>
+            <div class="text-sm text-slate-500 mt-1 flex items-center gap-2">
+                <a href="{{ route('seller.dashboard') }}" class="hover:text-blue-600 transition">Dashboard</a>
+                <i class="mdi mdi-chevron-right text-xs"></i>
+                <span class="text-slate-700 font-medium">Analitik</span>
+            </div>
+        </div>
+
+        {{-- Filter Cepat --}}
+        <div class="flex flex-wrap items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-slate-200">
+            <div class="flex items-center px-3 border-r border-slate-200">
+                <i class="mdi mdi-calendar text-slate-400 mr-2"></i>
+                <input type="date" class="bg-transparent text-sm font-semibold text-slate-700 focus:outline-none" value="{{ date('Y-m-d') }}">
+            </div>
+            <select class="bg-transparent text-sm font-semibold text-slate-700 focus:outline-none px-3 border-r border-slate-200 cursor-pointer">
+                <option>Semua Pesanan</option>
+                <option>Selesai Saja</option>
+            </select>
+            <div class="flex gap-2 px-2">
+                <button class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-1">
+                    <i class="mdi mdi-flash"></i> Real-Time
+                </button>
+                <button class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors flex items-center gap-1">
+                    <i class="mdi mdi-download"></i> Laporan
+                </button>
+            </div>
+        </div>
     </div>
-</div>
 
-<ul class="nav nav-tabs main-performance-tabs" id="performanceTab" role="tablist">
-    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tinjauan-content" type="button">Ringkasan Utama</button></li>
-    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#produk-content" type="button">Analitik Produk</button></li>
-</ul>
+    {{-- Navigasi Tab --}}
+    <div class="flex gap-8 border-b border-slate-200 mb-6">
+        <button onclick="appLogic.switchTab('tinjauan')" id="tab-tinjauan" class="pb-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 transition-colors">Ringkasan Utama</button>
+        <button onclick="appLogic.switchTab('produk')" id="tab-produk" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-colors">Analitik Produk</button>
+    </div>
 
-<div class="tab-content" id="performanceTabContent">
+    <div id="tab-content">
+        {{-- TAB: TINJAUAN --}}
+        <div id="tinjauan-content" class="block space-y-6 animate-[fadeIn_0.3s_ease-in-out]">
 
-    {{-- TAB 1: TINJAUAN UTAMA --}}
-    <div class="tab-pane fade show active" id="tinjauan-content" role="tabpanel">
+            {{-- KPI Cards --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                @php
+                    $kpis = [
+                        ['title' => 'Total Penjualan', 'value' => 'Rp ' . number_format($kriteria['penjualan']['nilai'], 0, ',', '.'), 'vs' => $kriteria['penjualan']['perbandingan'], 'icon' => 'mdi-cash-multiple', 'color' => 'blue'],
+                        ['title' => 'Jumlah Pesanan', 'value' => number_format($kriteria['pesanan']['nilai'], 0, ',', '.'), 'vs' => $kriteria['pesanan']['perbandingan'], 'icon' => 'mdi-receipt', 'color' => 'indigo'],
+                        ['title' => 'Tingkat Konversi', 'value' => $kriteria['tingkat_konversi']['nilai'] . '%', 'vs' => $kriteria['tingkat_konversi']['perbandingan'], 'icon' => 'mdi-percent-circle-outline', 'color' => 'emerald'],
+                        ['title' => 'Total Pengunjung', 'value' => number_format($kriteria['pengunjung']['nilai'], 0, ',', '.'), 'vs' => $kriteria['pengunjung']['perbandingan'], 'icon' => 'mdi-account-group-outline', 'color' => 'orange']
+                    ];
+                @endphp
 
-        {{-- Kotak Kriteria --}}
-        <div class="key-criteria-grid">
-            <div class="criteria-box">
-                <div class="title"><i class="mdi mdi-cash-multiple me-1"></i> Total Penjualan</div>
-                <h3 class="value">Rp {{ number_format($kriteria['penjualan']['nilai'], 0, ',', '.') }}</h3>
-                <div class="comparison">vs Kemarin <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-bold">+{{ $kriteria['penjualan']['perbandingan'] }}%</span></div>
-            </div>
-            <div class="criteria-box">
-                <div class="title"><i class="mdi mdi-receipt me-1"></i> Jumlah Pesanan</div>
-                <h3 class="value">{{ number_format($kriteria['pesanan']['nilai'], 0, ',', '.') }}</h3>
-                <div class="comparison">vs Kemarin <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-bold">+{{ $kriteria['pesanan']['perbandingan'] }}%</span></div>
-            </div>
-            <div class="criteria-box">
-                <div class="title"><i class="mdi mdi-percent-circle-outline me-1"></i> Tingkat Konversi</div>
-                <h3 class="value">{{ $kriteria['tingkat_konversi']['nilai'] }}%</h3>
-                <div class="comparison">vs Kemarin <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-bold">+{{ $kriteria['tingkat_konversi']['perbandingan'] }}%</span></div>
-            </div>
-            <div class="criteria-box">
-                <div class="title"><i class="mdi mdi-account-group-outline me-1"></i> Total Pengunjung</div>
-                <h3 class="value">{{ number_format($kriteria['pengunjung']['nilai'], 0, ',', '.') }}</h3>
-                <div class="comparison">vs Kemarin <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-bold">+{{ $kriteria['pengunjung']['perbandingan'] }}%</span></div>
-            </div>
-        </div>
-
-        {{-- Area Chart Utama --}}
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center flex-wrap mb-4 border-bottom pb-3">
-                    <h5 class="card-title fw-bold m-0" style="color: #111827;">Grafik Tren Performa</h5>
-                    <div class="criteria-selection d-flex gap-3 mt-3 mt-md-0" id="chartCriteriaCheckboxes">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" value="penjualan" id="checkPenjualan" checked>
-                            <label class="form-check-label fw-bold text-secondary" for="checkPenjualan">Penjualan</label>
+                @foreach($kpis as $kpi)
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-{{ $kpi['color'] }}-50 flex items-center justify-center text-{{ $kpi['color'] }}-600 group-hover:scale-110 transition-transform">
+                            <i class="mdi {{ $kpi['icon'] }} text-xl"></i>
                         </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" value="pesanan" id="checkPesanan">
-                            <label class="form-check-label fw-bold text-secondary" for="checkPesanan">Pesanan</label>
-                        </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" value="pengunjung" id="checkPengunjung" checked>
-                            <label class="form-check-label fw-bold text-secondary" for="checkPengunjung">Pengunjung</label>
-                        </div>
+                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold {{ $kpi['vs'] >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600' }}">
+                            <i class="mdi {{ $kpi['vs'] >= 0 ? 'mdi-trending-up' : 'mdi-trending-down' }} mr-1"></i> {{ abs($kpi['vs']) }}%
+                        </span>
+                    </div>
+                    <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">{{ $kpi['title'] }}</h3>
+                    <div class="text-2xl font-black text-slate-900">{{ $kpi['value'] }}</div>
+                </div>
+                @endforeach
+            </div>
+
+            {{-- Chart Utama --}}
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <h2 class="text-lg font-bold text-slate-900">Tren Performa Berjalan</h2>
+                    <div class="flex flex-wrap gap-4" id="chartToggles">
+                        @foreach(['penjualan' => 'Penjualan', 'pesanan' => 'Pesanan', 'pengunjung' => 'Pengunjung'] as $val => $label)
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" value="{{ $val }}" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500" {{ $val != 'pesanan' ? 'checked' : '' }} onchange="appLogic.updateMainChart()">
+                            <span class="text-sm font-semibold text-slate-600 group-hover:text-slate-900">{{ $label }}</span>
+                        </label>
+                        @endforeach
                     </div>
                 </div>
-                <div class="chart-container">
+                <div class="w-full h-[350px] relative">
                     <canvas id="mainPerformanceChart"></canvas>
                 </div>
             </div>
-        </div>
 
-        {{-- Area Saluran & Pembeli --}}
-        <div class="row g-4 mb-4">
+            {{-- Grid Bawah: Saluran & Demografi --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {{-- Saluran Penjualan --}}
-            <div class="col-lg-6">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 16px;">
-                    <div class="card-body p-4">
-                        <h5 class="card-title fw-bold border-bottom pb-3" style="color: #111827;">Saluran Penjualan Utama</h5>
-                        <div class="mt-3">
-                            <div class="channel-list-item">
-                                <span><i class="mdi mdi-cube-outline me-2 text-muted fs-5 align-middle"></i> Halaman Produk</span>
-                                <div class="text-end">
-                                    <div class="fw-bold text-dark">Rp {{ number_format($saluran['halaman_produk']['nilai'], 0, ',', '.') }}</div>
-                                    <span class="text-success small fw-bold">+{{ $saluran['halaman_produk']['perbandingan'] }}%</span>
-                                </div>
+                {{-- Saluran Penjualan --}}
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Sumber Pendapatan</h2>
+                    <div class="space-y-4">
+                        @php
+                            $channels = [
+                                ['label' => 'Halaman Produk', 'icon' => 'mdi-cube-outline', 'val' => $saluran['halaman_produk']['nilai'], 'vs' => $saluran['halaman_produk']['perbandingan']],
+                                ['label' => 'Live Streaming', 'icon' => 'mdi-video-wireless-outline', 'val' => $saluran['live']['nilai'], 'vs' => $saluran['live']['perbandingan']],
+                                ['label' => 'Video Promosi', 'icon' => 'mdi-play-circle-outline', 'val' => $saluran['video']['nilai'], 'vs' => $saluran['video']['perbandingan']],
+                            ]
+                        @endphp
+                        @foreach($channels as $ch)
+                        <div class="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-slate-100 rounded-lg text-slate-500"><i class="mdi {{ $ch['icon'] }} text-lg"></i></div>
+                                <span class="font-bold text-slate-700">{{ $ch['label'] }}</span>
                             </div>
-                            <div class="channel-list-item">
-                                <span><i class="mdi mdi-video-wireless-outline me-2 text-muted fs-5 align-middle"></i> Live Streaming</span>
-                                <div class="text-end">
-                                    <div class="fw-bold text-dark">Rp {{ number_format($saluran['live']['nilai'], 0, ',', '.') }}</div>
-                                    <span class="text-danger small fw-bold">{{ $saluran['live']['perbandingan'] }}%</span>
-                                </div>
+                            <div class="text-right">
+                                <div class="font-black text-slate-900">Rp {{ number_format($ch['val'], 0, ',', '.') }}</div>
+                                <div class="text-xs font-bold {{ $ch['vs'] >= 0 ? 'text-emerald-500' : 'text-red-500' }}">{{ $ch['vs'] >= 0 ? '+' : '' }}{{ $ch['vs'] }}%</div>
                             </div>
-                            <div class="channel-list-item">
-                                <span><i class="mdi mdi-play-circle-outline me-2 text-muted fs-5 align-middle"></i> Video Promosi</span>
-                                <div class="text-end">
-                                    <div class="fw-bold text-dark">Rp {{ number_format($saluran['video']['nilai'], 0, ',', '.') }}</div>
-                                    <span class="text-success small fw-bold">+{{ $saluran['video']['perbandingan'] }}%</span>
-                                </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Retensi Pembeli --}}
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Retensi & Akuisisi</h2>
+                    <div class="flex flex-col sm:flex-row items-center gap-6 flex-1">
+
+                        <div class="relative chart-donut-wrapper">
+                            <canvas id="buyerDonutChart"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span class="text-2xl font-black text-slate-900">{{ $pembeli['pembeli_saat_ini_persen'] }}%</span>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Setia</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 w-full">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div class="text-xs font-bold text-slate-500 mb-1">TOTAL PEMBELI</div>
+                                <div class="text-lg font-black text-slate-900">{{ number_format($pembeli['total_pembeli']) }}</div>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div class="text-xs font-bold text-slate-500 mb-1">PEMBELI BARU</div>
+                                <div class="text-lg font-black text-slate-900">{{ number_format($pembeli['pembeli_baru']) }}</div>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div class="text-xs font-bold text-slate-500 mb-1">POTENSI KEMBALI</div>
+                                <div class="text-lg font-black text-slate-900">{{ number_format($pembeli['potensi_pembeli']) }}</div>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div class="text-xs font-bold text-slate-500 mb-1">RETENTION RATE</div>
+                                <div class="text-lg font-black text-blue-600">{{ $pembeli['tingkat_pembeli_berulang'] }}%</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Statistik Pembeli --}}
-            <div class="col-lg-6">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 16px;">
-                    <div class="card-body p-4 d-flex flex-column justify-content-center">
-                        <h5 class="card-title fw-bold border-bottom pb-3 mb-4 w-100 text-start" style="color: #111827;">Statistik Pembeli</h5>
-
-                        <div class="buyer-stats-container d-flex w-100 align-items-center gap-4">
-
-                            {{-- Donut Chart Wrapper --}}
-                            <div class="donut-wrapper">
-                                <canvas id="buyerDonutChart"></canvas>
-                                <div class="donut-center-text">
-                                    <div class="value">{{ $pembeli['pembeli_saat_ini_persen'] }}%</div>
-                                    <div class="label">Pembeli<br>Setia</div>
-                                </div>
-                            </div>
-
-                            {{-- Metrik Pembeli Grid --}}
-                            <div class="buyer-metrics-grid">
-                                <div class="metric-item"><span>Total Pembeli</span><p>{{ number_format($pembeli['total_pembeli']) }}</p></div>
-                                <div class="metric-item"><span>Pembeli Baru</span><p>{{ number_format($pembeli['pembeli_baru']) }}</p></div>
-                                <div class="metric-item"><span>Potensi Balik</span><p>{{ number_format($pembeli['potensi_pembeli']) }}</p></div>
-                                <div class="metric-item"><span>Retention</span><p>{{ $pembeli['tingkat_pembeli_berulang'] }}%</p></div>
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
             </div>
         </div>
 
-    </div>
-
-    {{-- TAB 2: ANALITIK PRODUK --}}
-    <div class="tab-pane fade" id="produk-content" role="tabpanel">
-        <div class="card border-0 shadow-sm" style="border-radius: 16px;">
-            <div class="card-body p-5 text-center text-muted">
-                <i class="mdi mdi-cube-scan" style="font-size: 5rem; color: #e5e7eb;"></i>
-                <h5 class="mt-4 fw-bold text-dark">Data Analitik Produk Belum Tersedia</h5>
-                <p>Kumpulkan lebih banyak data penjualan untuk melihat performa per-produk di sini.</p>
+        {{-- TAB: PRODUK --}}
+        <div id="produk-content" class="hidden">
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm py-24 px-6 text-center">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-100 rounded-full mb-4">
+                    <i class="mdi mdi-cube-scan text-4xl text-slate-400"></i>
+                </div>
+                <h2 class="text-xl font-black text-slate-900 mb-2">Belum Ada Data Produk</h2>
+                <p class="text-slate-500 font-medium max-w-md mx-auto">Kumpulkan lebih banyak metrik transaksi untuk mengaktifkan heat-map dan analisis performa per-SKU.</p>
             </div>
         </div>
     </div>
@@ -344,106 +182,94 @@
 @endsection
 
 @push('scripts')
-{{-- Load Chart.js --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-
-    // --- 1. SETUP DATA CHART UTAMA (LINE) ---
-    const chartLabels = @json($chart_labels);
-    const chartData = {
-        penjualan: @json($chart_data['penjualan']),
-        pesanan: @json($chart_data['pesanan']),
-        pengunjung: @json($chart_data['pengunjung'])
-    };
-
-    const datasetConfigs = {
-        penjualan: { label: 'Total Penjualan (Rp)', borderColor: '#111827', backgroundColor: 'rgba(17, 24, 39, 0.08)' },
-        pesanan: { label: 'Pesanan', borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.1)' },
-        pengunjung: { label: 'Pengunjung', borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.05)' }
-    };
-
-    const ctxMain = document.getElementById('mainPerformanceChart').getContext('2d');
-    let mainPerformanceChart = new Chart(ctxMain, {
-        type: 'line',
-        data: { labels: chartLabels, datasets: [] },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            tension: 0.4,
-            fill: true,
-            plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
-                tooltip: { backgroundColor: '#111827', padding: 12, cornerRadius: 8 }
-            },
-            scales: {
-                y: { beginAtZero: true, border: {display: false}, grid: { color: '#f3f4f6', drawTicks: false } },
-                x: { border: {display: false}, grid: { display: false } }
-            }
+const appLogic = {
+    charts: {},
+    data: {
+        labels: @json($chart_labels),
+        metrics: {
+            penjualan: @json($chart_data['penjualan']),
+            pesanan: @json($chart_data['pesanan']),
+            pengunjung: @json($chart_data['pengunjung'])
+        },
+        configs: {
+            penjualan: { label: 'Penjualan (Rp)', borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)' },
+            pesanan: { label: 'Pesanan', borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)' },
+            pengunjung: { label: 'Pengunjung', borderColor: '#0f172a', backgroundColor: 'rgba(15, 23, 42, 0.1)' }
         }
-    });
+    },
 
-    function updateMainChart() {
-        const activeDatasets = [];
-        document.querySelectorAll('#chartCriteriaCheckboxes input:checked').forEach(checkbox => {
-            const key = checkbox.value;
-            if (chartData[key] && datasetConfigs[key]) {
-                activeDatasets.push({
-                    label: datasetConfigs[key].label,
-                    data: chartData[key],
-                    borderColor: datasetConfigs[key].borderColor,
-                    backgroundColor: datasetConfigs[key].backgroundColor,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: datasetConfigs[key].borderColor,
-                    pointBorderWidth: 2,
-                });
+    init() {
+        this.initMainChart();
+        this.initDonutChart();
+    },
+
+    switchTab(tab) {
+        ['tinjauan', 'produk'].forEach(t => {
+            document.getElementById(`${t}-content`).classList.toggle('hidden', t !== tab);
+            const btn = document.getElementById(`tab-${t}`);
+            if(t === tab) {
+                btn.className = 'pb-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 transition-colors';
+            } else {
+                btn.className = 'pb-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-colors';
             }
         });
-        mainPerformanceChart.data.datasets = activeDatasets;
-        mainPerformanceChart.update();
-    }
+    },
 
-    document.querySelectorAll('#chartCriteriaCheckboxes input').forEach(checkbox => {
-        checkbox.addEventListener('change', updateMainChart);
-    });
-    updateMainChart();
-
-
-    // --- 2. SETUP DATA DONUT CHART PEMBELI ---
-    const ctxDonut = document.getElementById('buyerDonutChart').getContext('2d');
-    new Chart(ctxDonut, {
-        type: 'doughnut',
-        data: {
-            labels: ['Pembeli Baru', 'Pembeli Setia'],
-            datasets: [{
-                data: [{{ $pembeli_donut_chart['baru'] }}, {{ $pembeli_donut_chart['berulang'] }}],
-                backgroundColor: ['#e5e7eb', '#111827'],
-                borderWidth: 0,
-                borderRadius: 4,
-                cutout: '75%',
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: false, // KUNCI UTAMA: Matikan responsive auto-resize agar tidak membesar
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#111827',
-                    padding: 10,
-                    callbacks: {
-                        label: function(context) { return " " + context.label + ": " + context.raw; }
-                    }
-                }
+    initMainChart() {
+        const ctx = document.getElementById('mainPerformanceChart').getContext('2d');
+        this.charts.main = new Chart(ctx, {
+            type: 'line',
+            data: { labels: this.data.labels, datasets: [] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8, font: { family: 'inherit', weight: '600' } } },
+                    tooltip: { backgroundColor: '#0f172a', padding: 12, cornerRadius: 8, titleFont: { size: 13 }, bodyFont: { size: 14, weight: 'bold' } }
+                },
+                scales: {
+                    x: { grid: { display: false }, border: { display: false } },
+                    y: { border: { display: false }, grid: { color: '#f1f5f9' }, beginAtZero: true }
+                },
+                elements: { line: { tension: 0.4, borderWidth: 3 }, point: { radius: 0, hoverRadius: 6, backgroundColor: '#fff', borderWidth: 2 } }
             }
-        }
-    });
-});
+        });
+        this.updateMainChart();
+    },
+
+    updateMainChart() {
+        const active = Array.from(document.querySelectorAll('#chartToggles input:checked')).map(cb => cb.value);
+        this.charts.main.data.datasets = active.map(key => ({
+            ...this.data.configs[key],
+            data: this.data.metrics[key],
+            fill: true,
+            pointBorderColor: this.data.configs[key].borderColor
+        }));
+        this.charts.main.update();
+    },
+
+    initDonutChart() {
+        const ctx = document.getElementById('buyerDonutChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Baru', 'Setia'],
+                datasets: [{
+                    data: [{{ $pembeli_donut_chart['baru'] }}, {{ $pembeli_donut_chart['berulang'] }}],
+                    backgroundColor: ['#e2e8f0', '#2563eb'],
+                    borderWidth: 0, cutout: '75%', borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0f172a', padding: 10, bodyFont: { weight: 'bold' } } }
+            }
+        });
+    }
+};
+
+document.addEventListener("DOMContentLoaded", () => appLogic.init());
 </script>
 @endpush

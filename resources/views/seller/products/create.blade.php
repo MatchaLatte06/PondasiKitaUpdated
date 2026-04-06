@@ -2,190 +2,31 @@
 
 @section('title', isset($product) ? 'Kelola Produk' : 'Tambah Produk')
 
-@section('content')
-{{-- 
-    =========================================
-    FULL PAGE "GOD LEVEL" WITH CAROUSEL
-    =========================================
---}}
+@push('styles')
 <style>
-    /* --- RESET & VARIABLES --- */
-    :root {
-        --sc-primary: #00AA5B; /* Tokopedia Green */
-        --sc-primary-hover: #00924e;
-        --sc-accent: #ff5722; /* Shopee Orange */
-        --sc-bg: #f8fafc;
-        --sc-surface: #ffffff;
-        --sc-text: #334155;
-        --sc-border: #e2e8f0;
-    }
+    /* Menyembunyikan scrollbar agar tampilan HP Preview persis seperti HP asli */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    .sc-container {
-        font-family: 'Inter', sans-serif;
-        color: var(--sc-text);
-        max-width: 100%;
-        overflow-x: hidden;
-    }
-
-    /* --- CARDS --- */
-    .sc-card {
-        background: var(--sc-surface);
-        border: 1px solid var(--sc-border);
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        margin-bottom: 24px;
-        overflow: hidden;
-    }
-    .sc-card-header {
-        padding: 16px 24px;
-        border-bottom: 1px solid var(--sc-border);
-        background: #fff;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .sc-card-title { font-size: 16px; font-weight: 700; margin: 0; color: #0f172a; }
-    .sc-card-body { padding: 24px; }
-
-    /* --- FORMS --- */
-    .sc-form-group { margin-bottom: 20px; }
-    .sc-label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #475569; }
-    .sc-label span { color: #ef4444; }
-
-    .sc-input, .sc-select, .sc-textarea {
-        display: block; width: 100%; padding: 10px 14px;
-        font-size: 14px; color: #334155; background-color: #fff;
-        border: 1px solid #cbd5e1; border-radius: 8px;
-        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    }
-    .sc-input:focus, .sc-select:focus, .sc-textarea:focus {
-        border-color: var(--sc-primary); outline: 0;
-        box-shadow: 0 0 0 3px rgba(0, 170, 91, 0.15);
-    }
-
-    /* Input Group */
-    .sc-input-group { display: flex; align-items: stretch; width: 100%; }
-    .sc-input-group-text {
-        display: flex; align-items: center; padding: 0 14px;
-        font-size: 14px; font-weight: 600; color: #64748b;
-        background-color: #f1f5f9; border: 1px solid #cbd5e1;
-        border-radius: 8px 0 0 8px; border-right: none;
-    }
-    .sc-input-group .sc-input { border-top-left-radius: 0; border-bottom-left-radius: 0; }
-    .sc-input-group .sc-input-right { border-top-right-radius: 8px !important; border-bottom-right-radius: 8px !important; }
-    .sc-input-suffix {
-        display: flex; align-items: center; padding: 0 14px;
-        font-size: 12px; color: #64748b; background-color: #f1f5f9;
-        border: 1px solid #cbd5e1; border-radius: 0 8px 8px 0; border-left: none;
-    }
-
-    /* --- UPLOAD ZONE --- */
-    .upload-zone {
-        border: 2px dashed #cbd5e1; border-radius: 12px;
-        background: #f8fafc; padding: 30px; text-align: center;
-        cursor: pointer; transition: all 0.2s;
-    }
-    .upload-zone:hover, .upload-zone.active { border-color: var(--sc-primary); background: #f0fdf4; }
-    .upload-zone i { font-size: 40px; color: #94a3b8; display: block; margin-bottom: 10px; }
-    
-    .preview-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
-    .preview-box {
-        width: 100px; height: 100px; border-radius: 8px;
-        overflow: hidden; position: relative; border: 1px solid #e2e8f0;
-    }
-    .preview-box img { width: 100%; height: 100%; object-fit: cover; }
-    .preview-box .btn-del {
-        position: absolute; top: 4px; right: 4px; width: 24px; height: 24px;
-        background: rgba(255,255,255,0.9); color: #ef4444;
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .preview-box .label-main {
-        position: absolute; bottom: 0; left: 0; width: 100%;
-        background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; text-align: center; padding: 2px 0;
-    }
-
-    /* --- MOBILE MOCKUP STYLING (CAROUSEL FIX) --- */
-    .mockup-container { position: sticky; top: 20px; width: 300px; margin: 0 auto; }
-    .hp-frame {
-        width: 100%; height: 600px; background: #fff;
-        border-radius: 35px; border: 8px solid #1e293b;
-        position: relative; overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    }
-    .hp-notch {
-        position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-        width: 120px; height: 20px; background: #1e293b;
-        border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 50;
-    }
-    .hp-screen {
-        height: 100%; overflow-y: auto; background: #fff;
-        padding-bottom: 60px; scrollbar-width: none;
-    }
-    .hp-screen::-webkit-scrollbar { display: none; }
-
-    /* CAROUSEL LOGIC */
-    .hp-carousel-wrapper {
-        width: 100%; height: 300px; background: #e2e8f0;
-        position: relative;
-    }
-    .hp-carousel-track {
-        display: flex;
-        width: 100%; height: 100%;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
-        scrollbar-width: none; /* Firefox */
-    }
-    .hp-carousel-track::-webkit-scrollbar { display: none; } /* Chrome */
-    
-    .hp-slide {
-        min-width: 100%; height: 100%;
-        scroll-snap-align: start;
-        object-fit: cover;
-    }
-    
-    .hp-indicators {
-        position: absolute; bottom: 10px; right: 10px;
-        background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 10px;
-        display: flex; gap: 4px; z-index: 10; pointer-events: none;
-    }
-    .hp-dot { width: 6px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 50%; }
-    .hp-dot.active { background: #fff; }
-
-    /* HP Details */
-    .hp-info { padding: 12px; border-bottom: 6px solid #f1f5f9; }
-    .hp-price { color: var(--sc-accent); font-size: 18px; font-weight: 700; }
-    .hp-title { font-size: 13px; line-height: 1.4; color: #1e293b; margin-top: 5px; }
-    .hp-shop { padding: 10px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 6px solid #f1f5f9; }
-    .hp-shop-icon { width: 36px; height: 36px; background: #cbd5e1; border-radius: 50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; }
-    .hp-footer {
-        position: absolute; bottom: 0; width: 100%; height: 50px;
-        background: #fff; border-top: 1px solid #e2e8f0;
-        display: flex; align-items: center; padding: 0 10px;
-    }
-    .btn-buy { flex: 1; background: var(--sc-accent); color: #fff; font-size: 12px; font-weight: 600; text-align: center; padding: 8px; border-radius: 4px; margin-left: 5px; }
-
-    /* Action Buttons */
-    .btn-save {
-        background: var(--sc-primary); color: #fff; border: none;
-        padding: 10px 20px; border-radius: 50px; font-weight: 600;
-        display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;
-    }
-    .btn-save:hover { background: var(--sc-primary-hover); color: #fff; }
-    .btn-cancel {
-        background: #fff; border: 1px solid #cbd5e1; color: #475569;
-        padding: 10px 20px; border-radius: 50px; font-weight: 600; text-decoration: none;
-    }
-    .btn-cancel:hover { background: #f8fafc; color: #1e293b; }
+    /* Animasi Upload Zone */
+    .upload-zone-active { border-color: #3b82f6 !important; background-color: #eff6ff !important; }
 </style>
+@endpush
 
-<div class="sc-container">
+@section('content')
+<div class="min-h-screen bg-slate-50 p-4 md:p-6 lg:p-8 font-sans text-slate-900">
+
     <form id="productForm" action="{{ isset($product) ? route('seller.products.update', $product->id) : route('seller.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if(isset($product)) @method('PUT') @endif
+
+        {{-- ERROR ALERT --}}
         @if ($errors->any())
-            <div class="alert alert-danger" style="background:#ffebee; color:#c62828; padding:15px; border-radius:8px; margin-bottom:20px;">
-                <strong>Gagal Menyimpan!</strong> Periksa kembali isian Anda:
-                <ul style="margin:10px 0 0 0; padding-left:20px;">
+            <div class="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-6 shadow-sm">
+                <div class="font-bold flex items-center gap-2 mb-2">
+                    <i class="mdi mdi-alert-circle text-xl"></i> Gagal Menyimpan!
+                </div>
+                <ul class="list-disc list-inside text-sm ml-6 space-y-1">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -194,216 +35,255 @@
         @endif
 
         {{-- HEADER --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="page-header mb-4">
-    <h3 class="page-title d-flex align-items-center m-0">
-        <div class="page-title-icon-mono me-3">
-            <i class="mdi mdi-package"></i>
-        </div> 
-        <div class="d-flex align-items-center" style="font-size: 1.6rem;">
-            <a href="{{ route('seller.dashboard') }}" class="header-path-link">Dashboard</a>
-            <i class="mdi mdi-chevron-right header-path-separator"></i>
-            <span class="header-path-current">Tambah Produk Baru</span>
-        </div>
-    </h3>
-</div>
-            <div class="d-flex gap-2">
-                <a href="{{ route('seller.products.index') }}" class="btn-cancel">Batal</a>
-                <button type="submit" class="btn-save"><i class="mdi mdi-check"></i> Simpan Produk</button>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">
+                    <i class="mdi mdi-package-variant-closed text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ isset($product) ? 'Edit Produk' : 'Tambah Produk Baru' }}</h1>
+                    <div class="text-sm font-medium text-slate-500 flex items-center gap-2 mt-1">
+                        <a href="{{ route('seller.dashboard') }}" class="hover:text-blue-600 transition-colors">Dashboard</a>
+                        <i class="mdi mdi-chevron-right text-xs"></i>
+                        <span>Katalog</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <a href="{{ route('seller.products.index') }}" class="flex-1 md:flex-none text-center px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-colors shadow-sm">Batal</a>
+                <button type="submit" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm shadow-blue-600/20 transition-all">
+                    <i class="mdi mdi-check-circle-outline text-lg"></i> Simpan
+                </button>
             </div>
         </div>
 
-        <div class="row">
-            {{-- KOLOM KIRI --}}
-            <div class="col-lg-8">
-                
-                {{-- INFO PRODUK --}}
-                <div class="sc-card">
-                    <div class="sc-card-header">
-                        <i class="mdi mdi-information-outline" style="font-size: 18px; color: var(--sc-primary);"></i>
-                        <h6 class="sc-card-title">Informasi Dasar</h6>
+        {{-- MAIN GRID --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            {{-- ========================================== --}}
+            {{-- KOLOM KIRI (FORM INPUT)                    --}}
+            {{-- ========================================== --}}
+            <div class="lg:col-span-8 space-y-6">
+
+                {{-- 1. INFORMASI DASAR --}}
+                <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+                        <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg"><i class="mdi mdi-information-variant leading-none"></i></div>
+                        <h2 class="font-bold text-slate-800">Informasi Dasar</h2>
                     </div>
-                    <div class="sc-card-body">
-                        <div class="sc-form-group">
-                            <label class="sc-label">Nama Produk <span>*</span></label>
-                            <input type="text" class="sc-input" id="inputNama" name="nama_barang" value="{{ old('nama_barang', $product->nama_barang ?? '') }}" placeholder="Contoh: Sepatu Pria Nike Air Zoom" required>
+                    <div class="p-6 space-y-5">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Nama Produk <span class="text-red-500">*</span></label>
+                            <input type="text" id="inputNama" name="nama_barang" value="{{ old('nama_barang', $product->nama_barang ?? '') }}" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400" placeholder="Contoh: Semen Gresik 50kg" required>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 sc-form-group">
-                                <label class="sc-label">Kategori <span>*</span></label>
-                                <select class="sc-select" name="kategori_id" required>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Kategori <span class="text-red-500">*</span></label>
+                                <select name="kategori_id" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer" required>
                                     <option value="">-- Pilih Kategori --</option>
                                     @foreach($categories as $cat)
                                         <option value="{{ $cat->id }}" {{ (old('kategori_id', $product->kategori_id ?? '') == $cat->id) ? 'selected' : '' }}>{{ $cat->nama_kategori }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-6 sc-form-group">
-                                <label class="sc-label">Etalase</label>
-                                <div class="sc-input-group">
-                                    <span class="sc-input-group-text"><i class="mdi mdi-store"></i></span>
-                                    <input type="text" class="sc-input sc-input-right" placeholder="Contoh: Promo Ramadhan">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Etalase Toko</label>
+                                <div class="flex">
+                                    <span class="inline-flex items-center px-4 bg-slate-100 border border-r-0 border-slate-200 text-slate-500 rounded-l-xl"><i class="mdi mdi-storefront-outline"></i></span>
+                                    <input type="text" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-r-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400" placeholder="Contoh: Promo Material">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- UPLOAD FOTO --}}
-                <div class="sc-card">
-                    <div class="sc-card-header">
-                        <i class="mdi mdi-image-multiple-outline" style="font-size: 18px; color: var(--sc-primary);"></i>
-                        <h6 class="sc-card-title">Foto Produk</h6>
+                {{-- 2. UPLOAD FOTO --}}
+                <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+                        <div class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg"><i class="mdi mdi-image-multiple leading-none"></i></div>
+                        <h2 class="font-bold text-slate-800">Foto Produk</h2>
                     </div>
-                    <div class="sc-card-body">
-                        <input type="file" id="realFileInput" name="gambar[]" multiple accept="image/*" style="display: none;">
-                        <div class="upload-zone" id="uploadZone">
-                            <i class="mdi mdi-cloud-upload-outline"></i>
-                            <h6 style="font-weight: 700;">Klik atau Tarik Foto ke Sini</h6>
-                            <p class="text-muted small mb-0">Format: JPG, PNG (Max 5 Foto)</p>
+                    <div class="p-6">
+                        <input type="file" id="realFileInput" name="gambar[]" multiple accept="image/*" class="hidden">
+
+                        <div id="uploadZone" class="border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 hover:bg-blue-50 hover:border-blue-400 transition-colors p-10 text-center cursor-pointer group">
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
+                                <i class="mdi mdi-cloud-upload-outline text-3xl text-blue-500"></i>
+                            </div>
+                            <h6 class="text-base font-black text-slate-800 mb-1">Klik atau Tarik Foto ke Sini</h6>
+                            <p class="text-xs font-medium text-slate-500">Format: JPG, PNG (Maksimal 5 Foto. Foto pertama menjadi cover)</p>
                         </div>
-                        <div class="preview-grid" id="previewGrid"></div>
+
+                        {{-- Tempat Preview Gambar --}}
+                        <div id="previewGrid" class="flex flex-wrap gap-4 mt-6 empty:mt-0"></div>
                     </div>
                 </div>
 
-                {{-- HARGA & STOK --}}
-                <div class="sc-card">
-                    <div class="sc-card-header">
-                        <i class="mdi mdi-cash-multiple" style="font-size: 18px; color: var(--sc-primary);"></i>
-                        <h6 class="sc-card-title">Harga & Stok</h6>
+                {{-- 3. HARGA & STOK --}}
+                <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+                        <div class="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><i class="mdi mdi-cash-multiple leading-none"></i></div>
+                        <h2 class="font-bold text-slate-800">Harga & Stok</h2>
                     </div>
-                    <div class="sc-card-body">
-                        <div class="row">
-                            <div class="col-md-6 sc-form-group">
-                                <label class="sc-label">Harga Satuan <span>*</span></label>
-                                <div class="sc-input-group">
-                                    <span class="sc-input-group-text">Rp</span>
-                                    <input type="text" class="sc-input sc-input-right" id="viewHarga" placeholder="0" required>
+                    <div class="p-6 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Harga Satuan <span class="text-red-500">*</span></label>
+                                <div class="flex">
+                                    <span class="inline-flex items-center px-4 bg-slate-100 border border-r-0 border-slate-200 text-slate-600 font-bold rounded-l-xl">Rp</span>
+                                    <input type="text" id="viewHarga" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-r-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400" placeholder="0" required>
                                     <input type="hidden" name="harga" id="rawHarga" value="{{ old('harga', $product->harga ?? '') }}">
                                 </div>
                             </div>
-                            <div class="col-md-6 sc-form-group">
-                                <label class="sc-label">Stok <span>*</span></label>
-                                <input type="number" class="sc-input" name="stok" value="{{ old('stok', $product->stok ?? '') }}" placeholder="0" required>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Stok Tersedia <span class="text-red-500">*</span></label>
+                                <input type="number" name="stok" value="{{ old('stok', $product->stok ?? '') }}" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400" placeholder="0" required>
                             </div>
                         </div>
+
                         {{-- Diskon --}}
-                        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1;">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="checkDiskon">
-                                <label class="form-check-label fw-bold" for="checkDiskon">Aktifkan Harga Coret / Diskon</label>
-                            </div>
-                            <div id="boxDiskon" class="row mt-3" style="display: none;">
-                                <div class="col-4">
-                                    <select class="sc-select" id="typeDiskon" name="tipe_diskon">
-                                        <option value="PERSEN">Diskon %</option>
-                                        <option value="NOMINAL">Potongan Rp</option>
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" id="checkDiskon" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                <span class="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Aktifkan Harga Coret / Diskon</span>
+                            </label>
+
+                            <div id="boxDiskon" class="hidden mt-4 pt-4 border-t border-slate-200">
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <select id="typeDiskon" name="tipe_diskon" class="w-full sm:w-1/3 bg-white border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                                        <option value="PERSEN">Diskon (%)</option>
+                                        <option value="NOMINAL">Potongan (Rp)</option>
                                     </select>
-                                </div>
-                                <div class="col-8">
-                                    <input type="number" class="sc-input" id="valDiskon" name="nilai_diskon" placeholder="Masukkan nilai">
+                                    <input type="number" id="valDiskon" name="nilai_diskon" class="w-full sm:w-2/3 bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none placeholder-slate-400" placeholder="Masukkan nilai diskon...">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- DETAIL & PENGIRIMAN --}}
-                <div class="sc-card">
-                    <div class="sc-card-header">
-                        <i class="mdi mdi-file-document-outline" style="font-size: 18px; color: var(--sc-primary);"></i>
-                        <h6 class="sc-card-title">Detail & Pengiriman</h6>
+                {{-- 4. DETAIL & PENGIRIMAN --}}
+                <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+                        <div class="p-1.5 bg-amber-50 text-amber-600 rounded-lg"><i class="mdi mdi-text-box-outline leading-none"></i></div>
+                        <h2 class="font-bold text-slate-800">Detail Spesifikasi</h2>
                     </div>
-                    <div class="sc-card-body">
-                        <div class="row">
-                            <div class="col-md-6 sc-form-group">
-                                <label class="sc-label">Merek</label>
-                                <input type="text" class="sc-input" id="inputMerk" name="merk_barang" value="{{ old('merk_barang', $product->merk_barang ?? '') }}">
+                    <div class="p-6 space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Merek</label>
+                                <input type="text" id="inputMerk" name="merk_barang" value="{{ old('merk_barang', $product->merk_barang ?? '') }}" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400" placeholder="Tidak ada merek">
                             </div>
-                            <div class="col-md-6 sc-form-group">
-                                <label class="sc-label">Kondisi</label>
-                                <select class="sc-select" id="inputKondisi" name="kondisi">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Kondisi</label>
+                                <select id="inputKondisi" name="kondisi" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
                                     <option value="Baru">Baru</option>
                                     <option value="Bekas">Bekas</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="sc-form-group">
-                            <label class="sc-label">Deskripsi Lengkap <span>*</span></label>
-                            <textarea class="sc-textarea" id="inputDeskripsi" name="deskripsi" rows="6" placeholder="Tuliskan detail produk..." required>{{ old('deskripsi', $product->deskripsi ?? '') }}</textarea>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi Lengkap <span class="text-red-500">*</span></label>
+                            <textarea id="inputDeskripsi" name="deskripsi" rows="6" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400 leading-relaxed" placeholder="Jelaskan spesifikasi, ukuran, dan kegunaan material ini..." required>{{ old('deskripsi', $product->deskripsi ?? '') }}</textarea>
                         </div>
-                        <div class="sc-form-group">
-                            <label class="sc-label">Berat (Gram) <span>*</span></label>
-                            <div class="sc-input-group">
-                                <input type="number" class="sc-input" id="inputBerat" name="berat_gram" value="{{ isset($product->berat_kg) ? $product->berat_kg * 1000 : '' }}" placeholder="Contoh: 1000">
-                                <span class="sc-input-suffix">Gram</span>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Berat (Gram) <span class="text-red-500">*</span></label>
+                            <div class="flex w-full md:w-1/2">
+                                <input type="number" id="inputBerat" name="berat_gram" value="{{ isset($product->berat_kg) ? $product->berat_kg * 1000 : '' }}" class="w-full bg-slate-50 border border-slate-200 border-r-0 text-slate-900 text-sm rounded-l-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400" placeholder="1000" required>
+                                <span class="inline-flex items-center px-4 bg-slate-100 border border-slate-200 text-slate-500 text-sm font-bold rounded-r-xl">Gram</span>
                             </div>
+                            <p class="text-xs text-slate-400 mt-2">Pastikan berat akurat untuk perhitungan ongkir otomatis.</p>
                             <input type="hidden" name="berat_kg" id="beratKgRaw">
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            {{-- KOLOM KANAN (PREVIEW HP) --}}
-            <div class="col-lg-4 d-none d-lg-block">
-                <div class="mockup-container">
-                    <div class="text-center mb-2 fw-bold text-muted small">Live Preview</div>
-                    <div class="hp-frame">
-                        <div class="hp-notch"></div>
-                        <div class="hp-screen">
-                            {{-- Header HP --}}
-                            <div style="position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 10px 15px; z-index: 10;">
-                                <div style="background: rgba(0,0,0,0.3); border-radius: 50%; width: 30px; height: 30px; display:flex; align-items:center; justify-content:center; color:white;"><i class="mdi mdi-arrow-left"></i></div>
-                                <div style="background: rgba(0,0,0,0.3); border-radius: 50%; width: 30px; height: 30px; display:flex; align-items:center; justify-content:center; color:white;"><i class="mdi mdi-cart-outline"></i></div>
+            {{-- ========================================== --}}
+            {{-- KOLOM KANAN (LIVE MOBILE PREVIEW)          --}}
+            {{-- ========================================== --}}
+            <div class="hidden lg:block lg:col-span-4 relative">
+                <div class="sticky top-24 w-[320px] mx-auto">
+                    <div class="text-center mb-3 text-xs font-black text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Live Preview
+                    </div>
+
+                    {{-- Mockup HP --}}
+                    <div class="w-full h-[650px] bg-slate-50 border-[10px] border-slate-900 rounded-[40px] relative shadow-2xl overflow-hidden">
+                        {{-- Notch / Kamera --}}
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-50"></div>
+
+                        {{-- Layar HP --}}
+                        <div class="w-full h-full overflow-y-auto hide-scrollbar pb-20 bg-slate-100 relative">
+
+                            {{-- Navbar HP Mengambang --}}
+                            <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-40">
+                                <div class="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white"><i class="mdi mdi-arrow-left"></i></div>
+                                <div class="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white"><i class="mdi mdi-cart-outline"></i></div>
                             </div>
 
-                            {{-- Carousel Gambar (Slide) --}}
-                            <div class="hp-carousel-wrapper">
-                                <div class="hp-carousel-track" id="hpCarousel">
-                                    <img src="https://placehold.co/400x400/e2e8f0/94a3b8?text=Produk" class="hp-slide">
+                            {{-- Carousel Gambar --}}
+                            <div class="relative w-full h-[320px] bg-slate-200">
+                                <div id="hpCarousel" class="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar">
+                                    {{-- Placeholder Default --}}
+                                    <img src="https://placehold.co/400x400/e2e8f0/94a3b8?text=Foto+Produk" class="min-w-full h-full object-cover snap-start">
                                 </div>
-                                <div class="hp-indicators" id="hpIndicators" style="display:none;">
-                                    </div>
-                            </div>
-
-                            {{-- Info HP --}}
-                            <div class="hp-info">
-                                <div class="hp-price" id="hpPrice">Rp0</div>
-                                <div id="hpDiskon" style="display: none; font-size: 11px; color: #94a3b8;">
-                                    <span style="text-decoration: line-through;" id="hpOldPrice">Rp0</span>
-                                    <span style="background: #ffeceb; color: #ff5722; padding: 0 4px; font-weight: bold; margin-left: 5px;">HEMAT</span>
+                                <div id="hpIndicators" class="absolute bottom-3 right-3 bg-black/40 backdrop-blur-sm px-2.5 py-1.5 rounded-full flex gap-1.5 hidden">
+                                    {{-- Titik indicator akan di-inject JS --}}
                                 </div>
-                                <div class="hp-title" id="hpTitle">Nama Produk Anda...</div>
                             </div>
 
-                            {{-- Shop Info --}}
-                            <div class="hp-shop">
-                                <div class="hp-shop-icon">{{ substr(Auth::user()->nama ?? 'T', 0, 1) }}</div>
+                            {{-- Info Harga & Judul --}}
+                            <div class="bg-white p-4 mb-2">
+                                <div class="text-xl font-black text-orange-500" id="hpPrice">Rp0</div>
+                                <div id="hpDiskon" class="hidden mt-1 flex items-center gap-2">
+                                    <span class="text-xs text-slate-400 line-through font-semibold" id="hpOldPrice">Rp0</span>
+                                    <span class="text-[10px] font-black bg-red-100 text-red-600 px-1.5 py-0.5 rounded">DISKON</span>
+                                </div>
+                                <h1 class="text-sm font-bold text-slate-800 mt-2 leading-snug" id="hpTitle">Nama produk akan tampil di sini...</h1>
+                            </div>
+
+                            {{-- Info Toko --}}
+                            <div class="bg-white p-3 mb-2 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-600 font-black text-lg">
+                                    {{ substr(Auth::user()->nama ?? 'T', 0, 1) }}
+                                </div>
                                 <div>
-                                    <div style="font-size: 12px; font-weight: 700;">{{ Auth::user()->nama ?? 'Nama Toko' }}</div>
-                                    <div style="font-size: 10px; color: #00AA5B;">Online</div>
+                                    <div class="text-xs font-black text-slate-900">{{ Auth::user()->nama ?? 'Nama Toko' }}</div>
+                                    <div class="text-[10px] font-bold text-emerald-500 flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
+                                    </div>
                                 </div>
                             </div>
 
-                            {{-- Deskripsi --}}
-                            <div style="padding: 12px;">
-                                <div style="font-weight: 700; font-size: 13px; margin-bottom: 5px;">Rincian Produk</div>
-                                <div style="font-size: 11px; color: #64748b;" id="hpSpec">
-                                    Merek: - <br> Kondisi: Baru <br> Berat: 0 gr
+                            {{-- Spesifikasi & Deskripsi --}}
+                            <div class="bg-white p-4 min-h-[200px]">
+                                <h3 class="text-xs font-black text-slate-900 mb-3 pb-2 border-b border-slate-100">Detail Produk</h3>
+                                <div class="text-[11px] font-medium text-slate-500 space-y-1 mb-4" id="hpSpec">
+                                    <div class="grid grid-cols-3"><span class="text-slate-400">Merek</span><span class="col-span-2 text-slate-800 font-bold">-</span></div>
+                                    <div class="grid grid-cols-3"><span class="text-slate-400">Kondisi</span><span class="col-span-2 text-slate-800 font-bold">Baru</span></div>
+                                    <div class="grid grid-cols-3"><span class="text-slate-400">Berat</span><span class="col-span-2 text-slate-800 font-bold">0 gr</span></div>
                                 </div>
-                                <div style="margin-top: 10px; font-size: 12px; color: #334155; white-space: pre-line;" id="hpDesc">Belum ada deskripsi.</div>
+                                <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line" id="hpDesc">Deskripsi lengkap produk Anda akan muncul di bagian ini.</div>
                             </div>
+
                         </div>
 
-                        {{-- Footer HP --}}
-                        <div class="hp-footer">
-                            <i class="mdi mdi-message-processing-outline" style="font-size: 20px; color: #64748b; margin-right: 10px;"></i>
-                            <div style="flex:1; border: 1px solid var(--sc-primary); color: var(--sc-primary); text-align: center; padding: 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">+ Keranjang</div>
-                            <div class="btn-buy">Beli Sekarang</div>
+                        {{-- Footer Aksi Beli (Fixed Bottom) --}}
+                        <div class="absolute bottom-0 left-0 w-full h-[60px] bg-white border-t border-slate-100 flex items-center px-3 gap-2 z-40">
+                            <div class="w-10 h-10 flex items-center justify-center text-slate-500 border border-slate-200 rounded-lg"><i class="mdi mdi-chat-processing-outline text-lg"></i></div>
+                            <div class="flex-1 h-10 flex items-center justify-center text-blue-600 border border-blue-600 rounded-lg text-xs font-bold bg-blue-50">+ Keranjang</div>
+                            <div class="flex-1 h-10 flex items-center justify-center text-white bg-blue-600 rounded-lg text-xs font-bold">Beli Langsung</div>
                         </div>
                     </div>
+
                 </div>
             </div>
+
         </div>
     </form>
 </div>
@@ -411,6 +291,7 @@
 
 @push('scripts')
 <script>
+    // FUNGSI FORMAT RUPIAH
     function formatRupiah(angka) {
         if(!angka) return '';
         var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
@@ -429,63 +310,87 @@
         const fileInput = $('#realFileInput');
         const uploadZone = $('#uploadZone');
         const previewGrid = $('#previewGrid');
-        
-        // Carousel Elements
+
+        // Element Carousel HP
         const hpCarousel = $('#hpCarousel');
         const hpIndicators = $('#hpIndicators');
-        
+
         let dt = new DataTransfer();
 
+        // 1. UPLOAD GAMBAR LOGIC
         uploadZone.on('click', () => fileInput.click());
+        uploadZone.on('dragover', function(e) {
+            e.preventDefault();
+            $(this).addClass('upload-zone-active');
+        });
+        uploadZone.on('dragleave', function(e) {
+            e.preventDefault();
+            $(this).removeClass('upload-zone-active');
+        });
+        uploadZone.on('drop', function(e) {
+            e.preventDefault();
+            $(this).removeClass('upload-zone-active');
+            let files = e.originalEvent.dataTransfer.files;
+            handleFiles(files);
+        });
 
         fileInput.on('change', function() {
-            for(let file of this.files) {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            for(let file of files) {
                 if(dt.items.length < 5 && file.type.startsWith('image/')) {
                     dt.items.add(file);
                 }
             }
             updateFiles();
-        });
+        }
 
         function updateFiles() {
-            fileInput[0].files = dt.files; 
+            fileInput[0].files = dt.files;
             previewGrid.empty();
-            hpCarousel.empty(); 
+            hpCarousel.empty();
             hpIndicators.empty();
 
             if (dt.files.length > 0) {
-                // Show Indicators if more than 1
-                if(dt.files.length > 1) hpIndicators.show(); else hpIndicators.hide();
+                if(dt.files.length > 1) {
+                    hpIndicators.removeClass('hidden');
+                } else {
+                    hpIndicators.addClass('hidden');
+                }
 
                 Array.from(dt.files).forEach((file, index) => {
                     let reader = new FileReader();
                     reader.onload = (e) => {
-                        // 1. Grid Preview (Form)
-                        let badge = index === 0 ? '<div class="label-main">Utama</div>' : '';
+                        // Grid Editor Form (Tailwind)
+                        let badge = index === 0 ? '<div class="absolute bottom-0 left-0 w-full bg-blue-600/90 text-white text-[10px] font-bold text-center py-0.5">FOTO UTAMA</div>' : '';
                         let html = `
-                            <div class="preview-box">
-                                <img src="${e.target.result}">
+                            <div class="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 group shadow-sm">
+                                <img src="${e.target.result}" class="w-full h-full object-cover">
                                 ${badge}
-                                <div class="btn-del" data-idx="${index}"><i class="mdi mdi-close"></i></div>
+                                <div class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 hover:bg-red-50 text-red-500 rounded-full flex items-center justify-center cursor-pointer shadow-sm opacity-0 group-hover:opacity-100 transition-opacity btn-del" data-idx="${index}">
+                                    <i class="mdi mdi-close text-sm"></i>
+                                </div>
                             </div>
                         `;
                         previewGrid.append(html);
 
-                        // 2. Carousel HP (Inject Slide)
-                        let slide = `<img src="${e.target.result}" class="hp-slide">`;
+                        // Carousel HP
+                        let slide = `<img src="${e.target.result}" class="min-w-full h-full object-cover snap-start">`;
                         hpCarousel.append(slide);
 
-                        // 3. Carousel Dot
-                        let activeClass = index === 0 ? 'active' : '';
-                        let dot = `<div class="hp-dot ${activeClass}"></div>`;
+                        // Dot Indicator
+                        let activeClass = index === 0 ? 'bg-white' : 'bg-white/40';
+                        let dot = `<div class="w-1.5 h-1.5 rounded-full transition-colors ${activeClass}"></div>`;
                         hpIndicators.append(dot);
                     }
                     reader.readAsDataURL(file);
                 });
             } else {
-                // Placeholder Slide
-                hpCarousel.html('<img src="https://placehold.co/400x400/e2e8f0/94a3b8?text=Produk" class="hp-slide">');
-                hpIndicators.hide();
+                // Gambar Default
+                hpCarousel.html('<img src="https://placehold.co/400x400/e2e8f0/94a3b8?text=Foto+Produk" class="min-w-full h-full object-cover snap-start">');
+                hpIndicators.addClass('hidden');
             }
         }
 
@@ -497,33 +402,48 @@
             updateFiles();
         });
 
-        // Live Text Logic
-        $('#inputNama').on('input', function() { $('#hpTitle').text($(this).val() || 'Nama Produk Anda...'); });
-        $('#inputDeskripsi').on('input', function() { $('#hpDesc').text($(this).val() || 'Belum ada deskripsi.'); });
+        // 2. LIVE TEXT PREVIEW LOGIC
+        $('#inputNama').on('input', function() { $('#hpTitle').text($(this).val() || 'Nama produk akan tampil di sini...'); });
+        $('#inputDeskripsi').on('input', function() { $('#hpDesc').text($(this).val() || 'Deskripsi lengkap produk Anda akan muncul di bagian ini.'); });
 
-        // Specs Logic
         function updateSpecs() {
             let m = $('#inputMerk').val() || '-';
             let k = $('#inputKondisi').val();
             let b = $('#inputBerat').val() || '0';
-            $('#hpSpec').html(`Merek: ${m} <br> Kondisi: ${k} <br> Berat: ${b} gr`);
+
+            let specHtml = `
+                <div class="grid grid-cols-3"><span class="text-slate-400">Merek</span><span class="col-span-2 text-slate-800 font-bold">${m}</span></div>
+                <div class="grid grid-cols-3"><span class="text-slate-400">Kondisi</span><span class="col-span-2 text-slate-800 font-bold">${k}</span></div>
+                <div class="grid grid-cols-3"><span class="text-slate-400">Berat</span><span class="col-span-2 text-slate-800 font-bold">${b} gr</span></div>
+            `;
+            $('#hpSpec').html(specHtml);
+
+            // Konversi gram ke Kg untuk database
             $('#beratKgRaw').val(parseFloat(b)/1000);
         }
         $('#inputMerk, #inputKondisi, #inputBerat').on('input change', updateSpecs);
 
-        // Price Logic
+        // 3. LOGIKA HARGA & DISKON
         const viewHarga = $('#viewHarga');
         const rawHarga = $('#rawHarga');
+
         viewHarga.on('keyup', function() {
             let val = $(this).val().replace(/[^0-9]/g, '');
             rawHarga.val(val);
             $(this).val(formatRupiah(val).replace('Rp ', ''));
             calcPrice();
         });
+
         $('#checkDiskon').on('change', function() {
-            if(this.checked) $('#boxDiskon').slideDown(); else $('#boxDiskon').slideUp();
+            // Gunakan jQuery slide untuk animasi expand/collapse di Tailwind
+            if(this.checked) {
+                $('#boxDiskon').slideDown(200);
+            } else {
+                $('#boxDiskon').slideUp(200);
+            }
             calcPrice();
         });
+
         $('#typeDiskon, #valDiskon').on('input change', calcPrice);
 
         function calcPrice() {
@@ -534,17 +454,23 @@
             let val = parseFloat($('#valDiskon').val()) || 0;
 
             if(active && val > 0) {
-                $('#hpDiskon').show();
+                $('#hpDiskon').removeClass('hidden');
                 $('#hpOldPrice').text(formatRupiah(price));
-                if(type === 'PERSEN') final = price - (price * (val/100));
-                else final = price - val;
+
+                if(type === 'PERSEN') {
+                    final = price - (price * (val/100));
+                } else {
+                    final = price - val;
+                }
             } else {
-                $('#hpDiskon').hide();
+                $('#hpDiskon').addClass('hidden');
             }
+
             if(final < 0) final = 0;
             $('#hpPrice').text(formatRupiah(final));
         }
 
+        // Trigger inisial jika ada old value (saat mode edit)
         if(rawHarga.val()) viewHarga.trigger('keyup');
     });
 </script>
