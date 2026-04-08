@@ -2,314 +2,305 @@
 
 @section('title', 'Manajemen Harga Coret (Diskon)')
 
-@section('content')
+@push('styles')
 <style>
-    :root {
-        --promo-dark: #0f172a;
-        --promo-primary: #ef4444; /* Merah untuk diskon */
-        --promo-warning: #f59e0b;
-        --promo-success: #10b981;
-        --promo-border: #e2e8f0;
-        --promo-bg: #f8fafc;
-        --text-mut: #64748b;
-    }
-    .promo-wrapper { font-family: 'Inter', sans-serif; color: #1e293b; }
-
-    /* HEADER & STATS */
-    .promo-header-row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; }
-    .promo-title-box { display: flex; align-items: center; gap: 15px; }
-    .promo-icon { background: var(--promo-dark); color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    
-    .stats-card { background: white; border: 1px solid var(--promo-border); padding: 16px 24px; border-radius: 12px; display: flex; gap: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .stat-item h6 { font-size: 12px; font-weight: 700; color: var(--text-mut); text-transform: uppercase; margin-bottom: 4px; }
-    .stat-item h3 { font-size: 24px; font-weight: 800; color: var(--promo-dark); margin: 0; }
-    .stat-item h3.text-danger { color: var(--promo-primary) !important; }
-
-    /* TABS & TOOLBAR */
-    .promo-nav-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--promo-border); margin-bottom: 24px; overflow-x: auto; scrollbar-width: none; }
-    .promo-nav-tabs::-webkit-scrollbar { display: none; }
-    .promo-tab { padding: 12px 20px; font-weight: 700; color: var(--text-mut); text-decoration: none; font-size: 14px; border-bottom: 3px solid transparent; white-space: nowrap; transition: 0.2s; }
-    .promo-tab:hover { color: var(--promo-dark); }
-    .promo-tab.active { color: var(--promo-primary); border-bottom-color: var(--promo-primary); }
-
-    .promo-toolbar { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-    .search-box { position: relative; flex-grow: 1; max-width: 400px; }
-    .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.2rem; }
-    .search-box input { width: 100%; padding: 12px 16px 12px 45px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 500; font-size: 14px; }
-    .search-box input:focus { border-color: var(--promo-primary); outline: none; box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
-
-    /* TABLE PROMO */
-    .promo-card { background: white; border: 1px solid var(--promo-border); border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow-x: auto; }
-    .table-promo { width: 100%; min-width: 900px; border-collapse: collapse; }
-    .table-promo th { background: var(--promo-bg); color: #334155; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 16px 20px; border-bottom: 2px solid var(--promo-border); text-align: left; }
-    .table-promo td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-    .table-promo tr:hover td { background-color: #f8fafc; }
-
-    .product-info { display: flex; align-items: center; gap: 12px; }
-    .product-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid var(--promo-border); }
-    .product-name { font-size: 13px; font-weight: 700; color: var(--promo-dark); margin: 0 0 4px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .product-price-ori { font-size: 12px; color: var(--text-mut); text-decoration: line-through; }
-
-    .discount-badge { display: inline-block; background: #fef2f2; color: var(--promo-primary); border: 1px solid #fecaca; padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size: 12px; }
-    .price-final { font-size: 15px; font-weight: 900; color: var(--promo-primary); }
-
-    /* Badges */
-    .status-badge { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid transparent; }
-    .s-aktif { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-    .s-nonaktif { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
-    .s-mendatang { background: #fffbeb; color: #d97706; border-color: #fde68a; }
-
-    .btn-edit { background: white; border: 1px solid #cbd5e1; color: #334155; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; transition: 0.2s; cursor: pointer; }
-    .btn-edit:hover { background: var(--promo-primary); color: white; border-color: var(--promo-primary); }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
+@endpush
 
-<div class="promo-wrapper">
+@section('content')
+<div class="min-h-screen bg-slate-50 p-4 md:p-6 lg:p-8 font-sans text-slate-900 space-y-6">
 
+    {{-- SETUP SWEETALERT TOAST --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const Toast = Swal.mixin({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+            customClass: { popup: 'rounded-2xl shadow-lg border border-slate-100' }
+        });
+    </script>
     @if(session('success'))
-        <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({toast: true, position: 'top-end', icon: 'success', title: '{!! session('success') !!}', showConfirmButton: false, timer: 3000}));</script>
+        <script>document.addEventListener('DOMContentLoaded', () => Toast.fire({icon: 'success', title: '{!! session('success') !!}'}));</script>
     @endif
     @if(session('error'))
-        <script>document.addEventListener('DOMContentLoaded', () => Swal.fire('Gagal!', '{!! session('error') !!}', 'error'));</script>
+        <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({title: 'Gagal!', text: '{!! session('error') !!}', icon: 'error', customClass: { popup: 'rounded-3xl' }}));</script>
     @endif
 
     {{-- 1. HEADER & STATS --}}
-    <div class="promo-header-row">
-        <div class="promo-title-box">
-            <div class="promo-icon"><i class="mdi mdi-tag-multiple-outline"></i></div>
+    <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-red-500 shadow-sm flex-shrink-0">
+                <i class="mdi mdi-tag-multiple-outline text-2xl"></i>
+            </div>
             <div>
-                <h3 class="m-0 fw-bold fs-4">Harga Coret Produk</h3>
-                <p class="m-0 text-muted" style="font-size: 13px;">Atur diskon produk agar lebih menarik perhatian pembeli.</p>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Harga Coret Produk</h1>
+                <p class="text-sm font-medium text-slate-500 mt-0.5">Atur diskon produk agar lebih menarik perhatian pembeli.</p>
             </div>
         </div>
-        <div class="stats-card">
-            <div class="stat-item border-end pe-4">
-                <h6>Semua Promo</h6>
-                <h3>{{ $stats['semua'] ?? 0 }}</h3>
+
+        <div class="flex bg-white border border-slate-200 rounded-2xl p-2 shadow-sm w-full xl:w-auto overflow-x-auto hide-scrollbar">
+            <div class="px-5 py-2 border-r border-slate-100 min-w-[120px]">
+                <h6 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Semua Promo</h6>
+                <h3 class="text-xl font-black text-slate-800">{{ $stats['semua'] ?? 0 }}</h3>
             </div>
-            <div class="stat-item border-end pe-4">
-                <h6>Sedang Aktif</h6>
-                <h3 class="text-danger">{{ $stats['aktif'] ?? 0 }}</h3>
+            <div class="px-5 py-2 border-r border-slate-100 min-w-[120px]">
+                <h6 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sedang Aktif</h6>
+                <h3 class="text-xl font-black text-red-500">{{ $stats['aktif'] ?? 0 }}</h3>
             </div>
-            <div class="stat-item">
-                <h6>Akan Datang</h6>
-                <h3>{{ $stats['akan_datang'] ?? 0 }}</h3>
+            <div class="px-5 py-2 min-w-[120px]">
+                <h6 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Akan Datang</h6>
+                <h3 class="text-xl font-black text-slate-800">{{ $stats['akan_datang'] ?? 0 }}</h3>
             </div>
         </div>
     </div>
 
     {{-- 2. TABS & TOOLBAR --}}
-    @php $tab = $currentTab ?? 'semua'; @endphp
-    <div class="promo-nav-tabs">
-        <a href="?tab=semua" class="promo-tab {{ $tab == 'semua' ? 'active' : '' }}">Semua</a>
-        <a href="?tab=aktif" class="promo-tab {{ $tab == 'aktif' ? 'active' : '' }}">Sedang Berjalan</a>
-        <a href="?tab=akan_datang" class="promo-tab {{ $tab == 'akan_datang' ? 'active' : '' }}">Akan Datang</a>
-        <a href="?tab=tidak_aktif" class="promo-tab {{ $tab == 'tidak_aktif' ? 'active' : '' }}">Tidak Aktif / Selesai</a>
-    </div>
+    <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
 
-    <div class="promo-toolbar">
-        <form action="{{ route('seller.promotion.discounts') }}" method="GET" class="search-box m-0">
-            <input type="hidden" name="tab" value="{{ $tab }}">
-            <i class="mdi mdi-magnify"></i>
-            <input type="text" name="search" placeholder="Cari Nama Produk..." value="{{ request('search') }}">
-        </form>
-    </div>
+        @php $tab = $currentTab ?? 'semua'; @endphp
+        <div class="flex gap-6 px-6 pt-4 border-b border-slate-100 overflow-x-auto hide-scrollbar bg-slate-50/50">
+            <a href="?tab=semua" class="pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 {{ $tab == 'semua' ? 'border-red-500 text-red-500' : 'border-transparent text-slate-500 hover:text-slate-800' }}">Semua</a>
+            <a href="?tab=aktif" class="pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 {{ $tab == 'aktif' ? 'border-red-500 text-red-500' : 'border-transparent text-slate-500 hover:text-slate-800' }}">Sedang Berjalan</a>
+            <a href="?tab=akan_datang" class="pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 {{ $tab == 'akan_datang' ? 'border-red-500 text-red-500' : 'border-transparent text-slate-500 hover:text-slate-800' }}">Akan Datang</a>
+            <a href="?tab=tidak_aktif" class="pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 {{ $tab == 'tidak_aktif' ? 'border-red-500 text-red-500' : 'border-transparent text-slate-500 hover:text-slate-800' }}">Tidak Aktif / Selesai</a>
+        </div>
 
-    {{-- 3. TABEL PROMOSI --}}
-    <div class="promo-card">
-        <table class="table-promo">
-            <thead>
-                <tr>
-                    <th width="35%">Informasi Produk</th>
-                    <th width="15%">Diskon</th>
-                    <th width="15%">Harga Akhir</th>
-                    <th width="20%">Periode Promo</th>
-                    <th width="15%" class="text-end">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($products as $p)
-                    @php
-                        // Logika Tampilan Status & Harga
-                        $hasPromo = !empty($p->nilai_diskon) && $p->nilai_diskon > 0;
-                        $now = time();
-                        $start = strtotime($p->diskon_mulai);
-                        $end = strtotime($p->diskon_berakhir);
-                        
-                        $statusClass = 's-nonaktif'; $statusText = 'Tidak Aktif';
-                        if ($hasPromo) {
-                            if ($now >= $start && $now <= $end) { $statusClass = 's-aktif'; $statusText = 'Aktif'; }
-                            elseif ($now < $start) { $statusClass = 's-mendatang'; $statusText = 'Mendatang'; }
-                            else { $statusClass = 's-nonaktif'; $statusText = 'Berakhir'; }
-                        }
+        <div class="p-4 sm:p-6 border-b border-slate-100 bg-white">
+            <form action="{{ route('seller.promotion.discounts') }}" method="GET" class="relative w-full md:max-w-md group m-0">
+                <input type="hidden" name="tab" value="{{ $tab }}">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="mdi mdi-magnify text-slate-400 group-focus-within:text-red-500 transition-colors text-lg"></i>
+                </div>
+                <input type="text" name="search" placeholder="Cari Nama Produk..." value="{{ request('search') }}" class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:bg-white outline-none transition-all shadow-sm">
+            </form>
+        </div>
 
-                        // Kalkulasi Harga Akhir
-                        $hargaAkhir = $p->harga;
-                        if ($hasPromo && $statusText == 'Aktif') {
-                            if ($p->tipe_diskon == 'PERSEN') {
-                                $potongan = ($p->harga * $p->nilai_diskon) / 100;
-                                $hargaAkhir = $p->harga - $potongan;
-                            } else {
-                                $hargaAkhir = $p->harga - $p->nilai_diskon;
+        {{-- 3. TABEL PROMOSI --}}
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Informasi Produk</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Diskon</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Harga Akhir</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Periode Promo</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($products as $p)
+                        @php
+                            $hasPromo = !empty($p->nilai_diskon) && $p->nilai_diskon > 0;
+                            $now = time();
+                            $start = strtotime($p->diskon_mulai);
+                            $end = strtotime($p->diskon_berakhir);
+
+                            $statusClass = 'bg-slate-100 text-slate-600 border-slate-200'; $statusText = 'Tidak Aktif';
+                            if ($hasPromo) {
+                                if ($now >= $start && $now <= $end) { $statusClass = 'bg-emerald-50 text-emerald-600 border-emerald-200'; $statusText = 'Aktif'; }
+                                elseif ($now < $start) { $statusClass = 'bg-amber-50 text-amber-600 border-amber-200'; $statusText = 'Mendatang'; }
+                                else { $statusClass = 'bg-slate-100 text-slate-600 border-slate-200'; $statusText = 'Berakhir'; }
                             }
-                        }
-                    @endphp
-                    <tr>
-                        {{-- Produk --}}
-                        <td>
-                            <div class="product-info">
-                                <img src="{{ asset('assets/uploads/products/' . ($p->gambar_utama ?? 'default.jpg')) }}" class="product-img">
-                                <div>
-                                    <p class="product-name">{{ $p->nama_barang }}</p>
-                                    @if($hasPromo)
-                                        <span class="product-price-ori">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
-                                    @else
-                                        <span style="font-size: 13px; font-weight: 700; color: var(--text-mut);">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
-                                    @endif
+
+                            $hargaAkhir = $p->harga;
+                            if ($hasPromo && $statusText == 'Aktif') {
+                                if ($p->tipe_diskon == 'PERSEN') {
+                                    $potongan = ($p->harga * $p->nilai_diskon) / 100;
+                                    $hargaAkhir = $p->harga - $potongan;
+                                } else {
+                                    $hargaAkhir = $p->harga - $p->nilai_diskon;
+                                }
+                            }
+                        @endphp
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-4 min-w-[250px]">
+                                    <img src="{{ asset('assets/uploads/products/' . ($p->gambar_utama ?? 'default.jpg')) }}" class="w-14 h-14 rounded-xl object-cover border border-slate-200 flex-shrink-0">
+                                    <div>
+                                        <h6 class="text-sm font-bold text-slate-900 leading-snug mb-1 line-clamp-2">{{ $p->nama_barang }}</h6>
+                                        @if($hasPromo)
+                                            <span class="text-xs font-bold text-slate-400 line-through">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
+                                        @else
+                                            <span class="text-xs font-bold text-slate-600">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
+                            </td>
 
-                        {{-- Diskon --}}
-                        <td>
-                            @if($hasPromo)
-                                <div class="discount-badge">
-                                    {{ $p->tipe_diskon == 'PERSEN' ? $p->nilai_diskon.'%' : 'Rp '.number_format($p->nilai_diskon, 0, ',', '.') }}
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                @if($hasPromo)
+                                    <div class="inline-flex items-center justify-center bg-red-50 text-red-600 border border-red-200 font-black text-xs px-2.5 py-1 rounded-lg">
+                                        {{ $p->tipe_diskon == 'PERSEN' ? $p->nilai_diskon.'%' : 'Rp '.number_format($p->nilai_diskon, 0, ',', '.') }}
+                                    </div>
+                                @else
+                                    <span class="text-slate-400 font-black">-</span>
+                                @endif
+                            </td>
+
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                @if($hasPromo)
+                                    <div class="text-base font-black text-red-500">Rp {{ number_format($hargaAkhir, 0, ',', '.') }}</div>
+                                @else
+                                    <span class="text-slate-400 font-black">-</span>
+                                @endif
+                            </td>
+
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                @if($hasPromo)
+                                    <div class="text-[11px] font-bold text-slate-500 mb-1.5">
+                                        {{ date('d M Y', $start) }} - {{ date('d M Y', $end) }}
+                                    </div>
+                                    <span class="inline-flex px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $statusClass }}">
+                                        {{ $statusText }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 border-slate-200">
+                                        Tidak Aktif
+                                    </span>
+                                @endif
+                            </td>
+
+                            <td class="py-4 px-6 text-right">
+                                <button type="button" onclick="openPromoModal({{ json_encode($p) }})" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-xs font-bold rounded-xl transition-all shadow-sm">
+                                    <i class="mdi mdi-pencil-outline text-sm"></i> Atur Promo
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-16 text-center">
+                                <div class="flex flex-col items-center justify-center opacity-60">
+                                    <i class="mdi mdi-tag-off-outline text-6xl text-slate-300 mb-4"></i>
+                                    <h5 class="text-lg font-black text-slate-800 mb-1">Tidak Ada Produk</h5>
+                                    <p class="text-sm font-medium text-slate-500">Tidak ada data produk yang sesuai dengan filter.</p>
                                 </div>
-                            @else
-                                <span class="text-muted">-</span>
-                            @endif
-                        </td>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-                        {{-- Harga Akhir --}}
-                        <td>
-                            @if($hasPromo)
-                                <div class="price-final">Rp {{ number_format($hargaAkhir, 0, ',', '.') }}</div>
-                            @else
-                                <span class="text-muted">-</span>
-                            @endif
-                        </td>
-
-                        {{-- Periode & Status --}}
-                        <td>
-                            @if($hasPromo)
-                                <div style="font-size: 11px; font-weight: 700; color: var(--text-mut); margin-bottom: 6px;">
-                                    {{ date('d M Y', $start) }} - {{ date('d M Y', $end) }}
-                                </div>
-                                <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
-                            @else
-                                <span class="status-badge s-nonaktif">Tidak Aktif</span>
-                            @endif
-                        </td>
-
-                        {{-- Aksi --}}
-                        <td class="text-end">
-                            <button type="button" class="btn-edit" onclick="openPromoModal({{ json_encode($p) }})">
-                                <i class="mdi mdi-pencil-outline"></i> Atur Promo
-                            </button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="text-center py-5">
-                            <i class="mdi mdi-tag-off-outline d-block mb-2" style="font-size: 3rem; color: #cbd5e1;"></i>
-                            <h6 class="fw-bold text-dark">Data Produk Kosong</h6>
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-4 d-flex justify-content-center">
-        {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+        @if($products->hasPages())
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-center lg:justify-end">
+                {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
     </div>
 </div>
 
-{{-- MODAL ATUR PROMO --}}
-<div class="modal fade" id="modalPromo" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <form id="formPromo">
-                <input type="hidden" name="product_ids[]" id="input_product_id">
-                <div class="modal-header bg-light border-bottom rounded-top-4 p-4">
-                    <h5 class="modal-title fw-bold text-dark"><i class="mdi mdi-tag-plus text-danger me-2"></i> Atur Harga Coret</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="fw-bold" style="font-size:12px; color:#475569;">NAMA PRODUK</label>
-                        <p id="modal_product_name" class="fw-bold text-dark m-0 mt-1"></p>
+{{-- MODAL TAILWIND ATUR PROMO --}}
+<div id="modalPromo" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 duration-300" onclick="closePromoModal()"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div id="modalPanel" class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all opacity-0 scale-95 duration-300 w-full sm:max-w-lg border border-slate-200">
+
+                <form id="formPromo">
+                    <input type="hidden" name="product_ids[]" id="input_product_id">
+
+                    <div class="bg-slate-50 px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-lg font-black text-slate-900 flex items-center gap-2"><i class="mdi mdi-tag-plus text-red-500"></i> Atur Harga Coret</h3>
+                        <button type="button" onclick="closePromoModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-red-100 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors">
+                            <i class="mdi mdi-close text-lg leading-none"></i>
+                        </button>
                     </div>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="fw-bold" style="font-size:12px; color:#475569;">TIPE DISKON</label>
-                            <select name="tipe_diskon" id="modal_tipe_diskon" class="form-select mt-1" required>
-                                <option value="PERSEN">Persentase (%)</option>
-                                <option value="NOMINAL">Nominal (Rp)</option>
-                            </select>
+                    <div class="p-6 space-y-5">
+                        <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl">
+                            <label class="block text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">NAMA PRODUK</label>
+                            <p id="modal_product_name" class="text-sm font-bold text-slate-900 m-0"></p>
                         </div>
-                        <div class="col-md-6">
-                            <label class="fw-bold" style="font-size:12px; color:#475569;">NILAI DISKON</label>
-                            <input type="number" name="nilai_diskon" id="modal_nilai_diskon" class="form-control mt-1" placeholder="Cth: 10" required>
-                            <small class="text-muted" style="font-size:11px;">*Isi 0 untuk mematikan promo.</small>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Tipe Diskon</label>
+                                <select name="tipe_diskon" id="modal_tipe_diskon" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none cursor-pointer" required>
+                                    <option value="PERSEN">Persentase (%)</option>
+                                    <option value="NOMINAL">Nominal (Rp)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Nilai Diskon</label>
+                                <input type="number" name="nilai_diskon" id="modal_nilai_diskon" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none placeholder-slate-400" placeholder="Cth: 10" required>
+                                <p class="text-[10px] font-bold text-slate-400 mt-1.5">*Isi 0 untuk mematikan promo.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Mulai</label>
+                                <input type="datetime-local" name="diskon_mulai" id="modal_diskon_mulai" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Berakhir</label>
+                                <input type="datetime-local" name="diskon_berakhir" id="modal_diskon_berakhir" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="fw-bold" style="font-size:12px; color:#475569;">TANGGAL MULAI</label>
-                            <input type="datetime-local" name="diskon_mulai" id="modal_diskon_mulai" class="form-control mt-1">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="fw-bold" style="font-size:12px; color:#475569;">TANGGAL BERAKHIR</label>
-                            <input type="datetime-local" name="diskon_berakhir" id="modal_diskon_berakhir" class="form-control mt-1">
-                        </div>
+                    <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-3 rounded-b-3xl">
+                        <button type="button" onclick="closePromoModal()" class="w-full sm:w-auto px-6 py-2.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-100 transition-colors">Batal</button>
+                        <button type="button" id="btnSavePromo" class="w-full sm:w-auto px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-sm shadow-red-500/20 transition-all flex items-center justify-center gap-2">
+                            Simpan Promo
+                        </button>
                     </div>
-                </div>
-                
-                <div class="modal-footer p-3 bg-light border-top rounded-bottom-4">
-                    <button type="button" class="btn btn-outline-secondary fw-bold px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-danger fw-bold px-4" id="btnSavePromo">Simpan Promo</button>
-                </div>
-            </form>
+                </form>
+
+            </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Fungsi Buka Modal & Set Data
+    // FUNGSI MODAL TAILWIND
+    const modalPromo = document.getElementById('modalPromo');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalPanel = document.getElementById('modalPanel');
+
+    function formatDatetimeLocal(dateStr) {
+        if (!dateStr) return '';
+        // Ubah format 'YYYY-MM-DD HH:MM:SS' menjadi 'YYYY-MM-DDTHH:MM'
+        return dateStr.replace(' ', 'T').substring(0, 16);
+    }
+
     function openPromoModal(product) {
         document.getElementById('input_product_id').value = product.id;
         document.getElementById('modal_product_name').innerText = product.nama_barang;
-        
         document.getElementById('modal_tipe_diskon').value = product.tipe_diskon || 'PERSEN';
         document.getElementById('modal_nilai_diskon').value = product.nilai_diskon || '';
-        
-        // Format Tanggal untuk datetime-local input
-        if(product.diskon_mulai) {
-            document.getElementById('modal_diskon_mulai').value = product.diskon_mulai.substring(0, 16);
-        } else {
-            document.getElementById('modal_diskon_mulai').value = '';
-        }
+        document.getElementById('modal_diskon_mulai').value = formatDatetimeLocal(product.diskon_mulai);
+        document.getElementById('modal_diskon_berakhir').value = formatDatetimeLocal(product.diskon_berakhir);
 
-        if(product.diskon_berakhir) {
-            document.getElementById('modal_diskon_berakhir').value = product.diskon_berakhir.substring(0, 16);
-        } else {
-            document.getElementById('modal_diskon_berakhir').value = '';
-        }
-
-        new bootstrap.Modal(document.getElementById('modalPromo')).show();
+        modalPromo.classList.remove('hidden');
+        void modalPromo.offsetWidth;
+        modalOverlay.classList.replace('opacity-0', 'opacity-100');
+        modalPanel.classList.replace('opacity-0', 'opacity-100');
+        modalPanel.classList.replace('scale-95', 'scale-100');
     }
 
-    // Fungsi Simpan (AJAX) sinkron dengan Controller 'updateDiscount'
+    function closePromoModal() {
+        modalOverlay.classList.replace('opacity-100', 'opacity-0');
+        modalPanel.classList.replace('opacity-100', 'opacity-0');
+        modalPanel.classList.replace('scale-100', 'scale-95');
+        setTimeout(() => modalPromo.classList.add('hidden'), 300);
+    }
+
+    // FUNGSI SIMPAN AJAX + LOADING STATE
     document.getElementById('btnSavePromo').addEventListener('click', function() {
+        let btn = this;
+        let originalText = btn.innerHTML;
+
+        // Aktifkan Loading State
+        btn.disabled = true;
+        btn.innerHTML = '<i class="mdi mdi-loading mdi-spin"></i> Menyimpan...';
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+
         let form = document.getElementById('formPromo');
         let formData = new FormData(form);
-        
-        // Ubah format array untuk payload JSON
         let dataObj = Object.fromEntries(formData.entries());
         dataObj.product_ids = [document.getElementById('input_product_id').value];
 
@@ -326,16 +317,24 @@
         .then(data => {
             if(data.status === 'success') {
                 Swal.fire({
-                    toast: true, position: 'top-end', icon: 'success', 
-                    title: data.message, showConfirmButton: false, timer: 2000
+                    toast: true, position: 'top-end', icon: 'success',
+                    title: data.message, showConfirmButton: false, timer: 1500, customClass: { popup: 'rounded-2xl' }
                 }).then(() => location.reload());
             } else {
-                Swal.fire('Gagal!', data.message || 'Terjadi kesalahan', 'error');
+                Swal.fire({title: 'Gagal!', text: data.message || 'Terjadi kesalahan', icon: 'error', customClass: { popup: 'rounded-3xl' }});
+                resetBtn();
             }
         })
         .catch(err => {
-            Swal.fire('Error!', 'Sistem gagal menghubungi server.', 'error');
+            Swal.fire({title: 'Error!', text: 'Sistem gagal menghubungi server.', icon: 'error', customClass: { popup: 'rounded-3xl' }});
+            resetBtn();
         });
+
+        function resetBtn() {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
     });
 </script>
 @endsection

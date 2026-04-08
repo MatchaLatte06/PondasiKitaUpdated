@@ -30,7 +30,13 @@ class Toko extends Model
         'latitude',      // Persiapan jika nanti ada maps
         'longitude',     // Persiapan jika nanti ada maps
         'status',        // active, pending, suspended
-        'status_operasional' // Buka, Tutup
+        'status_operasional', // Buka, Tutup
+        'layout_data'    // <-- DITAMBAHKAN UNTUK MENYIMPAN JSON DEKORASI TOKO
+    ];
+
+    // KUNCI DEWA: Beritahu Laravel bahwa layout_data adalah Array/JSON
+    protected $casts = [
+        'layout_data' => 'array',
     ];
 
     // 2. Agar atribut tambahan ini otomatis muncul saat data diubah jadi JSON
@@ -75,13 +81,13 @@ class Toko extends Model
     {
         // Sesuaikan folder upload dengan AuthController (assets/uploads/...)
         $relativePath = 'assets/uploads/banners/' . $this->banner_toko;
-        
+
         if (!empty($this->banner_toko) && File::exists(public_path($relativePath))) {
             return asset($relativePath);
         }
-        
+
         // Return gambar default atau null
-        return null; 
+        return null;
     }
 
     /**
@@ -91,11 +97,11 @@ class Toko extends Model
     {
         // Sesuaikan folder upload dengan AuthController (assets/uploads/logos)
         $relativePath = 'assets/uploads/logos/' . $this->logo_toko;
-        
+
         if (!empty($this->logo_toko) && File::exists(public_path($relativePath))) {
             return asset($relativePath);
         }
-        
+
         return null;
     }
 
@@ -127,9 +133,9 @@ class Toko extends Model
         }
 
         $colors = [
-            '#e53935', '#d81b60', '#8e24aa', '#5e35b1', 
-            '#3949ab', '#1e88e5', '#039be5', '#00acc1', 
-            '#00897b', '#43a047', '#7cb342', '#c0ca33', 
+            '#e53935', '#d81b60', '#8e24aa', '#5e35b1',
+            '#3949ab', '#1e88e5', '#039be5', '#00acc1',
+            '#00897b', '#43a047', '#7cb342', '#c0ca33',
             '#fdd835', '#ffb300', '#fb8c00', '#f4511e'
         ];
 

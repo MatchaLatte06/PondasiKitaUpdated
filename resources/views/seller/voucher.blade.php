@@ -2,436 +2,398 @@
 
 @section('title', 'Manajemen Voucher Toko')
 
-@section('content')
+@push('styles')
 <style>
-    /* CSS ISOLATED UNTUK VOUCHER ENTERPRISE */
-    :root {
-        --vch-dark: #0f172a;
-        --vch-primary: #2563eb;
-        --vch-warning: #f59e0b;
-        --vch-success: #10b981;
-        --vch-danger: #ef4444;
-        --vch-border: #e2e8f0;
-        --vch-bg: #f8fafc;
-        --text-mut: #64748b;
-    }
-    .vch-wrapper { font-family: 'Inter', sans-serif; color: #1e293b; }
-
-    /* HEADER & STATS */
-    .vch-header-row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; }
-    .vch-title-box { display: flex; align-items: center; gap: 15px; }
-    .vch-icon { background: var(--vch-dark); color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    
-    .stats-card { background: white; border: 1px solid var(--vch-border); padding: 16px 24px; border-radius: 12px; display: flex; gap: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .stat-item h6 { font-size: 12px; font-weight: 700; color: var(--text-mut); text-transform: uppercase; margin-bottom: 4px; }
-    .stat-item h3 { font-size: 24px; font-weight: 800; color: var(--vch-primary); margin: 0; }
-
-    /* TABS & TOOLBAR */
-    .vch-nav-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--vch-border); margin-bottom: 24px; overflow-x: auto; scrollbar-width: none; }
-    .vch-nav-tabs::-webkit-scrollbar { display: none; }
-    .vch-tab { padding: 12px 20px; font-weight: 700; color: var(--text-mut); text-decoration: none; font-size: 14px; border-bottom: 3px solid transparent; white-space: nowrap; transition: 0.2s; }
-    .vch-tab:hover { color: var(--vch-dark); }
-    .vch-tab.active { color: var(--vch-primary); border-bottom-color: var(--vch-primary); }
-
-    .vch-toolbar { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-    .search-box { position: relative; flex-grow: 1; max-width: 400px; }
-    .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.2rem; }
-    .search-box input { width: 100%; padding: 12px 16px 12px 45px; border-radius: 10px; border: 1px solid #cbd5e1; font-weight: 500; font-size: 14px; }
-    .search-box input:focus { border-color: var(--vch-primary); outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-    
-    .btn-create { background: var(--vch-primary); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); cursor: pointer;}
-    .btn-create:hover { background: #1d4ed8; transform: translateY(-2px); }
-
-    /* TABLE VOUCHER (HIGH DENSITY) */
-    .vch-card { background: white; border: 1px solid var(--vch-border); border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow-x: auto; }
-    .table-vch { width: 100%; min-width: 900px; border-collapse: collapse; }
-    .table-vch th { background: var(--vch-bg); color: #334155; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 16px 20px; border-bottom: 2px solid var(--vch-border); text-align: left; }
-    .table-vch td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-    .table-vch tr:hover td { background-color: #f8fafc; }
-
-    .vch-code-box { background: #fffbeb; border: 1px dashed #f59e0b; color: #b45309; padding: 4px 10px; border-radius: 6px; font-family: monospace; font-weight: 800; font-size: 14px; display: inline-block; margin-bottom: 6px; }
-    .vch-desc { font-size: 13px; color: var(--vch-dark); font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    
-    .val-main { font-size: 16px; font-weight: 800; color: var(--vch-primary); }
-    .val-sub { font-size: 11px; font-weight: 700; color: var(--text-mut); margin-top: 4px; text-transform: uppercase; }
-    
-    /* Progress Bar Kuota */
-    .progress-container { width: 100%; background: #e2e8f0; border-radius: 10px; height: 8px; margin-bottom: 6px; overflow: hidden; }
-    .progress-bar { height: 100%; border-radius: 10px; transition: 0.4s; }
-    .quota-text { font-size: 11px; font-weight: 700; color: var(--text-mut); display: flex; justify-content: space-between; }
-
-    /* Badges & Actions */
-    .status-badge { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid transparent; }
-    .s-aktif { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-    .s-nonaktif { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
-    .s-habis { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
-
-    .action-group { display: flex; gap: 12px; align-items: center; justify-content: flex-end; }
-    .btn-del { color: var(--vch-danger); font-size: 1.3rem; cursor: pointer; background: none; border: none; transition: 0.2s; }
-    .btn-del:hover { transform: scale(1.1); }
-
-    /* Custom iOS Toggle */
-    .ios-switch { position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; }
-    .ios-switch input { opacity: 0; width: 0; height: 0; }
-    .ios-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
-    .ios-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .ios-switch input:checked + .ios-slider { background-color: var(--vch-success); }
-    .ios-switch input:checked + .ios-slider:before { transform: translateX(20px); }
-
-    /* MODAL FORM CSS */
-    .modal-content-custom { border-radius: 16px; border: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-    .modal-header-custom { background: var(--vch-bg); border-bottom: 1px solid var(--vch-border); border-radius: 16px 16px 0 0; padding: 20px 24px; }
-    .fm-label { font-weight: 700; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
-    .fm-input { border-radius: 10px; border: 2px solid var(--vch-border); padding: 12px 16px; font-weight: 600; font-size: 14px; width: 100%; transition: 0.2s; outline: none; }
-    .fm-input:focus { border-color: var(--vch-primary); }
-    .fm-input-group { display: flex; border: 2px solid var(--vch-border); border-radius: 10px; overflow: hidden; transition: 0.2s; }
-    .fm-input-group:focus-within { border-color: var(--vch-primary); }
-    .fm-input-group span { background: #f1f5f9; padding: 12px 16px; font-weight: 800; color: #475569; border-right: 1px solid var(--vch-border); }
-    .fm-input-group input { border: none; padding: 12px 16px; font-weight: 600; width: 100%; outline: none; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
+@endpush
 
-<div class="vch-wrapper">
+@section('content')
+<div class="min-h-screen bg-slate-50 p-4 md:p-6 lg:p-8 font-sans text-slate-900 space-y-6">
 
-    {{-- Notifikasi SweetAlert --}}
+    {{-- SETUP SWEETALERT TOAST --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const Toast = Swal.mixin({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+            customClass: { popup: 'rounded-2xl shadow-lg border border-slate-100' }
+        });
+    </script>
     @if(session('success'))
-        <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({toast: true, position: 'top-end', icon: 'success', title: '{{ session('success') }}', showConfirmButton: false, timer: 3000}));</script>
+        <script>document.addEventListener('DOMContentLoaded', () => Toast.fire({icon: 'success', title: '{!! session('success') !!}'}));</script>
     @endif
     @if(session('error'))
-        <script>document.addEventListener('DOMContentLoaded', () => Swal.fire('Gagal!', '{{ session('error') }}', 'error'));</script>
+        <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({title: 'Gagal!', text: '{!! session('error') !!}', icon: 'error', customClass: { popup: 'rounded-3xl' }}));</script>
     @endif
     @if ($errors->any())
-        <div class="alert alert-danger rounded-3 fw-bold">
-            <i class="mdi mdi-alert-circle me-2"></i> Form tidak valid. Cek kembali isian Anda.
+        <div class="bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-2xl flex items-center gap-3 font-bold shadow-sm">
+            <i class="mdi mdi-alert-circle text-xl"></i> Form tidak valid. Periksa kembali isian Anda.
         </div>
     @endif
 
     {{-- 1. HEADER & STATS --}}
-    <div class="vch-header-row">
-        <div class="vch-title-box">
-            <div class="vch-icon"><i class="mdi mdi-ticket-percent-outline"></i></div>
+    <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0">
+                <i class="mdi mdi-ticket-percent-outline text-2xl"></i>
+            </div>
             <div>
-                <h3 class="m-0 fw-bold fs-4">Manajemen Voucher</h3>
-                <p class="m-0 text-muted" style="font-size: 13px;">Buat kode kupon potongan harga khusus untuk pelanggan setia Anda.</p>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Manajemen Voucher</h1>
+                <p class="text-sm font-medium text-slate-500 mt-0.5">Buat kode kupon potongan harga khusus untuk pelanggan setia Anda.</p>
             </div>
         </div>
-        <div class="stats-card">
-            <div class="stat-item border-end pe-4">
-                <h6>Voucher Aktif</h6>
-                <h3>{{ $stats['aktif'] }}</h3>
+
+        <div class="flex bg-white border border-slate-200 rounded-2xl p-2 shadow-sm w-full xl:w-auto overflow-x-auto hide-scrollbar">
+            <div class="px-6 py-2 border-r border-slate-100 min-w-[140px]">
+                <h6 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Voucher Aktif</h6>
+                <h3 class="text-xl font-black text-blue-600">{{ $stats['aktif'] ?? 0 }}</h3>
             </div>
-            <div class="stat-item">
-                <h6>Total Diklaim</h6>
-                <h3>{{ $stats['terpakai'] }}</h3>
+            <div class="px-6 py-2 min-w-[140px]">
+                <h6 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Diklaim</h6>
+                <h3 class="text-xl font-black text-slate-800">{{ $stats['terpakai'] ?? 0 }}</h3>
             </div>
         </div>
     </div>
 
     {{-- 2. TABS & TOOLBAR --}}
-    <div class="vch-nav-tabs">
-        <a href="?tab=semua" class="vch-tab {{ $currentTab == 'semua' ? 'active' : '' }}">Semua Voucher</a>
-        <a href="?tab=aktif" class="vch-tab {{ $currentTab == 'aktif' ? 'active' : '' }}">Sedang Berjalan</a>
-        <a href="?tab=habis" class="vch-tab {{ $currentTab == 'habis' ? 'active' : '' }}">Kuota Habis</a>
-        <a href="?tab=nonaktif" class="vch-tab {{ $currentTab == 'nonaktif' ? 'active' : '' }}">Berakhir / Nonaktif</a>
-    </div>
+    <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
 
-    <div class="vch-toolbar">
-        <form action="{{ route('seller.promotion.vouchers') }}" method="GET" class="search-box m-0">
-            <input type="hidden" name="tab" value="{{ $currentTab }}">
-            <i class="mdi mdi-magnify"></i>
-            <input type="text" name="search" placeholder="Cari Kode atau Nama Voucher..." value="{{ request('search') }}">
-        </form>
-        <button type="button" class="btn-create" data-bs-toggle="modal" data-bs-target="#modalAddVoucher">
-            <i class="mdi mdi-plus-thick fs-5"></i> Buat Voucher Baru
-        </button>
-    </div>
+        <div class="flex gap-6 px-6 pt-4 border-b border-slate-100 overflow-x-auto hide-scrollbar bg-slate-50/50">
+            <a href="?tab=semua" class="pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 {{ $currentTab == 'semua' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800' }}">Semua Voucher</a>
+            <a href="?tab=aktif" class="pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 {{ $currentTab == 'aktif' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800' }}">Sedang Berjalan</a>
+            <a href="?tab=habis" class="pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 {{ $currentTab == 'habis' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800' }}">Kuota Habis</a>
+            <a href="?tab=nonaktif" class="pb-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 {{ $currentTab == 'nonaktif' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800' }}">Berakhir / Nonaktif</a>
+        </div>
 
-    {{-- 3. TABEL VOUCHER --}}
-    <div class="vch-card">
-        <table class="table-vch">
-            <thead>
-                <tr>
-                    <th width="25%">Kode & Rincian</th>
-                    <th width="20%">Skema Diskon</th>
-                    <th width="20%">Syarat Penggunaan</th>
-                    <th width="15%">Pemakaian Kuota</th>
-                    <th width="10%" class="text-center">Status</th>
-                    <th width="10%" class="text-end">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($voucher_list as $vch)
-                    @php
-                        // Logika Status
-                        $isActive = $vch->status == 'AKTIF' && strtotime($vch->tanggal_berakhir) >= time();
-                        $isHabis = $vch->kuota_terpakai >= $vch->kuota;
-                        $badgeClass = 's-aktif'; $statusText = 'Aktif';
-                        
-                        if($isHabis) { $badgeClass = 's-habis'; $statusText = 'Habis'; $isActive = false; }
-                        elseif(!$isActive || $vch->status == 'TIDAK_AKTIF') { $badgeClass = 's-nonaktif'; $statusText = 'Nonaktif'; }
+        <div class="p-4 sm:p-6 border-b border-slate-100 bg-white flex flex-col md:flex-row gap-4 justify-between">
+            <form action="{{ route('seller.promotion.vouchers') }}" method="GET" class="relative w-full md:max-w-md group m-0">
+                <input type="hidden" name="tab" value="{{ $currentTab }}">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="mdi mdi-magnify text-slate-400 group-focus-within:text-blue-600 transition-colors text-lg"></i>
+                </div>
+                <input type="text" name="search" placeholder="Cari Kode atau Nama Voucher..." value="{{ request('search') }}" class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:bg-white outline-none transition-all shadow-sm">
+            </form>
 
-                        // Kalkulasi Progress Kuota
-                        $progress = ($vch->kuota_terpakai / $vch->kuota) * 100;
-                        $progColor = $progress >= 80 ? '#ef4444' : ($progress >= 50 ? '#f59e0b' : '#2563eb');
-                    @endphp
-                    <tr>
-                        {{-- Info & Kode --}}
-                        <td>
-                            <div class="vch-code-box"><i class="mdi mdi-content-copy me-1" style="cursor:pointer" title="Copy"></i> {{ $vch->kode_voucher }}</div>
-                            <div class="vch-desc" title="{{ $vch->deskripsi }}">{{ $vch->deskripsi }}</div>
-                            <div class="text-muted mt-2" style="font-size: 11px;">
-                                <i class="mdi mdi-clock-outline"></i> {{ date('d M', strtotime($vch->tanggal_mulai)) }} - {{ date('d M Y', strtotime($vch->tanggal_berakhir)) }}
-                            </div>
-                        </td>
+            <button type="button" onclick="openVoucherModal()" class="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm shadow-blue-600/20 transition-all flex-shrink-0">
+                <i class="mdi mdi-plus-thick text-lg leading-none"></i> Buat Voucher Baru
+            </button>
+        </div>
 
-                        {{-- Skema Diskon --}}
-                        <td>
-                            @if($vch->tipe_diskon == 'PERSEN')
-                                <div class="val-main">Diskon {{ $vch->nilai_diskon }}%</div>
-                                <div class="val-sub">S/D Rp {{ number_format($vch->maks_diskon, 0, ',', '.') }}</div>
-                            @else
-                                <div class="val-main">Rp {{ number_format($vch->nilai_diskon, 0, ',', '.') }}</div>
-                                <div class="val-sub">Potongan Langsung</div>
-                            @endif
-                        </td>
+        {{-- 3. TABEL VOUCHER --}}
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Kode & Rincian</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Skema Diskon</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Syarat</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap min-w-[150px]">Pemakaian Kuota</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap text-center">Status</th>
+                        <th class="py-4 px-6 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($voucher_list as $vch)
+                        @php
+                            $isActive = $vch->status == 'AKTIF' && strtotime($vch->tanggal_berakhir) >= time();
+                            $isHabis = $vch->kuota_terpakai >= $vch->kuota;
+                            $badgeClass = 'bg-emerald-50 text-emerald-600 border-emerald-200'; $statusText = 'Aktif';
 
-                        {{-- Syarat --}}
-                        <td>
-                            <div style="font-size: 13px; font-weight: 700; color: var(--vch-dark);">Min. Belanja:</div>
-                            <div style="font-size: 14px; font-weight: 600; color: #475569;">Rp {{ number_format($vch->min_pembelian, 0, ',', '.') }}</div>
-                        </td>
+                            if($isHabis) { $badgeClass = 'bg-slate-100 text-slate-600 border-slate-300'; $statusText = 'Habis'; $isActive = false; }
+                            elseif(!$isActive || $vch->status == 'TIDAK_AKTIF') { $badgeClass = 'bg-red-50 text-red-600 border-red-200'; $statusText = 'Nonaktif'; }
 
-                        {{-- Kuota Tracker --}}
-                        <td>
-                            <div class="progress-container">
-                                <div class="progress-bar" style="width: {{ $progress }}%; background-color: {{ $progColor }};"></div>
-                            </div>
-                            <div class="quota-text">
-                                <span>Terpakai: {{ $vch->kuota_terpakai }}</span>
-                                <span>Total: {{ $vch->kuota }}</span>
-                            </div>
-                        </td>
+                            $progress = min(100, ($vch->kuota_terpakai / max(1, $vch->kuota)) * 100);
+                            $progColor = $progress >= 90 ? '#ef4444' : ($progress >= 60 ? '#f59e0b' : '#3b82f6');
+                        @endphp
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
 
-                        {{-- Status Badge --}}
-                        <td class="text-center">
-                            <span class="status-badge {{ $badgeClass }}">{{ $statusText }}</span>
-                        </td>
+                            <td class="py-4 px-6">
+                                <div class="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 px-2.5 py-1 rounded-lg font-mono font-black text-sm mb-2 cursor-pointer hover:bg-amber-100" title="Copy Kode" onclick="navigator.clipboard.writeText('{{ $vch->kode_voucher }}'); Toast.fire({icon: 'success', title: 'Kode disalin!'})">
+                                    <i class="mdi mdi-content-copy"></i> {{ $vch->kode_voucher }}
+                                </div>
+                                <div class="text-sm font-bold text-slate-800 line-clamp-2 leading-snug mb-1.5" title="{{ $vch->deskripsi }}">{{ $vch->deskripsi }}</div>
+                                <div class="text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
+                                    <i class="mdi mdi-clock-outline"></i> {{ date('d M', strtotime($vch->tanggal_mulai)) }} - {{ date('d M Y', strtotime($vch->tanggal_berakhir)) }}
+                                </div>
+                            </td>
 
-                        {{-- Aksi (Toggle & Hapus) --}}
-                        <td>
-                            <div class="action-group">
-                                {{-- Hanya bisa ditoggle jika belum habis dan belum expired jauh --}}
-                                @if(!$isHabis)
-                                    <label class="ios-switch" title="{{ $vch->status == 'AKTIF' ? 'Matikan Voucher' : 'Aktifkan Voucher' }}">
-                                        <input type="checkbox" class="toggle-status" data-id="{{ $vch->id }}" {{ $vch->status == 'AKTIF' ? 'checked' : '' }}>
-                                        <span class="ios-slider"></span>
-                                    </label>
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                @if($vch->tipe_diskon == 'PERSEN')
+                                    <div class="text-base font-black text-blue-600">Diskon {{ $vch->nilai_diskon }}%</div>
+                                    <div class="text-[10px] font-black text-slate-400 mt-0.5 uppercase tracking-widest">Maks Rp {{ number_format($vch->maks_diskon, 0, ',', '.') }}</div>
+                                @else
+                                    <div class="text-base font-black text-blue-600">Rp {{ number_format($vch->nilai_diskon, 0, ',', '.') }}</div>
+                                    <div class="text-[10px] font-black text-slate-400 mt-0.5 uppercase tracking-widest">Potongan Langsung</div>
                                 @endif
+                            </td>
 
-                                <form action="{{ route('seller.promotion.vouchers.destroy', $vch->id) }}" method="POST" class="m-0 form-delete">
-                                    @csrf @method('DELETE')
-                                    <button type="button" class="btn-del btn-delete-confirm" title="Hapus Permanen"><i class="mdi mdi-trash-can-outline"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <i class="mdi mdi-ticket-outline d-block mb-2" style="font-size: 4rem; color: #cbd5e1;"></i>
-                            <h5 class="fw-bold text-dark">Data Voucher Kosong</h5>
-                            <p class="text-muted">Tidak ada data yang cocok dengan kriteria filter Anda.</p>
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                <div class="text-[11px] font-bold text-slate-500 mb-0.5">Min. Belanja</div>
+                                <div class="text-sm font-black text-slate-800">Rp {{ number_format($vch->min_pembelian, 0, ',', '.') }}</div>
+                            </td>
 
-    {{-- Pagination --}}
-    <div class="mt-4 d-flex justify-content-center">
-        {{ $voucher_list->appends(request()->query())->links('pagination::bootstrap-5') }}
+                            <td class="py-4 px-6">
+                                <div class="w-full bg-slate-100 rounded-full h-2 mb-1.5 overflow-hidden">
+                                    <div class="h-2 rounded-full transition-all duration-500" style="width: {{ $progress }}%; background-color: {{ $progColor }};"></div>
+                                </div>
+                                <div class="flex justify-between text-[10px] font-bold text-slate-500">
+                                    <span>{{ $vch->kuota_terpakai }} Terpakai</span>
+                                    <span>{{ $vch->kuota }} Total</span>
+                                </div>
+                            </td>
+
+                            <td class="py-4 px-6 text-center">
+                                <span class="inline-flex px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $badgeClass }}">{{ $statusText }}</span>
+                            </td>
+
+                            <td class="py-4 px-6 text-right">
+                                <div class="flex items-center justify-end gap-4">
+                                    @if(!$isHabis)
+                                        <label class="relative inline-flex items-center cursor-pointer" title="{{ $vch->status == 'AKTIF' ? 'Matikan Voucher' : 'Aktifkan Voucher' }}">
+                                            <input type="checkbox" class="sr-only peer toggle-status" data-id="{{ $vch->id }}" {{ $vch->status == 'AKTIF' ? 'checked' : '' }}>
+                                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                                        </label>
+                                    @endif
+
+                                    <form action="{{ route('seller.promotion.vouchers.destroy', $vch->id) }}" method="POST" class="m-0 form-delete">
+                                        @csrf @method('DELETE')
+                                        <button type="button" class="text-slate-400 hover:text-red-500 transition-transform hover:scale-110 btn-delete-confirm" title="Hapus Permanen">
+                                            <i class="mdi mdi-trash-can-outline text-xl leading-none"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-16 text-center">
+                                <div class="flex flex-col items-center justify-center opacity-60">
+                                    <i class="mdi mdi-ticket-outline text-6xl text-slate-300 mb-4"></i>
+                                    <h5 class="text-lg font-black text-slate-800 mb-1">Data Voucher Kosong</h5>
+                                    <p class="text-sm font-medium text-slate-500">Tidak ada data yang cocok dengan kriteria filter Anda.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($voucher_list->hasPages())
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-center lg:justify-end">
+                {{ $voucher_list->appends(request()->query())->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
     </div>
 </div>
 
-{{-- MODAL BUAT VOUCHER BARU --}}
-<div class="modal fade" id="modalAddVoucher" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content modal-content-custom">
-            <form action="{{ route('seller.promotion.vouchers.store') }}" method="POST">
-                @csrf
-                <div class="modal-header modal-header-custom">
-                    <h5 class="modal-title fw-bold" style="color: #0f172a;"><i class="mdi mdi-ticket-percent me-2 text-primary"></i> Buat Voucher Baru</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                
-                <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
-                    {{-- Info Dasar --}}
-                    <div class="bg-light p-3 rounded-3 border mb-4">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="fm-label">Kode Voucher <span class="text-danger">*</span></label>
-                                <input type="text" name="kode_voucher" class="fm-input" placeholder="Cth: TOKOHEMAT99" maxlength="12" style="text-transform: uppercase;" required>
-                                <small class="text-muted" style="font-size: 11px;">Maksimal 12 Karakter (Tanpa Spasi).</small>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fm-label">Total Kuota (Pcs) <span class="text-danger">*</span></label>
-                                <input type="number" name="kuota" class="fm-input" placeholder="Cth: 100" min="1" required>
-                            </div>
-                            <div class="col-12">
-                                <label class="fm-label">Nama / Deskripsi Promo <span class="text-danger">*</span></label>
-                                <input type="text" name="deskripsi" class="fm-input" placeholder="Cth: Diskon Akhir Tahun Khusus Kontraktor" required>
-                            </div>
-                        </div>
+{{-- MODAL TAILWIND BUAT VOUCHER --}}
+<div id="modalAddVoucher" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 duration-300" onclick="closeVoucherModal()"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div id="modalPanel" class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all opacity-0 scale-95 duration-300 w-full sm:max-w-2xl border border-slate-200">
+
+                <form action="{{ route('seller.promotion.vouchers.store') }}" method="POST">
+                    @csrf
+
+                    <div class="bg-slate-50 px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-lg font-black text-slate-900 flex items-center gap-2"><i class="mdi mdi-ticket-percent text-blue-600"></i> Buat Voucher Baru</h3>
+                        <button type="button" onclick="closeVoucherModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-red-100 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors">
+                            <i class="mdi mdi-close text-lg leading-none"></i>
+                        </button>
                     </div>
 
-                    {{-- Pengaturan Diskon --}}
-                    <h6 class="fw-bold text-dark mb-3"><i class="mdi mdi-calculator text-warning"></i> Pengaturan Nilai Diskon</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="fm-label">Tipe Diskon <span class="text-danger">*</span></label>
-                            <select name="tipe_diskon" id="tipe_diskon" class="fm-input" required>
-                                <option value="RUPIAH">Potongan Nominal (Rp)</option>
-                                <option value="PERSEN">Potongan Persentase (%)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="fm-label">Nilai Diskon <span class="text-danger">*</span></label>
-                            <div class="fm-input-group">
-                                <span id="symbol_diskon">Rp</span>
-                                <input type="number" name="nilai_diskon" id="nilai_diskon" placeholder="0" min="1" required>
+                    <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto hide-scrollbar">
+
+                        {{-- Info Dasar --}}
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Kode Voucher <span class="text-red-500">*</span></label>
+                                    <input type="text" name="kode_voucher" class="w-full bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-600 outline-none uppercase" placeholder="Cth: TOKOHEMAT99" maxlength="12" required>
+                                    <p class="text-[10px] font-bold text-slate-400 mt-1">Maks. 12 Karakter (Tanpa Spasi).</p>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Total Kuota (Pcs) <span class="text-red-500">*</span></label>
+                                    <input type="number" name="kuota" class="w-full bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Cth: 100" min="1" required>
+                                </div>
                             </div>
-                        </div>
-                        
-                        {{-- Field Maksimal Diskon (Hanya Muncul Jika Persen) --}}
-                        <div class="col-md-6" id="box_maks_diskon" style="display: none;">
-                            <label class="fm-label text-danger">Maksimal Potongan (Rp) <span class="text-danger">*</span></label>
-                            <div class="fm-input-group" style="border-color: #ef4444;">
-                                <span style="background: #fef2f2; color: #ef4444; border-color: #fecaca;">Rp</span>
-                                <input type="number" name="maks_diskon" id="maks_diskon" placeholder="Batas kerugian (Cth: 50000)">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Nama / Deskripsi Promo <span class="text-red-500">*</span></label>
+                                <input type="text" name="deskripsi" class="w-full bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Cth: Diskon Akhir Tahun Khusus Kontraktor" required>
                             </div>
-                            <small class="text-danger fw-bold" style="font-size: 11px;">Wajib diisi agar toko tidak rugi besar.</small>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="fm-label">Minimal Belanja (Rp) <span class="text-danger">*</span></label>
-                            <div class="fm-input-group">
-                                <span>Rp</span>
-                                <input type="number" name="min_pembelian" placeholder="Cth: 100000" min="0" required>
+                        {{-- Pengaturan Diskon --}}
+                        <div>
+                            <h6 class="text-sm font-black text-slate-800 mb-3 flex items-center gap-2"><i class="mdi mdi-calculator text-amber-500"></i> Pengaturan Nilai Diskon</h6>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Tipe Diskon <span class="text-red-500">*</span></label>
+                                    <select name="tipe_diskon" id="tipe_diskon" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none cursor-pointer" required>
+                                        <option value="RUPIAH">Potongan Nominal (Rp)</option>
+                                        <option value="PERSEN">Potongan Persentase (%)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Nilai Diskon <span class="text-red-500">*</span></label>
+                                    <div class="flex border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 transition-all">
+                                        <span id="symbol_diskon" class="bg-slate-100 px-4 py-3 text-slate-500 font-black border-r border-slate-200">Rp</span>
+                                        <input type="number" name="nilai_diskon" id="nilai_diskon" class="w-full bg-slate-50 px-4 py-3 text-sm font-bold outline-none" placeholder="0" min="1" required>
+                                    </div>
+                                </div>
+
+                                <div id="box_maks_diskon" class="hidden">
+                                    <label class="block text-[11px] font-black text-red-500 uppercase tracking-widest mb-1.5">Maks Potongan (Rp) <span class="text-red-500">*</span></label>
+                                    <div class="flex border border-red-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-red-500 transition-all">
+                                        <span class="bg-red-50 px-4 py-3 text-red-500 font-black border-r border-red-200">Rp</span>
+                                        <input type="number" name="maks_diskon" id="maks_diskon" class="w-full bg-white px-4 py-3 text-sm font-bold outline-none" placeholder="Cth: 50000">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Minimal Belanja (Rp) <span class="text-red-500">*</span></label>
+                                    <div class="flex border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-600 transition-all">
+                                        <span class="bg-slate-100 px-4 py-3 text-slate-500 font-black border-r border-slate-200">Rp</span>
+                                        <input type="number" name="min_pembelian" class="w-full bg-slate-50 px-4 py-3 text-sm font-bold outline-none" placeholder="Cth: 100000" min="0" required>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        {{-- Periode --}}
+                        <div>
+                            <h6 class="text-sm font-black text-slate-800 mb-3 flex items-center gap-2"><i class="mdi mdi-calendar-clock text-indigo-500"></i> Periode Voucher Aktif</h6>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Waktu Mulai <span class="text-red-500">*</span></label>
+                                    <input type="datetime-local" name="tanggal_mulai" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none" required>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Waktu Berakhir <span class="text-red-500">*</span></label>
+                                    <input type="datetime-local" name="tanggal_berakhir" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none" required>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    {{-- Pengaturan Periode --}}
-                    <h6 class="fw-bold text-dark mb-3"><i class="mdi mdi-calendar-clock text-info"></i> Periode Voucher Aktif</h6>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="fm-label">Waktu Mulai <span class="text-danger">*</span></label>
-                            <input type="datetime-local" name="tanggal_mulai" class="fm-input" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="fm-label">Waktu Berakhir <span class="text-danger">*</span></label>
-                            <input type="datetime-local" name="tanggal_berakhir" class="fm-input" required>
-                        </div>
+                    <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-3 rounded-b-3xl">
+                        <button type="button" onclick="closeVoucherModal()" class="w-full sm:w-auto px-6 py-2.5 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-100 transition-colors">Batal</button>
+                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm shadow-blue-600/20 transition-all flex items-center justify-center gap-2">
+                            <i class="mdi mdi-check-circle-outline"></i> Terbitkan Voucher
+                        </button>
                     </div>
+                </form>
 
-                </div>
-                
-                <div class="modal-footer p-4 bg-light border-0 rounded-bottom-4">
-                    <button type="button" class="btn btn-outline-secondary fw-bold px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn-create"><i class="mdi mdi-check-circle-outline"></i> Terbitkan Voucher</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // --- 1. DYNAMIC FORM LOGIC (Persen vs Rupiah) ---
-    const tipeDiskonSelect = document.getElementById('tipe_diskon');
-    const symbolDiskon = document.getElementById('symbol_diskon');
-    const inputNilaiDiskon = document.getElementById('nilai_diskon');
-    const boxMaksDiskon = document.getElementById('box_maks_diskon');
-    const inputMaksDiskon = document.getElementById('maks_diskon');
+    // --- 1. MODAL LOGIC ---
+    const modalAdd = document.getElementById('modalAddVoucher');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalPanel = document.getElementById('modalPanel');
 
-    tipeDiskonSelect.addEventListener('change', function() {
-        if (this.value === 'PERSEN') {
-            symbolDiskon.textContent = '%';
-            inputNilaiDiskon.max = "100"; // Maksimal 100 persen
-            inputNilaiDiskon.placeholder = "Cth: 10";
-            
-            // Tampilkan kotak batas maksimal diskon (Wajib untuk B2B)
-            boxMaksDiskon.style.display = 'block';
-            inputMaksDiskon.setAttribute('required', 'required');
-        } else {
-            symbolDiskon.textContent = 'Rp';
-            inputNilaiDiskon.removeAttribute('max');
-            inputNilaiDiskon.placeholder = "Cth: 50000";
-            
-            // Sembunyikan kotak batas maksimal
-            boxMaksDiskon.style.display = 'none';
-            inputMaksDiskon.removeAttribute('required');
-            inputMaksDiskon.value = ''; // Reset
-        }
-    });
+    function openVoucherModal() {
+        modalAdd.classList.remove('hidden');
+        void modalAdd.offsetWidth;
+        modalOverlay.classList.replace('opacity-0', 'opacity-100');
+        modalPanel.classList.replace('opacity-0', 'opacity-100');
+        modalPanel.classList.replace('scale-95', 'scale-100');
+    }
 
-    // --- 2. AJAX LIVE TOGGLE STATUS (iOS Switch) ---
-    document.querySelectorAll('.toggle-status').forEach(toggle => {
-        toggle.addEventListener('change', function() {
-            let voucherId = this.dataset.id;
-            let isActive = this.checked ? 1 : 0;
-            let checkbox = this;
-            
-            fetch("{{ route('seller.promotion.vouchers.toggle') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ voucher_id: voucherId, is_active: isActive })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    Swal.fire({
-                        toast: true, position: 'top-end', icon: 'success', 
-                        title: isActive ? 'Voucher diaktifkan' : 'Voucher dinonaktifkan', 
-                        showConfirmButton: false, timer: 1500
-                    }).then(() => location.reload()); // Reload agar UI Badge status ikut berubah
-                } else {
-                    throw new Error('Update failed');
-                }
-            })
-            .catch(error => {
-                Swal.fire({toast: true, position: 'top-end', icon: 'error', title: 'Gagal update status!', showConfirmButton: false, timer: 2000});
-                checkbox.checked = !isActive; // Revert
+    function closeVoucherModal() {
+        modalOverlay.classList.replace('opacity-100', 'opacity-0');
+        modalPanel.classList.replace('opacity-100', 'opacity-0');
+        modalPanel.classList.replace('scale-100', 'scale-95');
+        setTimeout(() => modalAdd.classList.add('hidden'), 300);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- 2. DYNAMIC FORM LOGIC ---
+        const tipeDiskon = document.getElementById('tipe_diskon');
+        const symbolDiskon = document.getElementById('symbol_diskon');
+        const inputNilai = document.getElementById('nilai_diskon');
+        const boxMaks = document.getElementById('box_maks_diskon');
+        const inputMaks = document.getElementById('maks_diskon');
+
+        tipeDiskon.addEventListener('change', function() {
+            if (this.value === 'PERSEN') {
+                symbolDiskon.textContent = '%';
+                inputNilai.max = "100";
+                inputNilai.placeholder = "Cth: 10";
+                boxMaks.classList.remove('hidden');
+                inputMaks.setAttribute('required', 'required');
+            } else {
+                symbolDiskon.textContent = 'Rp';
+                inputNilai.removeAttribute('max');
+                inputNilai.placeholder = "Cth: 50000";
+                boxMaks.classList.add('hidden');
+                inputMaks.removeAttribute('required');
+                inputMaks.value = '';
+            }
+        });
+
+        // --- 3. AJAX TOGGLE STATUS ---
+        document.querySelectorAll('.toggle-status').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                let voucherId = this.dataset.id;
+                let isActive = this.checked ? 1 : 0;
+                let checkbox = this;
+
+                checkbox.disabled = true; // Hindari spam klik
+
+                fetch("{{ route('seller.promotion.vouchers.toggle') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ voucher_id: voucherId, is_active: isActive })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        Toast.fire({icon: 'success', title: isActive ? 'Voucher diaktifkan' : 'Voucher dinonaktifkan'})
+                        .then(() => location.reload());
+                    } else throw new Error();
+                })
+                .catch(() => {
+                    Toast.fire({icon: 'error', title: 'Gagal update status!'});
+                    checkbox.checked = !isActive;
+                })
+                .finally(() => checkbox.disabled = false);
+            });
+        });
+
+        // --- 4. HAPUS VOUCHER ---
+        document.querySelectorAll('.btn-delete-confirm').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                let form = this.closest('.form-delete');
+                Swal.fire({
+                    title: 'Hapus Voucher?',
+                    text: "Voucher ini akan dihapus permanen. Pembeli yang sudah mengklaim mungkin tidak bisa menggunakannya lagi.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#94a3b8',
+                    confirmButtonText: 'Ya, Hapus!',
+                    reverseButtons: true,
+                    customClass: { popup: 'rounded-3xl' }
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
             });
         });
     });
-
-    // --- 3. SWEETALERT HAPUS VOUCHER ---
-    document.querySelectorAll('.btn-delete-confirm').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            let form = this.closest('.form-delete');
-            Swal.fire({
-                title: 'Hapus Voucher?',
-                text: "Voucher ini akan dihapus permanen. Pembeli yang sudah mengklaim mungkin tidak bisa menggunakannya lagi.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Ya, Hapus!'
-            }).then((result) => {
-                if (result.isConfirmed) form.submit();
-            });
-        });
-    });
-
-});
 </script>
 @endpush

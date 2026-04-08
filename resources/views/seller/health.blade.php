@@ -2,464 +2,235 @@
 
 @section('title', 'Kesehatan Toko')
 
-@push('styles')
-<style>
-    /* ========================================= */
-    /* == STYLE KESEHATAN TOKO (MONOCHROME)   == */
-    /* ========================================= */
-    
-    /* --- Banner Status Atas dengan Chart --- */
-    .page-status-header {
-        background-color: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        display: flex;
-        gap: 2rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .status-content-wrapper {
-        flex: 1;
-        min-width: 300px;
-    }
-
-    .health-chart-wrapper {
-        width: 250px;
-        height: 250px;
-        position: relative;
-        flex-shrink: 0;
-        margin: 0 auto;
-    }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        background-color: #111827;
-        color: #ffffff;
-        padding: 0.6rem 1.5rem;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-        letter-spacing: 0.5px;
-    }
-    .status-badge i { font-size: 1.4rem; margin-right: 0.5rem; }
-    .page-status-header p { color: #4b5563; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.5; }
-    
-    /* --- Top Metrics Grid --- */
-    .top-metrics {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1rem;
-    }
-    .top-metrics .metric-item {
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        padding: 1rem;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-    }
-    .top-metrics .metric-item:hover {
-        background-color: #ffffff;
-        border-color: #d1d5db;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        transform: translateY(-2px);
-    }
-    .top-metrics .metric-item span { 
-        font-size: 0.8rem; 
-        color: #6b7280; 
-        font-weight: 700; 
-        text-transform: uppercase; 
-        display: block; 
-        margin-bottom: 8px; 
-        letter-spacing: 0.5px;
-    }
-    .top-metrics .metric-item p { margin: 0; font-size: 1.15rem; font-weight: 800; }
-
-    /* --- Filter Bar --- */
-    .filter-bar {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        background-color: #f9fafb;
-        padding: 1rem 1.5rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-    }
-    .filter-bar .form-select, 
-    .filter-bar .form-control {
-        width: auto;
-        border-color: #d1d5db;
-        border-radius: 8px;
-    }
-
-    /* ========================================= */
-    /* == DESAIN BARU: LIST METRIK KESEHATAN  == */
-    /* ========================================= */
-    
-    .metric-group {
-        margin-bottom: 1.5rem;
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-    
-    .metric-group-header {
-        background-color: #f9fafb;
-        padding: 1.2rem 1.5rem;
-        font-size: 1.05rem;
-        font-weight: 800;
-        color: #111827;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .metric-list-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1.5rem;
-        border-bottom: 1px dashed #e5e7eb;
-        transition: background-color 0.2s;
-    }
-    .metric-list-item:hover {
-        background-color: #fcfcfd;
-    }
-    .metric-list-item:last-child {
-        border-bottom: none;
-    }
-
-    /* Bagian Kiri: Nama & Target */
-    .metric-info {
-        flex: 2;
-        padding-right: 1rem;
-    }
-    .metric-info h6 {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #111827;
-        margin: 0 0 0.4rem 0;
-        line-height: 1.4;
-    }
-    .metric-target-badge {
-        display: inline-block;
-        background-color: #ffffff;
-        color: #4b5563;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.3rem 0.6rem;
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
-        margin-top: 0.2rem;
-    }
-
-    /* Bagian Tengah: Nilai Saat Ini & Sebelumnya */
-    .metric-stats {
-        flex: 1;
-        text-align: center;
-        border-left: 1px solid #e5e7eb;
-        border-right: 1px solid #e5e7eb;
-        padding: 0 1rem;
-    }
-    .metric-stats .current-val {
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: #111827;
-        margin: 0 0 0.2rem 0;
-        line-height: 1;
-    }
-    .metric-stats .past-val {
-        font-size: 0.8rem;
-        color: #6b7280;
-        margin: 0;
-    }
-
-    /* Bagian Kanan: Tombol Aksi */
-    .metric-action {
-        flex: 0.5;
-        text-align: right;
-        padding-left: 1rem;
-    }
-    .btn-rincian {
-        background: transparent;
-        color: #111827;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        transition: 0.2s;
-    }
-    .btn-rincian:hover {
-        background: #111827;
-        color: #ffffff;
-        border-color: #111827;
-    }
-    
-    /* --- Widget Penalti --- */
-    .penalty-list { list-style: none; padding: 0; margin: 0; }
-    .penalty-list li {
-        display: flex; justify-content: space-between; padding: 1rem 0;
-        border-bottom: 1px dashed #e5e7eb; font-size: 0.95rem;
-    }
-    .penalty-list li:last-child { border-bottom: none; padding-bottom: 0; }
-    .penalty-list li span:first-child { color: #4b5563; }
-    .penalty-list li span:last-child { font-weight: 700; color: #111827; }
-    
-    /* --- Widget Masalah --- */
-    .issue-box {
-        background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px;
-        padding: 1.25rem 1.5rem; display: flex; justify-content: space-between;
-        align-items: center; margin-bottom: 1rem; transition: border-color 0.2s;
-    }
-    .issue-box:hover { border-color: #d1d5db; }
-    .issue-box:last-child { margin-bottom: 0; }
-    .issue-box .issue-title { color: #4b5563; font-weight: 600; font-size: 0.95rem; margin: 0; display: flex; align-items: center;}
-    .issue-box .issue-title i { font-size: 1.2rem; margin-right: 0.5rem; }
-    .issue-box .value { font-size: 1.8rem; font-weight: 800; color: #111827; margin: 0; line-height: 1; }
-
-    /* --- Utilities --- */
-    .text-link { color: #111827; font-weight: 600; text-decoration: none; border-bottom: 1px solid transparent; transition: 0.2s;}
-    .text-link:hover { color: #4f46e5; border-bottom-color: #4f46e5; }
-    
-    .btn-dark { background-color: #111827; color: #ffffff; border: none; padding: 0.6rem 1.2rem; font-weight: 600; transition: 0.2s; }
-    .btn-dark:hover { background-color: #374151; color: #ffffff; }
-
-    .btn-outline-mono {
-        background: transparent; color: #111827; border: 1px solid #d1d5db;
-        border-radius: 8px; font-weight: 600; padding: 0.5rem 1rem; transition: 0.2s; text-decoration: none;
-    }
-    .btn-outline-mono:hover { background: #111827; color: white; border-color: #111827; }
-
-    .alert-box { background-color: #f9fafb; border: 1px dashed #d1d5db; border-radius: 12px; padding: 1.5rem; text-align: center; color: #6b7280; }
-
-    @media (max-width: 992px) {
-        .metric-list-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1.2rem;
-        }
-        .metric-stats {
-            text-align: left;
-            border: none;
-            padding: 0;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .metric-action {
-            width: 100%;
-            text-align: left;
-            padding: 0;
-        }
-        .btn-rincian { width: 100%; justify-content: center; }
-    }
-</style>
-@endpush
-
 @section('content')
-<div class="page-header mb-4">
-    <h3 class="page-title d-flex align-items-center m-0">
-        <div class="page-title-icon-mono me-3">
-            <i class="mdi mdi-shield-check-outline"></i>
-        </div> 
-        <div class="d-flex align-items-center" style="font-size: 1.6rem;">
-            <a href="{{ route('seller.dashboard') }}" class="header-path-link">Dashboard</a>
-            <i class="mdi mdi-chevron-right header-path-separator"></i>
-            <span class="header-path-current">Kesehatan Toko</span>
-        </div>
-    </h3>
-</div>
+<div class="min-h-screen bg-slate-50 p-4 md:p-6 lg:p-8 font-sans text-slate-900 space-y-6">
 
-{{-- Bar Filter --}}
-<div class="filter-bar shadow-sm">
-    <span class="fw-bold text-secondary"><i class="mdi mdi-filter-variant text-muted me-1"></i> Tinjau Data:</span>
-    <select class="form-select fw-bold">
-        <option>7 Hari Terakhir</option>
-        <option>30 Hari Terakhir</option>
-        <option>Kuartal Ini (Q3)</option>
-    </select>
-    <div class="ms-auto d-flex gap-2 mt-3 mt-md-0">
-        <a href="#" class="btn-outline-mono"><i class="mdi mdi-download me-1"></i> Unduh Laporan</a>
-    </div>
-</div>
-
-<div class="row g-4">
-    
-    {{-- KOLOM UTAMA (METRIK) --}}
-    <div class="col-lg-8">
-        
-        {{-- Banner Status + Radar Chart --}}
-        <div class="page-status-header">
-            <div class="status-content-wrapper">
-                <div class="status-badge"><i class="mdi mdi-thumb-up-outline"></i> {{ $status_kesehatan }}</div>
-                <p>Toko Anda berada pada kondisi prima. Terus pertahankan kecepatan pengiriman dan kualitas produk untuk menarik lebih banyak pembeli!</p>
-                <div class="top-metrics">
-                    <div class="metric-item">
-                        <span>Pesanan</span>
-                        <p class="{{ $top_summary['pesanan_terselesaikan'] > 0 ? 'text-danger' : 'text-success' }}">
-                            {{ $top_summary['pesanan_terselesaikan'] }} pelanggaran
-                        </p>
-                    </div>
-                    <div class="metric-item">
-                        <span>Produk</span>
-                        <p class="{{ $top_summary['produk_dilarang'] > 0 ? 'text-danger' : 'text-success' }}">
-                            {{ $top_summary['produk_dilarang'] }} pelanggaran
-                        </p>
-                    </div>
-                    <div class="metric-item">
-                        <span>Pelayanan</span>
-                        <p class="{{ $top_summary['pelayanan_pembeli'] > 0 ? 'text-danger' : 'text-success' }}">
-                            {{ $top_summary['pelayanan_pembeli'] }} pelanggaran
-                        </p>
-                    </div>
-                </div>
+    {{-- 1. HEADER --}}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm flex-shrink-0">
+                <i class="mdi mdi-shield-check-outline text-2xl"></i>
             </div>
-            
-            {{-- Wrapper Untuk Diagram Kesehatan --}}
-            <div class="health-chart-wrapper">
-                <canvas id="healthRadarChart"></canvas>
+            <div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Kesehatan Toko</h1>
+                <div class="text-sm font-medium text-slate-500 mt-0.5 flex items-center gap-2">
+                    <a href="{{ route('seller.dashboard') }}" class="hover:text-emerald-600 transition-colors">Dashboard</a>
+                    <i class="mdi mdi-chevron-right text-xs"></i>
+                    <span class="text-slate-700 font-bold">Analisis Kesehatan</span>
+                </div>
             </div>
         </div>
 
-        {{-- LIST METRIK DETAIL (Ganti Tabel menjadi Card List Flexbox) --}}
-        <div class="metric-container mt-4">
-            
-            @foreach ($metrics as $category => $items)
-            <div class="metric-group">
-                {{-- Header Kategori --}}
-                <div class="metric-group-header">
-                    <i class="mdi mdi-format-list-checks text-muted me-1"></i> {{ $category }}
-                </div>
-                
-                {{-- Daftar Item Metrik --}}
-                <div class="metric-list-body">
-                    @foreach ($items as $item)
-                    <div class="metric-list-item">
-                        
-                        {{-- Kiri: Informasi Metrik & Target --}}
-                        <div class="metric-info">
-                            <h6>{{ $item['nama'] }}</h6>
-                            <span class="metric-target-badge">
-                                <i class="mdi mdi-flag-triangle text-muted"></i> Target: <strong>{{ $item['target'] }}</strong>
-                            </span>
-                        </div>
-                        
-                        {{-- Tengah: Nilai Pencapaian --}}
-                        <div class="metric-stats">
-                            <p class="current-val">{{ $item['sekarang'] }}</p>
-                            <p class="past-val">Bulan lalu: {{ $item['sebelumnya'] }}</p>
-                        </div>
-                        
-                        {{-- Kanan: Aksi --}}
-                        <div class="metric-action">
-                            <a href="#" class="btn-rincian">
-                                Rincian <i class="mdi mdi-arrow-right"></i>
-                            </a>
-                        </div>
-                        
-                    </div>
-                    @endforeach
-                </div>
+        {{-- FILTER BAR --}}
+        <div class="w-full md:w-auto bg-white border border-slate-200 rounded-2xl p-2 shadow-sm flex flex-wrap lg:flex-nowrap items-center gap-3">
+            <div class="flex items-center gap-2 px-3 border-r border-slate-100 flex-1 md:flex-none">
+                <i class="mdi mdi-filter-variant text-slate-400 text-lg"></i>
+                <select class="w-full md:w-auto bg-transparent text-sm font-bold text-slate-700 focus:outline-none cursor-pointer appearance-none">
+                    <option>7 Hari Terakhir</option>
+                    <option>30 Hari Terakhir</option>
+                    <option>Kuartal Ini (Q3)</option>
+                </select>
             </div>
-            @endforeach
-            
+
+            <div class="flex items-center justify-end px-1 w-full md:w-auto">
+                <button class="flex items-center justify-center gap-1.5 px-5 py-2 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-black transition-colors shadow-sm shadow-slate-900/20 w-full md:w-auto">
+                    <i class="mdi mdi-download text-base"></i> Unduh Laporan
+                </button>
+            </div>
         </div>
     </div>
 
-    {{-- KOLOM SAMPING (WIDGETS) --}}
-    <div class="col-lg-4">
-        
-        {{-- Widget Penjual Star --}}
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
-            <div class="card-body p-4 text-center">
-                <div class="d-flex align-items-center justify-content-center mb-3">
-                    <i class="mdi mdi-shield-star-outline" style="font-size: 4rem; color: #d1d5db;"></i>
+    {{-- MAIN LAYOUT (KIRI 2, KANAN 1) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        {{-- ================================================= --}}
+        {{-- SISI KIRI (BANNER & LIST METRIK)                    --}}
+        {{-- ================================================= --}}
+        <div class="lg:col-span-8 space-y-6">
+
+            {{-- BANNER STATUS & CHART RADAR --}}
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+                {{-- Efek Glow --}}
+                <div class="absolute -left-20 -top-20 w-64 h-64 bg-emerald-50 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="flex-1 min-w-0 relative z-10">
+                    <div class="inline-flex items-center gap-2 px-5 py-2 bg-slate-900 text-white rounded-full text-sm font-black uppercase tracking-widest mb-4 shadow-sm shadow-slate-900/20">
+                        <i class="mdi mdi-thumb-up-outline text-lg leading-none"></i> {{ $status_kesehatan }}
+                    </div>
+                    <p class="text-sm font-medium text-slate-500 leading-relaxed mb-6 max-w-lg">
+                        Toko Anda berada pada kondisi prima. Terus pertahankan kecepatan pengiriman dan kualitas produk untuk menarik lebih banyak pembeli!
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:border-slate-300 transition-colors">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Pesanan</span>
+                            <div class="text-xl font-black {{ $top_summary['pesanan_terselesaikan'] > 0 ? 'text-red-500' : 'text-emerald-500' }}">
+                                {{ $top_summary['pesanan_terselesaikan'] }} <span class="text-xs font-bold text-slate-500">Isu</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:border-slate-300 transition-colors">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Produk</span>
+                            <div class="text-xl font-black {{ $top_summary['produk_dilarang'] > 0 ? 'text-red-500' : 'text-emerald-500' }}">
+                                {{ $top_summary['produk_dilarang'] }} <span class="text-xs font-bold text-slate-500">Isu</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:border-slate-300 transition-colors">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Pelayanan</span>
+                            <div class="text-xl font-black {{ $top_summary['pelayanan_pembeli'] > 0 ? 'text-red-500' : 'text-emerald-500' }}">
+                                {{ $top_summary['pelayanan_pembeli'] }} <span class="text-xs font-bold text-slate-500">Isu</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h5 class="fw-bold text-uppercase" style="color: #6b7280; font-size: 0.85rem; letter-spacing: 0.5px;">Status Saat Ini</h5>
-                <h4 class="fw-bold mt-1 mb-3" style="color: #111827;">Penjual Reguler</h4>
-                <p class="text-muted small px-2 mb-4">Penuhi 3 kriteria tambahan performa toko untuk meningkatkan status menjadi Penjual Star.</p>
-                <a href="#" class="btn btn-dark w-100" style="border-radius: 8px;">Lihat Kriteria <i class="mdi mdi-arrow-right ms-1"></i></a>
+
+                {{-- Chart Radar Container --}}
+                <div class="w-[280px] h-[280px] flex-shrink-0 relative z-10 hidden sm:block">
+                    <canvas id="healthRadarChart"></canvas>
+                </div>
             </div>
+
+            {{-- LIST METRIK DETAIL --}}
+            <div class="space-y-6">
+                @foreach ($metrics as $category => $items)
+                    <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+
+                        {{-- Header Kategori --}}
+                        <div class="bg-slate-50/80 px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+                            <i class="mdi mdi-format-list-checks text-slate-400 text-lg leading-none"></i>
+                            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">{{ $category }}</h3>
+                        </div>
+
+                        {{-- Item List --}}
+                        <div class="divide-y divide-slate-100">
+                            @foreach ($items as $item)
+                                <div class="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50/50 transition-colors">
+
+                                    {{-- Kiri: Info & Target --}}
+                                    <div class="flex-1">
+                                        <h6 class="text-sm font-bold text-slate-900 mb-2 leading-snug">{{ $item['nama'] }}</h6>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                            <i class="mdi mdi-flag-triangle text-amber-500"></i> Target: <span class="text-slate-800">{{ $item['target'] }}</span>
+                                        </span>
+                                    </div>
+
+                                    {{-- Tengah: Nilai Pencapaian --}}
+                                    <div class="w-full md:w-48 md:text-center md:border-x border-slate-100 md:px-6">
+                                        <div class="text-2xl font-black text-slate-900 mb-1 tracking-tight">{{ $item['sekarang'] }}</div>
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bulan Lalu: {{ $item['sebelumnya'] }}</div>
+                                    </div>
+
+                                    {{-- Kanan: Aksi --}}
+                                    <div class="w-full md:w-auto md:text-right">
+                                        <a href="#" class="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-900 hover:text-white hover:border-slate-900 text-xs font-bold rounded-xl transition-all shadow-sm w-full md:w-auto">
+                                            Rincian <i class="mdi mdi-arrow-right text-base leading-none"></i>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
         </div>
 
-        {{-- Widget Penalti --}}
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-                    <h5 class="card-title fw-bold m-0" style="color: #111827;">Penalti Saya</h5>
-                    <a href="#" class="text-link text-muted small">Riwayat <i class="mdi mdi-chevron-right"></i></a>
+        {{-- ================================================= --}}
+        {{-- SISI KANAN (WIDGETS)                              --}}
+        {{-- ================================================= --}}
+        <div class="lg:col-span-4 space-y-6">
+
+            {{-- WIDGET STATUS PENJUAL --}}
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 rounded-3xl p-8 text-center shadow-xl shadow-slate-900/10 relative overflow-hidden">
+                <i class="mdi mdi-shield-star-outline absolute -right-6 -bottom-6 text-9xl text-white/5 pointer-events-none transform -rotate-12"></i>
+
+                <div class="relative z-10">
+                    <div class="w-20 h-20 bg-white/10 border border-white/20 rounded-full flex items-center justify-center text-white mx-auto mb-5 shadow-inner">
+                        <i class="mdi mdi-medal-outline text-4xl"></i>
+                    </div>
+                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Status Saat Ini</span>
+                    <h4 class="text-xl font-black text-white mb-3">Penjual Reguler</h4>
+                    <p class="text-xs font-medium text-slate-400 leading-relaxed mb-6">Penuhi 3 kriteria tambahan performa toko untuk meningkatkan status menjadi <b>Penjual Star</b>.</p>
+
+                    <a href="#" class="flex items-center justify-center gap-2 w-full px-5 py-3 bg-white text-slate-900 hover:bg-slate-100 text-sm font-bold rounded-xl transition-colors shadow-sm">
+                        Lihat Kriteria <i class="mdi mdi-arrow-right"></i>
+                    </a>
                 </div>
-                
-                <div class="mb-4">
-                    <span class="text-secondary fw-bold small text-uppercase" style="letter-spacing: 0.5px;">Poin Kuartal Ini</span>
-                    <h2 class="fw-bold mt-1" style="color: #111827; letter-spacing: -1px;">{{ $poin_penalti_kuartal_ini }} <span style="font-size: 1.1rem; color: #6b7280; font-weight: 500; letter-spacing: normal;">poin</span></h2>
+            </div>
+
+            {{-- WIDGET PENALTI SAYA --}}
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-5">
+                    <h5 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                        <i class="mdi mdi-gavel text-red-500 text-lg leading-none"></i> Penalti Saya
+                    </h5>
+                    <a href="#" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">Riwayat <i class="mdi mdi-chevron-right"></i></a>
                 </div>
-                
-                <ul class="penalty-list mb-4">
+
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-5 text-center">
+                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Poin Kuartal Ini</span>
+                    <div class="text-3xl font-black text-slate-900 tracking-tight">
+                        {{ $poin_penalti_kuartal_ini }} <span class="text-sm font-bold text-slate-500">Poin</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-6">
                     @foreach($pelanggaran_penalti as $pelanggaran => $poin)
-                        <li><span>{{ $pelanggaran }}</span> <span>{{ $poin }} poin</span></li>
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <span class="text-slate-500">{{ $pelanggaran }}</span>
+                            <span class="text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md">{{ $poin }} Poin</span>
+                        </div>
                     @endforeach
-                </ul>
-                
-                <h6 class="fw-bold mb-3" style="color: #111827;">Penalti Berjalan</h6>
-                <div class="alert-box">
-                    <i class="mdi mdi-gavel fs-2 mb-2"></i>
-                    <p class="mb-0 small fw-bold">Hebat! Tidak ada penalti aktif.</p>
+                </div>
+
+                <div class="bg-emerald-50 border border-emerald-200 border-dashed rounded-2xl p-4 text-center">
+                    <i class="mdi mdi-check-circle-outline text-2xl text-emerald-500 mb-1"></i>
+                    <p class="text-xs font-bold text-emerald-700 m-0">Hebat! Tidak ada penalti aktif yang berjalan.</p>
                 </div>
             </div>
-        </div>
 
-        {{-- Widget Masalah --}}
-        <div class="card border-0 shadow-sm" style="border-radius: 16px;">
-            <div class="card-body p-4">
-                <div class="border-bottom pb-3 mb-4">
-                     <h5 class="card-title fw-bold mb-2" style="color: #111827;">Masalah Perlu Diselesaikan</h5>
-                     <p class="text-muted small m-0">Ada {{ count(array_filter($masalah_perlu_diselesaikan)) }} masalah yang perlu segera ditangani.</p>
+            {{-- WIDGET MASALAH PERLU DISELESAIKAN --}}
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <div class="border-b border-slate-100 pb-4 mb-5">
+                    <h5 class="text-sm font-black text-slate-900 flex items-center gap-2 mb-1">
+                        <i class="mdi mdi-alert-octagon-outline text-amber-500 text-lg leading-none"></i> Isu Berjalan
+                    </h5>
+                    <p class="text-[11px] font-bold text-slate-400">Ada {{ count(array_filter($masalah_perlu_diselesaikan)) }} masalah yang perlu ditangani.</p>
                 </div>
-               
-                <div class="issue-box">
-                    <p class="issue-title"><i class="mdi mdi-alert-circle-outline" style="color: #f59e0b;"></i> Produk bermasalah</p>
-                    <p class="value">{{ $masalah_perlu_diselesaikan['produk_bermasalah'] }}</p>
-                </div>
-                <div class="issue-box">
-                    <p class="issue-title"><i class="mdi mdi-clock-alert-outline" style="color: #ef4444;"></i> Keterlambatan kirim</p>
-                    <p class="value">{{ $masalah_perlu_diselesaikan['keterlambatan_pengiriman'] }}</p>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center bg-amber-50 border border-amber-100 rounded-2xl p-4 hover:border-amber-300 transition-colors cursor-pointer">
+                        <span class="text-xs font-bold text-amber-700 flex items-center gap-2">
+                            <i class="mdi mdi-alert-circle text-amber-500 text-base"></i> Produk bermasalah
+                        </span>
+                        <span class="text-lg font-black text-amber-600">{{ $masalah_perlu_diselesaikan['produk_bermasalah'] }}</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-red-50 border border-red-100 rounded-2xl p-4 hover:border-red-300 transition-colors cursor-pointer">
+                        <span class="text-xs font-bold text-red-700 flex items-center gap-2">
+                            <i class="mdi mdi-clock-alert text-red-500 text-base"></i> Telat Pengiriman
+                        </span>
+                        <span class="text-lg font-black text-red-600">{{ $masalah_perlu_diselesaikan['keterlambatan_pengiriman'] }}</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
+
 </div>
 @endsection
 
 @push('scripts')
-{{-- Include Chart.js --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // Konfigurasi Radar Chart untuk Kesehatan Toko
+
+    // Konfigurasi Radar Chart Tingkat Dewa
     const ctx = document.getElementById('healthRadarChart').getContext('2d');
-    
-    // Nilai Dummy. Nanti ambil dari persentase skor masing-masing area. (Maks 100)
-    const dataSkor = [95, 100, 80, 100]; 
-    
+
+    // Data dummy, disarankan diisi dari backend
+    const dataSkor = [95, 100, 80, 100];
+
     new Chart(ctx, {
         type: 'radar',
         data: {
@@ -467,13 +238,16 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Skor Kesehatan',
                 data: dataSkor,
-                backgroundColor: 'rgba(17, 24, 39, 0.2)', // Hitam transparan
-                borderColor: '#111827', // Hitam pekat
-                pointBackgroundColor: '#111827',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: '#111827',
+                backgroundColor: 'rgba(16, 185, 129, 0.15)', // Emerald transparent
+                borderColor: '#10b981', // Emerald solid
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#ffffff',
+                pointHoverBackgroundColor: '#ffffff',
+                pointHoverBorderColor: '#10b981',
                 borderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBorderWidth: 2
             }]
         },
         options: {
@@ -481,14 +255,14 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             scales: {
                 r: {
-                    angleLines: { color: '#e5e7eb' },
-                    grid: { color: '#e5e7eb' },
+                    angleLines: { color: '#f1f5f9' },
+                    grid: { color: '#f1f5f9' },
                     pointLabels: {
-                        color: '#374151',
-                        font: { size: 11, weight: 'bold' }
+                        color: '#64748b',
+                        font: { family: 'Inter', size: 10, weight: '800' }
                     },
                     ticks: {
-                        display: false, // Sembunyikan angka skala di tengah
+                        display: false,
                         min: 0,
                         max: 100
                     }
@@ -496,7 +270,17 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             plugins: {
                 legend: { display: false },
-                tooltip: { backgroundColor: '#111827', padding: 10 }
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    padding: 12,
+                    cornerRadius: 8,
+                    bodyFont: { family: 'Inter', size: 12, weight: '700' },
+                    displayColors: false
+                }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart'
             }
         }
     });

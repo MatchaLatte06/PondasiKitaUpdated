@@ -7,12 +7,13 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController as FrontProductController;
-use App\Http\Controllers\WebhookController; // <-- IMPORT WEBHOOK CONTROLLER
+use App\Http\Controllers\WebhookController;
 
 // --- IMPORT CONTROLLER SELLER ---
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
+use App\Http\Controllers\Seller\ShopController;
 
 // --- IMPORT CONTROLLER ADMIN ---
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
@@ -29,16 +30,15 @@ use App\Http\Controllers\Admin\LogisticSettingController as AdminLogisticSetting
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Web Routes - Pondasikita Enterprise Edition
 |--------------------------------------------------------------------------
 */
 
-// 1. LANDING PAGE
+// 1. LANDING PAGE & FRONTEND DETAIL
 Route::get('/', [LandingController::class, 'index'])->name('home');
-
-// 2. FRONTEND (CUSTOMER JOURNEY)
 Route::get('/produk/{id}', [FrontProductController::class, 'detail'])->name('produk.detail');
 
+// 2. CUSTOMER JOURNEY (GROUPED)
 Route::controller(PageController::class)->group(function () {
     // Katalog & Toko
     Route::get('/pages/produk', 'produk')->name('produk.index');
@@ -68,15 +68,15 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/pesanan/{kode_invoice}', 'lacakPesanan')->name('pesanan.lacak');
 });
 
-// 3. AUTHENTICATION (CUSTOMER & SELLER)
+// 3. AUTHENTICATION SYSTEM
 Route::controller(AuthController::class)->group(function () {
-    // Customer
+    // Customer Auth
     Route::get('/login', 'showLogin')->name('login');
     Route::post('/login', 'login')->name('login.process');
     Route::get('/register', 'showRegister')->name('register');
     Route::post('/register', 'register')->name('register.process');
 
-    // Seller
+    // Seller Auth
     Route::get('/seller/login', 'showLoginSeller')->name('seller.login');
     Route::post('/seller/login', 'loginSeller')->name('seller.login.process');
     Route::get('/seller/register', 'showRegisterSeller')->name('seller.register');
@@ -85,12 +85,17 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
-// 4. AREA SELLER (Terproteksi Middleware)
+// 4. SELLER CENTER (GOD LOGIC PROTECTED)
 Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
+
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Product Management
     Route::resource('products', SellerProductController::class);
     Route::post('/products/toggle-status', [SellerProductController::class, 'toggleStatus'])->name('products.toggle');
 
+    // Order & Logistics
     Route::prefix('orders')->name('orders.')->group(function() {
         Route::get('/', [SellerController::class, 'pesanan'])->name('index');
         Route::post('/update-status', [SellerController::class, 'updateOrderStatus'])->name('updateStatus');
@@ -99,6 +104,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::post('/return/process', [SellerController::class, 'processPengembalian'])->name('return.process');
     });
 
+    // Shipping Settings
     Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
         Route::get('/pengiriman', [SellerController::class, 'pengaturanPengiriman'])->name('pengiriman');
         Route::post('/pengiriman/store', [SellerController::class, 'storePengiriman'])->name('pengiriman.store');
@@ -106,6 +112,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::delete('/pengiriman/{id}', [SellerController::class, 'destroyPengiriman'])->name('pengiriman.destroy');
     });
 
+    // Promotions & Marketing
     Route::prefix('promotion')->name('promotion.')->group(function() {
         Route::get('/discounts', [SellerController::class, 'promosi'])->name('discounts');
         Route::post('/discounts/update', [SellerController::class, 'updateDiscount'])->name('discounts.update');
@@ -115,6 +122,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::delete('/vouchers/{id}', [SellerController::class, 'destroyVoucher'])->name('vouchers.destroy');
     });
 
+    // Customer Service (Chat & Reviews)
     Route::prefix('service')->name('service.')->group(function() {
         Route::get('/chat', [SellerController::class, 'chat'])->name('chat');
         Route::get('/chat/list', [SellerController::class, 'getChatList'])->name('chat.list');
@@ -124,6 +132,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::post('/reviews/reply', [SellerController::class, 'replyReview'])->name('reviews.reply');
     });
 
+    // Finance & Wallet
     Route::prefix('finance')->name('finance.')->group(function() {
         Route::get('/income', [SellerController::class, 'income'])->name('income');
         Route::post('/payout', [SellerController::class, 'requestPayout'])->name('payout');
@@ -132,17 +141,27 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::post('/bank/destroy', [SellerController::class, 'destroyBank'])->name('bank.destroy');
     });
 
+    // Data Analytics
     Route::prefix('data')->name('data.')->group(function() {
         Route::get('/performance', [SellerController::class, 'performance'])->name('performance');
         Route::get('/health', [SellerController::class, 'health'])->name('health');
     });
 
+    // Shop Management (DEWA LOGIC CONNECTED)
     Route::prefix('shop')->name('shop.')->group(function() {
-        Route::get('/profile', function() { return "Halaman Profil Toko"; })->name('profile');
-        Route::get('/decoration', function() { return "Halaman Dekorasi Toko"; })->name('decoration');
-        Route::get('/settings', function() { return "Halaman Pengaturan Toko"; })->name('settings');
+        Route::get('/profile', [ShopController::class, 'profile'])->name('profile');
+        Route::put('/profile/update', [ShopController::class, 'updateProfile'])->name('profile.update');
+
+        // --- DEKORASI TOKO ---
+        Route::get('/decoration', [ShopController::class, 'decoration'])->name('decoration');
+        Route::get('/decoration/template', [ShopController::class, 'templateSelection'])->name('decoration.template'); // Tambahan Rute Template
+        Route::post('/decoration/update', [ShopController::class, 'updateDecoration'])->name('decoration.update'); // Diubah ke POST untuk AJAX JSON
+
+        Route::get('/settings', [ShopController::class, 'settings'])->name('settings');
+        Route::put('/settings/update', [ShopController::class, 'updateSettings'])->name('settings.update');
     });
 
+    // Point of Sale (POS)
     Route::prefix('pos')->name('pos.')->group(function() {
         Route::get('/', [SellerController::class, 'pos'])->name('index');
         Route::get('/api/products', [SellerController::class, 'getPosProducts'])->name('api.products');
@@ -151,13 +170,15 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     });
 });
 
-// 5. AREA ADMIN
+// 5. ADMIN PANEL (ENTRANCE)
 Route::get('/kunci-brankas-pks', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/kunci-brankas-pks', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 
 Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->group(function () {
+
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard')->middleware('admin.role:super,finance,cs');
 
+    // Customer Service & Store Management
     Route::middleware(['admin.role:super,cs'])->group(function () {
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/users/export', [AdminUserController::class, 'exportCsv'])->name('users.export');
@@ -179,6 +200,7 @@ Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->grou
         Route::post('/disputes/{id}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
     });
 
+    // Finance & Global Settings
     Route::middleware(['admin.role:super,finance'])->group(function () {
         Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
         Route::get('/payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
@@ -188,28 +210,21 @@ Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->grou
         Route::post('/settings/sync-komerce', [AdminSettingController::class, 'syncKomerce'])->name('settings.syncKomerce');
         Route::get('/logistics', [AdminLogisticSettingController::class, 'index'])->name('logistics.index');
         Route::post('/logistics/update', [AdminLogisticSettingController::class, 'update'])->name('logistics.update');
-
     });
 });
 
-// 6. API & AJAX & WEBHOOKS
+// 6. API, AJAX, & WEBHOOKS
 Route::get('/api/cities/{province_id}', [AuthController::class, 'getCities']);
 Route::get('/api/districts/{city_id}', [PageController::class, 'getDistrictsOnDemand']);
-
-// ---> RUTE BARU UNTUK AUTO-SYNC KECAMATAN <---
 Route::post('/api/get-or-create-district', [PageController::class, 'getOrCreateDistrict'])->name('api.get.create.district');
 
 Route::post('/api/chat', function() {
-    return response()->json(['reply' => 'Halo! Saya POTA (Versi Laravel).']);
+    return response()->json(['reply' => 'Halo! Saya POTA (AI Helper Pondasikita).']);
 })->name('api.chat');
 
-// --- ROUTE SYNC RAJAONGKIR (Dinonaktifkan agar limit Komerce tidak jebol) ---
-// Route::get('/sync-rajaongkir', [PageController::class, 'syncRajaOngkir']);
-
-// --- ROUTE WEBHOOK MIDTRANS ---
-// Route ini akan ditembak otomatis oleh server Midtrans saat pembayaran lunas/batal
+// Webhook Midtrans (Payment Gateway)
 Route::post('/webhook/midtrans', [WebhookController::class, 'midtransHandler'])->name('webhook.midtrans');
 
-// 7. EXTRA
+// 7. EXTERNAL & UTILS
 Route::get('/auth/google', function() { return "Fitur Login Google"; });
 Route::get('/lupa-password', function() { return "Halaman Lupa Password"; });
