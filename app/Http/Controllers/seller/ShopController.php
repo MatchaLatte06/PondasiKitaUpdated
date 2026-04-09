@@ -170,6 +170,13 @@ class ShopController extends Controller
         return view('seller.shop.editor', compact('toko'));
     }
 
+    public function editorDesktop()
+    {
+        $toko = auth()->user()->toko; // Mengambil data toko user yang login
+
+        // Pastikan nama view ini sesuai dengan lokasi file blade desktop Anda
+        return view('seller.shop.editor-desktop', compact('toko'));
+    }
     /**
      * Update susunan dekorasi via AJAX (Fetch API)
      */

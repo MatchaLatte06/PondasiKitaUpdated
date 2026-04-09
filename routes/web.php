@@ -155,8 +155,11 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         // --- DEKORASI TOKO ---
         Route::get('/decoration', [ShopController::class, 'decoration'])->name('decoration');
 
-        // --- TAMBAH RUTE EDITOR DI SINI ---
+        // --- RUTE EDITOR MOBILE ---
         Route::get('/decoration/editor', [ShopController::class, 'editor'])->name('decoration.editor');
+
+        // --- RUTE EDITOR DESKTOP ---
+        Route::get('/decoration/editor-desktop', [ShopController::class, 'editorDesktop'])->name('decoration.editor.desktop');
 
         Route::get('/decoration/template', [ShopController::class, 'templateSelection'])->name('decoration.template');
         Route::post('/decoration/update', [ShopController::class, 'updateDecoration'])->name('decoration.update');
