@@ -163,6 +163,13 @@ class ShopController extends Controller
         return view('seller.shop.template-selection', compact('toko'));
     }
 
+    // Halaman Editor Drag & Drop (Perbaikan Internal Server Error)
+    public function editor()
+    {
+        $toko = Auth::user()->toko;
+        return view('seller.shop.editor', compact('toko'));
+    }
+
     /**
      * Update susunan dekorasi via AJAX (Fetch API)
      */
