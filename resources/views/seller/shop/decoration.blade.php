@@ -457,8 +457,8 @@
                         timer: 1500,
                         customClass: { popup: 'rounded-3xl' }
                     }).then(() => {
-                        // Jika sudah ada route khusus editor, masukkan di sini
-                        // window.location.href = "{{ route('seller.shop.decoration') }}?platform=desktop";
+                        // MENGARAHKAN LANGSUNG KE PAGE EDIT DESKTOP
+                        window.location.href = "{{ route('seller.shop.decoration.editor.desktop') }}";
                         this.loadingBtn = null;
                     });
                 }
