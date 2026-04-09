@@ -154,8 +154,12 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
 
         // --- DEKORASI TOKO ---
         Route::get('/decoration', [ShopController::class, 'decoration'])->name('decoration');
-        Route::get('/decoration/template', [ShopController::class, 'templateSelection'])->name('decoration.template'); // Tambahan Rute Template
-        Route::post('/decoration/update', [ShopController::class, 'updateDecoration'])->name('decoration.update'); // Diubah ke POST untuk AJAX JSON
+
+        // --- TAMBAH RUTE EDITOR DI SINI ---
+        Route::get('/decoration/editor', [ShopController::class, 'editor'])->name('decoration.editor');
+
+        Route::get('/decoration/template', [ShopController::class, 'templateSelection'])->name('decoration.template');
+        Route::post('/decoration/update', [ShopController::class, 'updateDecoration'])->name('decoration.update');
 
         Route::get('/settings', [ShopController::class, 'settings'])->name('settings');
         Route::put('/settings/update', [ShopController::class, 'updateSettings'])->name('settings.update');

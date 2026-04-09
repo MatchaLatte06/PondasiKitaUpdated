@@ -2,338 +2,362 @@
 
 @section('title', 'Pilih Template Dekorasi')
 
+{{-- DATA 20 TEMPLATE PREMIUM --}}
+@php
+$templates = [
+    ['id'=>1, 'name'=>'Oceanic Premium', 'desc'=>'Profesional & Elegan', 'hc'=>'bg-gradient-to-r from-blue-600 to-indigo-700', 'ac'=>'bg-gradient-to-br from-blue-400 to-cyan-400', 'layout'=>['banner', 'kategori', 'produk1']],
+    ['id'=>2, 'name'=>'Eco Harvest', 'desc'=>'Segar & Natural', 'hc'=>'bg-gradient-to-r from-emerald-500 to-green-600', 'ac'=>'bg-gradient-to-br from-emerald-400 to-lime-400', 'layout'=>['kategori', 'carousel', 'produk1']],
+    ['id'=>3, 'name'=>'Sunset Flash', 'desc'=>'Fokus Diskon Kilat', 'hc'=>'bg-gradient-to-r from-orange-500 to-red-500', 'ac'=>'bg-gradient-to-br from-orange-400 to-red-400', 'layout'=>['video', 'produk1', 'banner']],
+    ['id'=>4, 'name'=>'Midnight Luxury', 'desc'=>'Eksklusif & Gelap', 'hc'=>'bg-gradient-to-b from-slate-800 to-black', 'ac'=>'bg-gradient-to-br from-slate-700 to-slate-900', 'layout'=>['carousel', 'kategori', 'produk1']],
+    ['id'=>5, 'name'=>'Pink Blossom', 'desc'=>'Lembut & Feminim', 'hc'=>'bg-gradient-to-r from-pink-400 to-rose-500', 'ac'=>'bg-gradient-to-br from-pink-300 to-rose-400', 'layout'=>['banner', 'produk1', 'kategori']],
+    ['id'=>6, 'name'=>'Neon Cyber', 'desc'=>'Modern & High Tech', 'hc'=>'bg-gradient-to-r from-purple-600 to-cyan-500', 'ac'=>'bg-gradient-to-br from-purple-500 to-fuchsia-500', 'layout'=>['video', 'carousel', 'produk1']],
+    ['id'=>7, 'name'=>'Minimalist Clean', 'desc'=>'Putih & Rapi', 'hc'=>'bg-white border-b border-slate-200 text-slate-800', 'ac'=>'bg-slate-100 text-slate-800 border border-slate-200', 'layout'=>['kategori', 'produk1', 'produk2']],
+    ['id'=>8, 'name'=>'Pastel Dream', 'desc'=>'Warna Warni Lembut', 'hc'=>'bg-gradient-to-r from-violet-400 to-fuchsia-400', 'ac'=>'bg-gradient-to-br from-fuchsia-300 to-pink-300', 'layout'=>['carousel', 'banner', 'produk1']],
+    ['id'=>9, 'name'=>'Earthy Warm', 'desc'=>'Coklat & Nyaman', 'hc'=>'bg-gradient-to-r from-amber-700 to-orange-800', 'ac'=>'bg-gradient-to-br from-amber-500 to-orange-400', 'layout'=>['banner', 'kategori', 'produk1']],
+    ['id'=>10, 'name'=>'Royal Gold', 'desc'=>'Mewah & Klasik', 'hc'=>'bg-gradient-to-r from-yellow-600 to-amber-600', 'ac'=>'bg-gradient-to-br from-yellow-400 to-amber-500', 'layout'=>['carousel', 'produk1', 'kategori']],
+    ['id'=>11, 'name'=>'Ruby Red', 'desc'=>'Berani & Meriah', 'hc'=>'bg-gradient-to-r from-red-600 to-rose-700', 'ac'=>'bg-gradient-to-br from-red-500 to-rose-500', 'layout'=>['video', 'kategori', 'produk1']],
+    ['id'=>12, 'name'=>'Sky Blue', 'desc'=>'Cerah & Terang', 'hc'=>'bg-gradient-to-r from-sky-400 to-blue-500', 'ac'=>'bg-gradient-to-br from-sky-300 to-blue-400', 'layout'=>['banner', 'carousel', 'produk1']],
+    ['id'=>13, 'name'=>'Vintage Retro', 'desc'=>'Klasik Nostalgia', 'hc'=>'bg-gradient-to-r from-stone-600 to-orange-800', 'ac'=>'bg-gradient-to-br from-stone-400 to-orange-300', 'layout'=>['kategori', 'produk1', 'banner']],
+    ['id'=>14, 'name'=>'Sporty Active', 'desc'=>'Kuning & Hitam', 'hc'=>'bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900', 'ac'=>'bg-gradient-to-br from-slate-800 to-black', 'layout'=>['video', 'produk1', 'produk2']],
+    ['id'=>15, 'name'=>'Lavender Magic', 'desc'=>'Ungu Elegan', 'hc'=>'bg-gradient-to-r from-indigo-500 to-purple-600', 'ac'=>'bg-gradient-to-br from-indigo-400 to-purple-400', 'layout'=>['banner', 'kategori', 'produk1']],
+    ['id'=>16, 'name'=>'Mint Fresh', 'desc'=>'Hijau Muda', 'hc'=>'bg-gradient-to-r from-teal-400 to-emerald-400', 'ac'=>'bg-gradient-to-br from-teal-300 to-emerald-300', 'layout'=>['carousel', 'kategori', 'produk1']],
+    ['id'=>17, 'name'=>'Dark Maroon', 'desc'=>'Merah Gelap', 'hc'=>'bg-gradient-to-r from-rose-900 to-red-950', 'ac'=>'bg-gradient-to-br from-rose-800 to-red-800', 'layout'=>['video', 'banner', 'produk1']],
+    ['id'=>18, 'name'=>'Silver Steel', 'desc'=>'Abu-Abu Tekno', 'hc'=>'bg-gradient-to-r from-slate-400 to-slate-600', 'ac'=>'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800', 'layout'=>['kategori', 'carousel', 'produk1']],
+    ['id'=>19, 'name'=>'Peach Perfect', 'desc'=>'Manis & Hangat', 'hc'=>'bg-gradient-to-r from-rose-400 to-orange-400', 'ac'=>'bg-gradient-to-br from-rose-300 to-orange-300', 'layout'=>['banner', 'produk1', 'kategori']],
+    ['id'=>20, 'name'=>'Galaxy Night', 'desc'=>'Neon Biru Pink', 'hc'=>'bg-gradient-to-r from-indigo-900 to-fuchsia-900', 'ac'=>'bg-gradient-to-br from-indigo-500 to-fuchsia-500', 'layout'=>['carousel', 'video', 'produk1']],
+];
+@endphp
+
 @push('styles')
 <style>
     [x-cloak] { display: none !important; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* MODAL PREVIEW HP ANTI-GEPENG */
-    .phone-container {
-        width: 330px; height: 680px; flex-shrink: 0;
-        background: #0f172a; border-radius: 45px; padding: 12px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    /* EFEK KARTU - NAIK HALUS SAAT HOVER */
+    .template-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .template-card:hover {
+        box-shadow: 0 20px 40px -5px rgba(59, 130, 246, 0.2);
+        border-color: #3b82f6; transform: translateY(-6px); z-index: 10;
+    }
+
+    /* MOCKUP HP TINGKAT DEWA (REALISTIC SMARTPHONE) */
+    .iphone-frame {
+        width: 345px; height: 720px; flex-shrink: 0;
+        background: #000000; border-radius: 50px; padding: 12px;
         position: relative; margin: 0 auto;
-        border: 2px solid #334155;
+        box-shadow: inset 0 0 6px 2px rgba(255,255,255,0.15), 0 0 0 2px #1e293b, 0 40px 80px -20px rgba(0, 0, 0, 0.8);
     }
-    .phone-screen {
+    .iphone-frame::before {
+        content: ''; position: absolute; top: 130px; left: -3px;
+        width: 3px; height: 40px; background: #334155; border-radius: 4px 0 0 4px;
+    }
+    .iphone-frame::after {
+        content: ''; position: absolute; top: 190px; left: -3px;
+        width: 3px; height: 60px; background: #334155; border-radius: 4px 0 0 4px;
+        box-shadow: 0 70px 0 0 #334155;
+    }
+    .iphone-power {
+        position: absolute; top: 160px; right: -3px;
+        width: 3px; height: 70px; background: #334155; border-radius: 0 4px 4px 0;
+    }
+    .iphone-screen {
         width: 100%; height: 100%; background: #f8fafc;
-        border-radius: 32px; overflow: hidden; position: relative;
+        border-radius: 38px; overflow: hidden; position: relative;
         display: flex; flex-direction: column;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
     }
-    .phone-notch {
-        position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-        width: 110px; height: 24px; background: #0f172a;
-        border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; z-index: 100;
+    .iphone-island {
+        position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+        width: 110px; height: 28px; background: #000000; border-radius: 20px; z-index: 100;
+        display: flex; align-items: center; justify-content: flex-end; padding: 0 8px;
+    }
+    .iphone-camera {
+        width: 14px; height: 14px; border-radius: 50%; background: #111;
+        box-shadow: inset -2px -2px 4px rgba(255,255,255,0.15); border: 1px solid #222;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
 @section('content')
 
-{{-- FULL SCREEN OVERLAY --}}
-<div class="fixed inset-0 z-[9999] bg-[#f8fafc] overflow-y-auto font-sans text-slate-800" x-data="templateManager()" x-init="initPage()" x-cloak>
+{{-- DATA DI PASSING AMAN KE JS --}}
+<script>
+    const TEMPLATES_DATA = @json($templates);
+</script>
 
-    {{-- HEADER PONDASIKITA --}}
-    <div class="bg-[#1e293b] border-b border-slate-700 h-16 px-4 md:px-8 flex justify-between items-center sticky top-0 z-40 shadow-sm">
-        <div class="flex items-center gap-4">
-            <div class="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xl shadow-lg shadow-blue-500/30">
-                <i class="mdi mdi-store"></i>
-            </div>
-            <div class="flex items-center text-sm md:text-base font-bold text-slate-400 gap-2">
-                <a href="{{ route('seller.dashboard') }}" class="hover:text-blue-400 transition-colors">Beranda</a>
-                <i class="mdi mdi-chevron-right text-slate-600"></i>
-                <a href="{{ route('seller.shop.decoration') }}" class="hover:text-blue-400 transition-colors">Dekorasi Toko</a>
-                <i class="mdi mdi-chevron-right text-slate-600"></i>
-                <span class="text-white">Dekorasi Instan</span>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 cursor-pointer hover:bg-slate-800 p-1.5 rounded-lg transition-colors text-white">
-                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black border border-blue-500">
-                    {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}
+{{-- WRAPPER UTAMA ALPINE JS --}}
+<div x-data="templateManager()" x-init="initPage()" class="font-sans text-slate-800" x-cloak>
+
+    {{-- =================================================================
+         FULL SCREEN OVERLAY (MENUTUPI SIDEBAR LAYOUT MASTER)
+         ================================================================= --}}
+    <div x-ref="mainWrapper" class="fixed inset-0 z-[9990] bg-[#f8fafc] overflow-y-auto">
+
+        {{-- 1. HEADER PONDASIKITA --}}
+        <div class="bg-[#1e293b] border-b border-slate-700 h-16 px-4 md:px-8 flex justify-between items-center sticky top-0 z-40 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xl shadow-lg shadow-blue-500/30">
+                    <i class="mdi mdi-store"></i>
                 </div>
-                <span class="text-sm font-bold hidden md:block">{{ Auth::user()->name ?? 'Seller' }}</span>
-            </div>
-        </div>
-    </div>
-
-    {{-- KONTEN HALAMAN --}}
-    <div class="px-6 lg:px-10 py-8 max-w-[1400px] mx-auto">
-
-        {{-- OPSI PEMBUATAN (HALAMAN KOSONG SAJA) --}}
-        <div class="mb-10">
-            <div @click="blankCanvas()" class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-5 shadow-sm cursor-pointer hover:shadow-md hover:border-blue-400 transition-all group max-w-md">
-                <div class="w-12 h-12 bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors rounded-full flex items-center justify-center">
-                    <i class="mdi mdi-plus text-2xl"></i>
+                <div class="flex items-center text-sm md:text-base font-bold text-slate-400 gap-2">
+                    <a href="{{ route('seller.dashboard') }}" class="hover:text-blue-400 transition-colors">Beranda</a>
+                    <i class="mdi mdi-chevron-right text-slate-600"></i>
+                    <a href="{{ route('seller.shop.decoration') }}" class="hover:text-blue-400 transition-colors">Dekorasi Toko</a>
+                    <i class="mdi mdi-chevron-right text-slate-600"></i>
+                    <span class="text-white">Dekorasi Instan</span>
                 </div>
-                <div>
-                    <h3 class="text-base font-black text-slate-900">Buat dari Halaman Kosong</h3>
-                    <p class="text-xs text-slate-500 font-medium">Rancang kanvas bebas sesuai kreativitas.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 cursor-pointer hover:bg-slate-800 p-1.5 rounded-lg transition-colors text-white">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black border border-blue-500">
+                        {{ strtoupper(substr(optional(Auth::user())->name ?? 'U', 0, 1)) }}
+                    </div>
+                    <span class="text-sm font-bold hidden md:block">{{ optional(Auth::user())->name ?? 'Seller' }}</span>
                 </div>
             </div>
         </div>
 
-        {{-- FILTER BAR --}}
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-            <h2 class="text-xl font-black text-slate-900 mb-2">Pilih Template</h2>
-            <p class="text-sm font-medium text-slate-500 mb-6">Gunakan template sebagai layout dasar untuk membantumu mendesain dekorasi toko.</p>
+        {{-- 2. KONTEN HALAMAN UTAMA --}}
+        <div class="px-6 lg:px-10 py-8 max-w-[1400px] mx-auto">
 
-            <div class="flex flex-wrap items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <div class="flex items-center gap-2 flex-1 min-w-[150px]">
-                    <span class="text-xs font-bold text-slate-500 uppercase">Kategori</span>
-                    <select class="w-full bg-white border border-slate-300 text-sm font-bold rounded px-3 py-2 outline-none"><option>Semua</option></select>
+            {{-- OPSI HALAMAN KOSONG --}}
+            <div class="mb-10">
+                <div x-on:click.prevent="blankCanvas()" class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-5 shadow-sm cursor-pointer hover:shadow-md hover:border-blue-400 transition-all group max-w-md">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors rounded-full flex items-center justify-center">
+                        <i class="mdi mdi-plus text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-slate-900">Buat dari Halaman Kosong</h3>
+                        <p class="text-xs text-slate-500 font-medium">Rancang kanvas bebas sesuai kreativitas.</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2 flex-1 min-w-[150px]">
-                    <span class="text-xs font-bold text-slate-500 uppercase">Tujuan</span>
-                    <select class="w-full bg-white border border-slate-300 text-sm font-bold rounded px-3 py-2 outline-none"><option>Semua</option></select>
+            </div>
+
+            {{-- FILTER BAR --}}
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                <h2 class="text-xl font-black text-slate-900 mb-2">Pilih Dari 20 Template Premium</h2>
+                <p class="text-sm font-medium text-slate-500 mb-6">Setiap template memiliki struktur komponen yang unik untuk memaksimalkan penjualan.</p>
+
+                <div class="flex flex-wrap items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div class="flex items-center gap-2 flex-1 min-w-[150px]">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Kategori</span>
+                        <select class="w-full bg-white border border-slate-300 text-sm font-bold rounded px-3 py-2 outline-none"><option>Semua Kategori</option></select>
+                    </div>
+                    <div class="flex items-center gap-2 flex-1 min-w-[150px]">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Tema</span>
+                        <select class="w-full bg-white border border-slate-300 text-sm font-bold rounded px-3 py-2 outline-none"><option>Semua Warna</option></select>
+                    </div>
+                    <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Urutkan</span>
+                        <select class="w-full bg-white border border-slate-300 text-sm font-bold rounded px-3 py-2 outline-none"><option>Paling Populer</option></select>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2 flex-1 min-w-[150px]">
-                    <span class="text-xs font-bold text-slate-500 uppercase">Tema</span>
-                    <select class="w-full bg-white border border-slate-300 text-sm font-bold rounded px-3 py-2 outline-none"><option>Semua</option></select>
-                </div>
-                <div class="flex items-center gap-2 flex-1 min-w-[200px]">
-                    <span class="text-xs font-bold text-slate-500 uppercase">Urutkan</span>
-                    <select class="w-full bg-white border border-slate-300 text-sm font-bold rounded px-3 py-2 outline-none"><option>Direkomendasikan</option></select>
-                </div>
+            </div>
+
+            {{-- 3. GRID 20 TEMPLATES (MENGGUNAKAN BLADE FOREACH MURNI) --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+                @foreach($templates as $tpl)
+                    <div class="template-card bg-white rounded-[2rem] border border-slate-200 p-2.5 flex flex-col relative group">
+
+                        {{-- Visual Mockup Card --}}
+                        <div class="h-[420px] w-full bg-slate-100 relative rounded-3xl overflow-hidden border border-slate-200 flex flex-col pointer-events-none">
+
+                            {{-- Header Mockup --}}
+                            <div class="h-28 w-full p-4 flex items-end relative {{ $tpl['hc'] }}">
+                                <div class="flex gap-2 items-center relative z-10">
+                                    <div class="w-8 h-8 rounded-full bg-white/20 border border-white/30"></div>
+                                    <div class="w-20 h-2.5 bg-white/40 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            {{-- Layout Mockup --}}
+                            <div class="flex-1 p-2 space-y-2 bg-slate-50 overflow-hidden relative flex flex-col pointer-events-none">
+                                @foreach($tpl['layout'] as $comp)
+                                    @if($comp === 'banner')
+                                        <div class="w-full h-24 rounded-lg flex items-center justify-center text-white/80 text-[10px] font-black shadow-sm {{ $tpl['ac'] }}">BANNER</div>
+                                    @elseif($comp === 'carousel')
+                                        <div class="w-full h-24 rounded-lg flex items-center justify-center text-white/80 text-[10px] font-black shadow-sm border border-slate-300 {{ $tpl['ac'] }}">CAROUSEL</div>
+                                    @elseif($comp === 'video')
+                                        <div class="w-full h-24 bg-slate-800 rounded-lg flex items-center justify-center text-red-500 shadow-sm border border-slate-300"><i class="mdi mdi-play-circle text-3xl"></i></div>
+                                    @elseif($comp === 'kategori')
+                                        <div class="grid grid-cols-4 gap-1.5">
+                                            <div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div>
+                                            <div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div>
+                                        </div>
+                                    @elseif($comp === 'produk1' || $comp === 'produk2')
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div class="h-20 bg-white rounded-lg border border-slate-100 p-1.5 shadow-sm"><div class="h-10 bg-slate-100 rounded mb-1"></div><div class="w-full h-1.5 bg-slate-200 rounded"></div></div>
+                                            <div class="h-20 bg-white rounded-lg border border-slate-100 p-1.5 shadow-sm"><div class="h-10 bg-slate-100 rounded mb-1"></div><div class="w-full h-1.5 bg-slate-200 rounded"></div></div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- OVERLAY HOVER MURNI TAILWIND (ANTI BUG KLIK & VUE.JS) --}}
+                        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-[2px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto flex flex-col items-center justify-center gap-3 px-6 z-30 transition-all duration-300 rounded-[1.5rem]">
+                            <button type="button" x-on:click.stop="applyTemplate({{ $tpl['id'] }})" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 w-full py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl shadow-xl outline-none">Gunakan Template</button>
+                            <button type="button" x-on:click.stop="openPreview({{ $tpl['id'] }})" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-150 w-full py-3 bg-white hover:bg-slate-100 text-slate-800 text-sm font-bold rounded-xl shadow-xl outline-none">Lihat Preview</button>
+                        </div>
+
+                        {{-- Teks Info Template --}}
+                        <div class="mt-3 mb-2 px-2 text-center pointer-events-none">
+                            <h5 class="font-black text-slate-800 text-sm">{{ $tpl['name'] }}</h5>
+                            <p class="text-[10px] text-slate-400 font-bold">{{ $tpl['desc'] }}</p>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
 
-        {{-- GRID 6 TEMPLATES --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
-
-            {{-- TPL 1: OCEANIC PREMIUM --}}
-            <div class="bg-white rounded-[2rem] border border-slate-200 p-2.5 flex flex-col relative overflow-hidden group hover:shadow-2xl hover:border-blue-500 transition-all duration-300">
-                <div class="h-[420px] w-full bg-slate-100 relative rounded-3xl overflow-hidden border border-slate-200 flex flex-col">
-                    <div class="h-32 w-full bg-gradient-to-r from-blue-600 to-indigo-700 p-4 flex items-end"><div class="flex gap-2 items-center"><div class="w-10 h-10 rounded-full bg-white/20"></div><div class="w-20 h-2.5 bg-white/40 rounded-full"></div></div></div>
-                    <div class="flex-1 p-2.5 bg-slate-50 space-y-2">
-                        <div class="w-full h-24 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-white/80 text-xs font-black shadow-sm">BANNER UTAMA</div>
-                        <div class="grid grid-cols-4 gap-1.5"><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div></div>
-                        <div class="grid grid-cols-2 gap-2"><div class="h-28 bg-white rounded-xl border border-slate-200 p-2 shadow-sm"><div class="h-16 bg-slate-100 rounded-lg mb-2"></div><div class="w-full h-2 bg-slate-200 rounded"></div></div><div class="h-28 bg-white rounded-xl border border-slate-200 p-2 shadow-sm"><div class="h-16 bg-slate-100 rounded-lg mb-2"></div><div class="w-full h-2 bg-slate-200 rounded"></div></div></div>
-                    </div>
-
-                    {{-- OVERLAY MURNI TAILWIND --}}
-                    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 px-6 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        <button @click.prevent="applyTemplate(1, 'Oceanic Premium')" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg">Tampilkan</button>
-                        <button @click.prevent="openPreview(1)" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100 w-full py-2.5 bg-white hover:bg-slate-100 text-slate-800 text-sm font-bold rounded-xl shadow-lg">Preview</button>
-                    </div>
-                </div>
-                <div class="mt-3 mb-2 px-2 text-center"><h5 class="font-black text-slate-800 text-sm">Oceanic Premium</h5></div>
-            </div>
-
-            {{-- TPL 2: ECO HARVEST --}}
-            <div class="bg-white rounded-[2rem] border border-slate-200 p-2.5 flex flex-col relative overflow-hidden group hover:shadow-2xl hover:border-emerald-500 transition-all duration-300">
-                <div class="h-[420px] w-full bg-slate-100 relative rounded-3xl overflow-hidden border border-slate-200 flex flex-col">
-                    <div class="h-32 w-full bg-gradient-to-r from-emerald-500 to-green-600 p-4 flex items-end"><div class="flex gap-2 items-center"><div class="w-10 h-10 rounded-full bg-white/20"></div><div class="w-20 h-2.5 bg-white/40 rounded-full"></div></div></div>
-                    <div class="flex-1 p-2.5 bg-slate-50 space-y-2">
-                        <div class="grid grid-cols-4 gap-1.5"><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div></div>
-                        <div class="w-full h-24 rounded-xl bg-gradient-to-br from-emerald-300 to-teal-400 flex items-center justify-center text-white/80 text-xs font-black shadow-sm">PROMO SPESIAL</div>
-                        <div class="w-full h-28 bg-white rounded-xl border border-slate-200 p-2 shadow-sm flex gap-2"><div class="w-20 h-full bg-slate-100 rounded-lg"></div><div class="flex-1"><div class="w-full h-2 bg-slate-200 rounded mb-2"></div><div class="w-1/2 h-2 bg-slate-200 rounded"></div></div></div>
-                    </div>
-
-                    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 px-6 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        <button @click.prevent="applyTemplate(2, 'Eco Harvest')" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg">Tampilkan</button>
-                        <button @click.prevent="openPreview(2)" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100 w-full py-2.5 bg-white hover:bg-slate-100 text-slate-800 text-sm font-bold rounded-xl shadow-lg">Preview</button>
-                    </div>
-                </div>
-                <div class="mt-3 mb-2 px-2 text-center"><h5 class="font-black text-slate-800 text-sm">Eco Harvest</h5></div>
-            </div>
-
-            {{-- TPL 3: SUNSET BOLD --}}
-            <div class="bg-white rounded-[2rem] border border-slate-200 p-2.5 flex flex-col relative overflow-hidden group hover:shadow-2xl hover:border-orange-500 transition-all duration-300">
-                <div class="h-[420px] w-full bg-slate-100 relative rounded-3xl overflow-hidden border border-slate-200 flex flex-col">
-                    <div class="h-32 w-full bg-gradient-to-r from-orange-500 to-red-500 p-4 flex items-end"><div class="flex gap-2 items-center"><div class="w-10 h-10 rounded-full bg-white/20"></div><div class="w-20 h-2.5 bg-white/40 rounded-full"></div></div></div>
-                    <div class="flex-1 p-2.5 bg-slate-50 space-y-2">
-                        <div class="w-full h-32 bg-slate-800 rounded-xl shadow-sm flex items-center justify-center border-2 border-slate-300"><i class="mdi mdi-play-circle text-4xl text-red-500"></i></div>
-                        <div class="grid grid-cols-2 gap-2"><div class="h-28 bg-white rounded-xl border border-slate-200 p-2 shadow-sm"><div class="h-16 bg-slate-100 rounded-lg mb-2"></div><div class="w-full h-2 bg-slate-200 rounded"></div></div><div class="h-28 bg-white rounded-xl border border-slate-200 p-2 shadow-sm"><div class="h-16 bg-slate-100 rounded-lg mb-2"></div><div class="w-full h-2 bg-slate-200 rounded"></div></div></div>
-                    </div>
-
-                    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 px-6 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        <button @click.prevent="applyTemplate(3, 'Sunset Bold')" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg">Tampilkan</button>
-                        <button @click.prevent="openPreview(3)" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100 w-full py-2.5 bg-white hover:bg-slate-100 text-slate-800 text-sm font-bold rounded-xl shadow-lg">Preview</button>
-                    </div>
-                </div>
-                <div class="mt-3 mb-2 px-2 text-center"><h5 class="font-black text-slate-800 text-sm">Sunset Bold (Video)</h5></div>
-            </div>
-
-            {{-- TPL 4: MIDNIGHT LUXURY --}}
-            <div class="bg-white rounded-[2rem] border border-slate-200 p-2.5 flex flex-col relative overflow-hidden group hover:shadow-2xl hover:border-slate-800 transition-all duration-300">
-                <div class="h-[420px] w-full bg-slate-100 relative rounded-3xl overflow-hidden border border-slate-200 flex flex-col">
-                    <div class="h-32 w-full bg-gradient-to-b from-slate-800 to-black p-4 flex items-end"><div class="flex gap-2 items-center"><div class="w-10 h-10 rounded-full bg-white/20"></div><div class="w-20 h-2.5 bg-white/40 rounded-full"></div></div></div>
-                    <div class="flex-1 p-2.5 bg-slate-50 space-y-2">
-                        <div class="w-full h-24 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex flex-col items-center justify-center text-white/80 text-xs font-black shadow-sm"><i class="mdi mdi-view-carousel text-2xl mb-1"></i> CAROUSEL</div>
-                        <div class="w-full h-28 bg-white rounded-xl border border-slate-200 p-2 shadow-sm flex gap-2"><div class="flex-1"><div class="w-full h-2 bg-slate-200 rounded mb-2"></div><div class="w-1/2 h-2 bg-slate-200 rounded"></div></div><div class="w-20 h-full bg-slate-100 rounded-lg"></div></div>
-                    </div>
-
-                    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 px-6 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        <button @click.prevent="applyTemplate(4, 'Midnight Luxury')" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg">Tampilkan</button>
-                        <button @click.prevent="openPreview(4)" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100 w-full py-2.5 bg-white hover:bg-slate-100 text-slate-800 text-sm font-bold rounded-xl shadow-lg">Preview</button>
-                    </div>
-                </div>
-                <div class="mt-3 mb-2 px-2 text-center"><h5 class="font-black text-slate-800 text-sm">Midnight Luxury</h5></div>
-            </div>
-
-            {{-- TPL 5: PINK BLOSSOM --}}
-            <div class="bg-white rounded-[2rem] border border-slate-200 p-2.5 flex flex-col relative overflow-hidden group hover:shadow-2xl hover:border-pink-500 transition-all duration-300">
-                <div class="h-[420px] w-full bg-slate-100 relative rounded-3xl overflow-hidden border border-slate-200 flex flex-col">
-                    <div class="h-32 w-full bg-gradient-to-r from-pink-400 to-rose-500 p-4 flex items-end"><div class="flex gap-2 items-center"><div class="w-10 h-10 rounded-full bg-white/20"></div><div class="w-20 h-2.5 bg-white/40 rounded-full"></div></div></div>
-                    <div class="flex-1 p-2.5 bg-slate-50 space-y-2">
-                        <div class="grid grid-cols-4 gap-1.5"><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div><div class="h-10 bg-white rounded-lg border border-slate-200 shadow-sm"></div></div>
-                        <div class="w-full h-24 rounded-xl bg-gradient-to-br from-pink-300 to-rose-400 flex items-center justify-center text-white/80 text-xs font-black shadow-sm">HOT DEALS</div>
-                        <div class="grid grid-cols-2 gap-2"><div class="h-20 bg-white rounded-xl border border-slate-200 p-1 shadow-sm"><div class="h-12 bg-slate-100 rounded-lg mb-1"></div><div class="w-full h-2 bg-slate-200 rounded"></div></div><div class="h-20 bg-white rounded-xl border border-slate-200 p-1 shadow-sm"><div class="h-12 bg-slate-100 rounded-lg mb-1"></div><div class="w-full h-2 bg-slate-200 rounded"></div></div></div>
-                    </div>
-
-                    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 px-6 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        <button @click.prevent="applyTemplate(5, 'Pink Blossom')" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg">Tampilkan</button>
-                        <button @click.prevent="openPreview(5)" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100 w-full py-2.5 bg-white hover:bg-slate-100 text-slate-800 text-sm font-bold rounded-xl shadow-lg">Preview</button>
-                    </div>
-                </div>
-                <div class="mt-3 mb-2 px-2 text-center"><h5 class="font-black text-slate-800 text-sm">Pink Blossom</h5></div>
-            </div>
-
-            {{-- TPL 6: NEON CYBER --}}
-            <div class="bg-white rounded-[2rem] border border-slate-200 p-2.5 flex flex-col relative overflow-hidden group hover:shadow-2xl hover:border-cyan-500 transition-all duration-300">
-                <div class="h-[420px] w-full bg-slate-100 relative rounded-3xl overflow-hidden border border-slate-200 flex flex-col">
-                    <div class="h-32 w-full bg-gradient-to-r from-purple-600 to-cyan-500 p-4 flex items-end"><div class="flex gap-2 items-center"><div class="w-10 h-10 rounded-full bg-white/20"></div><div class="w-20 h-2.5 bg-white/40 rounded-full"></div></div></div>
-                    <div class="flex-1 p-2.5 bg-slate-50 flex flex-col gap-2">
-                        <div class="w-full flex-1 bg-slate-800 rounded-xl shadow-sm flex flex-col items-center justify-center border-2 border-slate-300 relative"><i class="mdi mdi-play-circle text-4xl text-cyan-400 absolute"></i><div class="absolute bottom-2 left-2 text-[8px] text-white">NEW ARRIVAL</div></div>
-                        <div class="h-20 bg-white rounded-xl border border-slate-200 p-2 shadow-sm flex items-center justify-between"><div class="w-12 h-12 bg-slate-100 rounded-full"></div><div class="w-12 h-12 bg-slate-100 rounded-full"></div><div class="w-12 h-12 bg-slate-100 rounded-full"></div></div>
-                    </div>
-
-                    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 px-6 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        <button @click.prevent="applyTemplate(6, 'Neon Cyber')" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg">Tampilkan</button>
-                        <button @click.prevent="openPreview(6)" class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-100 w-full py-2.5 bg-white hover:bg-slate-100 text-slate-800 text-sm font-bold rounded-xl shadow-lg">Preview</button>
-                    </div>
-                </div>
-                <div class="mt-3 mb-2 px-2 text-center"><h5 class="font-black text-slate-800 text-sm">Neon Cyber</h5></div>
-            </div>
-
-        </div>
     </div>
 
     {{-- =================================================================
-        MODAL LIVE PREVIEW (HP MOCKUP - ANTI GEPENG)
-        ================================================================= --}}
-    <div x-show="isPreviewOpen" class="fixed inset-0 z-[100000] overflow-y-auto" style="display: none;" x-cloak>
-        <div x-show="isPreviewOpen" x-transition.opacity.duration.300ms class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm" @click="closePreview()"></div>
+         MODAL LIVE PREVIEW (TELEPORT KE BODY)
+         ================================================================= --}}
+    <template x-teleport="body">
+        <div x-show="isPreviewOpen" class="fixed inset-0 z-[100000] flex items-center justify-center p-4 overflow-y-auto" style="display: none;" x-cloak>
 
-        <div class="min-h-screen flex items-center justify-center p-4">
+            {{-- Backdrop Gelap Ekstra --}}
+            <div x-show="isPreviewOpen" x-transition.opacity.duration.300ms class="fixed inset-0 bg-slate-900/90 backdrop-blur-md" x-on:click="closePreview()"></div>
+
+            {{-- Wrapper Bebas Scroll Utama --}}
             <div x-show="isPreviewOpen"
                  x-transition:enter="transition ease-out duration-400 transform"
                  x-transition:enter-start="opacity-0 translate-y-12 scale-95"
                  x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                 class="relative flex-shrink-0 w-[360px] h-[720px] bg-white rounded-[2.5rem] shadow-2xl flex flex-col z-10 overflow-hidden my-8">
+                 x-transition:leave="transition ease-in duration-300"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-12 scale-95"
+                 class="relative z-10 w-full flex flex-col items-center justify-center min-h-screen py-10">
 
-                {{-- Header Modal --}}
-                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-20">
-                    <h2 class="text-base font-black text-slate-800" x-text="'Preview: ' + previewData.name"></h2>
-                    <button @click="closePreview()" class="text-slate-400 hover:text-red-500 outline-none"><i class="mdi mdi-close text-2xl"></i></button>
+                {{-- TOMBOL TUTUP & JUDUL (Di Atas HP) --}}
+                <div class="w-[345px] flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-black text-white drop-shadow-md" x-text="'Preview: ' + (activeTemplate ? activeTemplate.name : '')"></h2>
+                    <button x-on:click="closePreview()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-red-500 text-white border border-white/20 flex items-center justify-center transition-colors shadow-lg outline-none">
+                        <i class="mdi mdi-close text-xl"></i>
+                    </button>
                 </div>
 
-                {{-- Phone Wrapper --}}
-                <div class="flex-1 bg-slate-100 p-6 flex justify-center overflow-y-auto hide-scrollbar">
-                    <div class="phone-container">
-                        <div class="phone-notch"></div>
-                        <div class="phone-screen">
+                {{-- BENTUK FISIK HP IPHONE DEWA --}}
+                <div class="iphone-frame">
+                    <div class="iphone-power"></div>
+                    <div class="iphone-screen">
 
-                            {{-- Status Bar --}}
-                            <div class="h-7 w-full bg-black/20 flex justify-between items-center px-6 pt-1.5 text-[10px] font-black z-50 text-white absolute top-0">
-                                <span x-text="currentTime"></span>
-                                <div class="flex gap-1.5"><i class="mdi mdi-signal"></i><i class="mdi mdi-wifi"></i><i class="mdi mdi-battery"></i></div>
+                        {{-- DYNAMIC ISLAND --}}
+                        <div class="iphone-island">
+                            <div class="iphone-camera"></div>
+                        </div>
+
+                        {{-- Status Bar Text --}}
+                        <div class="h-8 w-full bg-transparent flex justify-between items-center px-7 pt-1 text-[10px] font-black z-[101] text-white absolute top-0 pointer-events-none">
+                            <span x-text="currentTime"></span>
+                            <div class="flex gap-1.5"><i class="mdi mdi-signal"></i><i class="mdi mdi-wifi"></i><i class="mdi mdi-battery"></i></div>
+                        </div>
+
+                        {{-- KONTEN LAYAR DALAM HP --}}
+                        <div class="flex-1 overflow-y-auto hide-scrollbar bg-slate-50 flex flex-col pb-10 relative z-10 pt-2">
+
+                            {{-- HEADER TOKO --}}
+                            <div class="h-48 p-4 text-white flex flex-col justify-end relative shadow-lg pt-12" :class="activeTemplate ? activeTemplate.hc : 'bg-slate-800'">
+                                <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+
+                                <div class="absolute top-10 left-4 right-4 flex justify-between items-center z-10">
+                                    <i class="mdi mdi-arrow-left text-lg"></i>
+                                    <div class="bg-black/20 rounded-full px-3 py-1.5 flex items-center gap-2 text-[10px] w-3/5 backdrop-blur-sm border border-white/20"><i class="mdi mdi-magnify text-white/70"></i> Cari di toko</div>
+                                    <i class="mdi mdi-dots-vertical text-lg"></i>
+                                </div>
+
+                                <div class="relative z-10 flex items-center gap-3">
+                                    <div class="w-14 h-14 rounded-full border-2 border-white/50 bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl font-black shadow-lg">
+                                        {{ strtoupper(substr(optional($toko ?? null)->nama_toko ?? 'T', 0, 1)) }}
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-black truncate drop-shadow-md">{{ optional($toko ?? null)->nama_toko ?? 'NAMA TOKO' }}</div>
+                                        <div class="text-[9px] font-bold text-white/90 flex items-center gap-1 mt-0.5 drop-shadow"><i class="mdi mdi-star text-amber-400"></i> 5.0 | 1.9K Pengikut</div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="flex-1 overflow-y-auto hide-scrollbar bg-slate-50 flex flex-col pb-10">
+                            {{-- TABS --}}
+                            <div class="flex bg-white shadow-sm border-b border-slate-100 z-20 sticky top-0">
+                                <div class="flex-1 py-3 text-center text-[12px] font-black border-b-2 border-blue-600 text-blue-600">Beranda</div>
+                                <div class="flex-1 py-3 text-center text-[12px] font-bold text-slate-500">Produk</div>
+                            </div>
 
-                                {{-- HEADER TOKO DINAMIS --}}
-                                <div class="h-44 p-4 text-white flex flex-col justify-end relative shadow-md pt-10" :class="previewData.headerClass">
-                                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                                    <div class="absolute top-8 left-4 right-4 flex justify-between items-center z-10">
-                                        <i class="mdi mdi-arrow-left text-lg"></i>
-                                        <div class="bg-black/20 rounded px-3 py-1.5 flex items-center gap-1 text-[10px] w-3/5 backdrop-blur-sm border border-white/20"><i class="mdi mdi-magnify"></i> Cari di toko</div>
-                                        <i class="mdi mdi-dots-vertical text-lg"></i>
+                            {{-- RENDER KOMPONEN DINAMIS MENGGUNAKAN FLEX ORDER --}}
+                            <div class="p-3 flex flex-col gap-3">
+
+                                {{-- Komponen Banner --}}
+                                <div x-show="hasComp('banner')" :style="`order: ${getOrder('banner')}`" class="w-full h-40 rounded-2xl shadow-md flex flex-col items-center justify-center p-4 border border-white/20" :class="activeTemplate ? activeTemplate.ac : 'bg-slate-200'">
+                                    <h3 class="text-white text-2xl font-black text-center leading-tight drop-shadow-md italic">PROMO SPESIAL</h3>
+                                    <button class="px-5 py-2 mt-2 bg-white text-slate-900 text-[10px] font-black rounded-full shadow-lg">Klaim Sekarang</button>
+                                </div>
+
+                                {{-- Komponen Carousel --}}
+                                <div x-show="hasComp('carousel')" :style="`order: ${getOrder('carousel')}`" class="w-full h-44 rounded-2xl shadow-md flex flex-col items-center justify-center relative overflow-hidden" :class="activeTemplate ? activeTemplate.ac : 'bg-slate-200'">
+                                    <div class="absolute inset-0 bg-black opacity-30"></div>
+                                    <i class="mdi mdi-view-carousel text-5xl text-white relative z-10 drop-shadow"></i>
+                                    <div class="flex gap-1.5 absolute bottom-3 z-10"><div class="w-2 h-2 bg-white rounded-full"></div><div class="w-2 h-2 bg-white/40 rounded-full"></div><div class="w-2 h-2 bg-white/40 rounded-full"></div></div>
+                                </div>
+
+                                {{-- Komponen Video --}}
+                                <div x-show="hasComp('video')" :style="`order: ${getOrder('video')}`" class="w-full h-48 bg-slate-900 rounded-2xl shadow-md flex items-center justify-center relative overflow-hidden border border-slate-700">
+                                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80" class="absolute inset-0 w-full h-full object-cover opacity-60">
+                                    <i class="mdi mdi-play-circle text-red-500 text-6xl drop-shadow-lg relative z-10"></i>
+                                </div>
+
+                                {{-- Komponen Kategori --}}
+                                <div x-show="hasComp('kategori')" :style="`order: ${getOrder('kategori')}`" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                                    <h4 class="text-[12px] font-black text-slate-800 mb-3"><i class="mdi mdi-shape text-blue-500"></i> Kategori Pilihan</h4>
+                                    <div class="grid grid-cols-4 gap-2">
+                                        <div class="flex flex-col items-center gap-1.5"><div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 shadow-inner"><i class="mdi mdi-shoe-sneaker text-slate-400 text-2xl"></i></div><span class="text-[9px] font-bold text-slate-600">Sepatu</span></div>
+                                        <div class="flex flex-col items-center gap-1.5"><div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 shadow-inner"><i class="mdi mdi-tshirt-crew text-slate-400 text-2xl"></i></div><span class="text-[9px] font-bold text-slate-600">Pakaian</span></div>
+                                        <div class="flex flex-col items-center gap-1.5"><div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 shadow-inner"><i class="mdi mdi-watch text-slate-400 text-2xl"></i></div><span class="text-[9px] font-bold text-slate-600">Aksesoris</span></div>
+                                        <div class="flex flex-col items-center gap-1.5"><div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 shadow-inner"><i class="mdi mdi-dots-horizontal text-slate-400 text-2xl"></i></div><span class="text-[9px] font-bold text-slate-600">Lainnya</span></div>
                                     </div>
-                                    <div class="relative z-10 flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-full border-2 border-white/50 bg-white/20 backdrop-blur-sm flex items-center justify-center text-xl font-black shadow-lg">T</div>
-                                        <div class="flex-1">
-                                            <div class="text-sm font-black truncate">{{ $toko->nama_toko ?? 'NAMA TOKO' }}</div>
-                                            <div class="text-[9px] font-bold text-white/90 flex items-center gap-1 mt-0.5"><i class="mdi mdi-star text-amber-400"></i> 5.0 | 1.9K Pengikut</div>
+                                </div>
+
+                                {{-- Komponen Produk 1 --}}
+                                <div x-show="hasComp('produk1')" :style="`order: ${getOrder('produk1')}`" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mt-2">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h4 class="text-[12px] font-black text-slate-800"><i class="mdi mdi-fire text-red-500"></i> Rekomendasi Utama</h4>
+                                        <span class="text-[9px] font-bold text-slate-400">LIHAT SEMUA <i class="mdi mdi-chevron-right"></i></span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="border border-slate-100 rounded-xl p-2 shadow-sm bg-slate-50">
+                                            <div class="h-32 bg-white rounded-lg mb-2 flex items-center justify-center border border-slate-100"><i class="mdi mdi-image-outline text-3xl text-slate-300"></i></div>
+                                            <div class="text-[10px] font-bold text-slate-700 truncate">Produk Unggulan A</div><div class="text-[12px] font-black text-blue-600 mt-1">Rp 150.000</div>
+                                        </div>
+                                        <div class="border border-slate-100 rounded-xl p-2 shadow-sm bg-slate-50">
+                                            <div class="h-32 bg-white rounded-lg mb-2 flex items-center justify-center border border-slate-100"><i class="mdi mdi-image-outline text-3xl text-slate-300"></i></div>
+                                            <div class="text-[10px] font-bold text-slate-700 truncate">Produk Unggulan B</div><div class="text-[12px] font-black text-blue-600 mt-1">Rp 250.000</div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {{-- TABS --}}
-                                <div class="flex bg-white shadow-sm border-b border-slate-100 z-20 sticky top-0">
-                                    <div class="flex-1 py-3 text-center text-[11px] font-black border-b-2 border-blue-600 text-blue-600">Beranda</div>
-                                    <div class="flex-1 py-3 text-center text-[11px] font-bold text-slate-500">Produk</div>
-                                </div>
-
-                                {{-- KONTEN PREVIEW MURNI (ANTI VUE CONFLICT) --}}
-                                <div class="p-3 space-y-3">
-
-                                    {{-- LAYOUT 1: OCEANIC --}}
-                                    <div x-show="currentPreviewId === 1" class="space-y-3">
-                                        <div class="w-full h-36 rounded-xl shadow-md flex items-center justify-center text-white text-xl font-black bg-gradient-to-br from-blue-400 to-cyan-400">PROMO SPESIAL</div>
-                                        <div class="grid grid-cols-4 gap-2">
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-slate-100"><i class="mdi mdi-shoe-sneaker text-slate-400"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-slate-100"><i class="mdi mdi-tshirt-crew text-slate-400"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-slate-100"><i class="mdi mdi-watch text-slate-400"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-slate-100"><i class="mdi mdi-dots-horizontal text-slate-400"></i></div>
+                                {{-- Komponen Produk 2 --}}
+                                <div x-show="hasComp('produk2')" :style="`order: ${getOrder('produk2')}`" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h4 class="text-[12px] font-black text-slate-800"><i class="mdi mdi-tag text-blue-500"></i> Pilihan Lainnya</h4>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="border border-slate-100 rounded-xl p-2 shadow-sm bg-slate-50">
+                                            <div class="h-32 bg-white rounded-lg mb-2 flex items-center justify-center border border-slate-100"><i class="mdi mdi-image-outline text-3xl text-slate-300"></i></div>
+                                            <div class="text-[10px] font-bold text-slate-700 truncate">Produk Regular C</div><div class="text-[12px] font-black text-blue-600 mt-1">Rp 99.000</div>
                                         </div>
-                                        <div class="bg-white p-3 rounded-xl shadow-sm">
-                                            <h4 class="text-[11px] font-black text-slate-800 mb-2">Produk Baru</h4>
-                                            <div class="grid grid-cols-2 gap-2"><div class="h-32 bg-slate-50 rounded-lg border border-slate-100"></div><div class="h-32 bg-slate-50 rounded-lg border border-slate-100"></div></div>
+                                        <div class="border border-slate-100 rounded-xl p-2 shadow-sm bg-slate-50">
+                                            <div class="h-32 bg-white rounded-lg mb-2 flex items-center justify-center border border-slate-100"><i class="mdi mdi-image-outline text-3xl text-slate-300"></i></div>
+                                            <div class="text-[10px] font-bold text-slate-700 truncate">Produk Regular D</div><div class="text-[12px] font-black text-blue-600 mt-1">Rp 120.000</div>
                                         </div>
                                     </div>
-
-                                    {{-- LAYOUT 2: ECO HARVEST --}}
-                                    <div x-show="currentPreviewId === 2" class="space-y-3">
-                                        <div class="grid grid-cols-4 gap-2">
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-emerald-100 text-emerald-500"><i class="mdi mdi-leaf"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-emerald-100 text-emerald-500"><i class="mdi mdi-food-apple"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-emerald-100 text-emerald-500"><i class="mdi mdi-bottle-tonic"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-emerald-100 text-emerald-500"><i class="mdi mdi-dots-horizontal"></i></div>
-                                        </div>
-                                        <div class="w-full h-32 rounded-xl shadow-md flex items-center justify-center text-white text-xl font-black bg-gradient-to-br from-emerald-400 to-lime-400">ORGANIC SALE</div>
-                                        <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-100 flex gap-2"><div class="w-24 h-24 bg-slate-100 rounded-lg"></div><div class="flex-1 py-2"><div class="w-full h-2 bg-slate-200 mb-2"></div><div class="w-1/2 h-2 bg-slate-200"></div></div></div>
-                                    </div>
-
-                                    {{-- LAYOUT 3: SUNSET BOLD --}}
-                                    <div x-show="currentPreviewId === 3" class="space-y-3">
-                                        <div class="w-full h-48 bg-slate-900 rounded-xl shadow-md flex items-center justify-center relative overflow-hidden border-2 border-orange-500">
-                                            <i class="mdi mdi-play-circle text-orange-500 text-5xl"></i>
-                                            <div class="absolute bottom-2 left-3 text-white text-[10px] font-bold">Watch Video</div>
-                                        </div>
-                                        <div class="grid grid-cols-2 gap-2"><div class="h-32 bg-white rounded-xl shadow-sm border border-slate-100"></div><div class="h-32 bg-white rounded-xl shadow-sm border border-slate-100"></div></div>
-                                    </div>
-
-                                    {{-- LAYOUT 4: MIDNIGHT LUXURY --}}
-                                    <div x-show="currentPreviewId === 4" class="space-y-3">
-                                        <div class="w-full h-32 rounded-xl shadow-md flex flex-col items-center justify-center text-white bg-gradient-to-br from-slate-700 to-slate-900">
-                                            <i class="mdi mdi-view-carousel text-3xl"></i><span class="text-[10px] mt-1 font-bold">LUXURY CAROUSEL</span>
-                                        </div>
-                                        <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-100 flex gap-2"><div class="flex-1 py-2"><div class="w-full h-2 bg-slate-200 mb-2"></div><div class="w-1/2 h-2 bg-slate-200"></div></div><div class="w-24 h-24 bg-slate-100 rounded-lg"></div></div>
-                                    </div>
-
-                                    {{-- LAYOUT 5: PINK BLOSSOM --}}
-                                    <div x-show="currentPreviewId === 5" class="space-y-3">
-                                        <div class="grid grid-cols-4 gap-2">
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-pink-100 text-pink-500"><i class="mdi mdi-lipstick"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-pink-100 text-pink-500"><i class="mdi mdi-ring"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-pink-100 text-pink-500"><i class="mdi mdi-hanger"></i></div>
-                                            <div class="h-14 bg-white rounded-xl shadow-sm flex items-center justify-center border border-pink-100 text-pink-500"><i class="mdi mdi-dots-horizontal"></i></div>
-                                        </div>
-                                        <div class="w-full h-32 rounded-xl shadow-md flex items-center justify-center text-white text-xl font-black bg-gradient-to-br from-pink-400 to-rose-400">HOT DEALS</div>
-                                        <div class="grid grid-cols-2 gap-2"><div class="h-28 bg-white rounded-xl shadow-sm border border-slate-100"></div><div class="h-28 bg-white rounded-xl shadow-sm border border-slate-100"></div></div>
-                                    </div>
-
-                                    {{-- LAYOUT 6: NEON CYBER --}}
-                                    <div x-show="currentPreviewId === 6" class="space-y-3">
-                                        <div class="w-full h-40 bg-slate-900 rounded-xl shadow-md flex items-center justify-center border-2 border-cyan-400"><i class="mdi mdi-play text-cyan-400 text-5xl"></i></div>
-                                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center"><div class="w-12 h-12 bg-slate-100 rounded-full"></div><div class="w-12 h-12 bg-slate-100 rounded-full"></div><div class="w-12 h-12 bg-slate-100 rounded-full"></div></div>
-                                    </div>
-
                                 </div>
 
                             </div>
@@ -342,16 +366,15 @@
                 </div>
             </div>
         </div>
-    </div>
-
+    </template>
 </div>
 
 <script>
     function templateManager() {
         return {
+            templates: TEMPLATES_DATA,
             isPreviewOpen: false,
-            currentPreviewId: 1,
-            previewData: { name: '', headerClass: '' },
+            activeTemplate: null,
             currentTime: '12:30',
 
             initPage() {
@@ -361,51 +384,57 @@
                 }, 1000);
             },
 
+            hasComp(compName) {
+                if(!this.activeTemplate) return false;
+                return this.activeTemplate.layout.includes(compName);
+            },
+            getOrder(compName) {
+                if(!this.activeTemplate) return 99;
+                return this.activeTemplate.layout.indexOf(compName);
+            },
+
             blankCanvas() {
                 Swal.fire({
                     title: 'Membuat Kanvas Kosong',
-                    text: 'Menyiapkan ruang kerja...',
+                    text: 'Menyiapkan ruang kerja tanpa template...',
                     icon: 'success',
                     timer: 1500,
                     showConfirmButton: false,
                     customClass: { popup: 'rounded-2xl' }
                 }).then(() => {
-                    window.location.href = "{{ route('seller.shop.decoration') }}?tpl=blank";
+                    // MENGGUNAKAN ROUTE YANG BENAR SESUAI WEB.PHP
+                    window.location.href = "{{ route('seller.shop.decoration.editor') }}?tpl=blank";
                 });
             },
 
             openPreview(id) {
-                this.currentPreviewId = id;
-                if(id === 1) this.previewData = { name: 'Oceanic Premium', headerClass: 'bg-gradient-to-r from-blue-600 to-indigo-700' };
-                if(id === 2) this.previewData = { name: 'Eco Harvest', headerClass: 'bg-gradient-to-r from-emerald-500 to-green-600' };
-                if(id === 3) this.previewData = { name: 'Sunset Bold', headerClass: 'bg-gradient-to-r from-orange-500 to-red-500' };
-                if(id === 4) this.previewData = { name: 'Midnight Luxury', headerClass: 'bg-gradient-to-b from-slate-800 to-black' };
-                if(id === 5) this.previewData = { name: 'Pink Blossom', headerClass: 'bg-gradient-to-r from-pink-400 to-rose-500' };
-                if(id === 6) this.previewData = { name: 'Neon Cyber', headerClass: 'bg-gradient-to-r from-purple-600 to-cyan-500' };
-
+                this.activeTemplate = this.templates.find(t => t.id === id);
                 this.isPreviewOpen = true;
-                document.body.style.overflow = 'hidden';
+                this.$refs.mainWrapper.style.overflow = 'hidden';
             },
 
             closePreview() {
                 this.isPreviewOpen = false;
-                document.body.style.overflow = 'auto';
+                this.$refs.mainWrapper.style.overflow = 'auto';
+                setTimeout(() => { this.activeTemplate = null; }, 300);
             },
 
-            applyTemplate(id, name) {
+            applyTemplate(id) {
+                const tpl = this.templates.find(t => t.id === id);
                 Swal.fire({
                     title: 'Terapkan Template?',
-                    text: `Tema "${name}" akan diterapkan.`,
+                    text: `Toko Anda akan menggunakan tema "${tpl.name}".`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#2563eb',
-                    confirmButtonText: 'Terapkan',
+                    confirmButtonText: 'Gunakan Tema Ini',
                     cancelButtonText: 'Batal',
                     customClass: { popup: 'rounded-2xl' }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Swal.fire({ title: 'Menerapkan...', html: 'Mohon tunggu', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-                        setTimeout(() => { window.location.href = "{{ route('seller.shop.decoration') }}?tpl=" + id; }, 1500);
+                        Swal.fire({ title: 'Menyiapkan Kanvas...', html: 'Menerapkan struktur layout, mohon tunggu.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                        // MENGGUNAKAN ROUTE YANG BENAR SESUAI WEB.PHP
+                        setTimeout(() => { window.location.href = "{{ route('seller.shop.decoration.editor') }}?tpl=" + id; }, 1500);
                     }
                 });
             }
