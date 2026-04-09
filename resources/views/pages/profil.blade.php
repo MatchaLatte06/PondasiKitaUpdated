@@ -144,7 +144,7 @@
                         {{-- Tombol Buka Toko --}}
                         <div class="relative z-10 shrink-0 w-full sm:w-auto">
                             {{-- Ganti route di bawah dengan rute pendaftaran seller Anda yang sebenarnya --}}
-                            <a href="#" onclick="alert('Formulir pendaftaran Seller sedang disiapkan!'); return false;" class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-black px-6 py-4 rounded-xl transition-all duration-300 shadow-glow hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(37,99,235,0.6)]">
+                            <a href="{{ route('seller.register') }}" class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-black px-6 py-4 rounded-xl transition-all duration-300 shadow-glow hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(37,99,235,0.6)]">
                                 Buka Toko Sekarang <i class="fas fa-arrow-right ml-1"></i>
                             </a>
                         </div>

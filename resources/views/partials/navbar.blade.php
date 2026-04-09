@@ -18,24 +18,20 @@
             </a>
         </div>
 
-        {{-- TENGAH: Search Bar Enterprise --}}
+       {{-- TENGAH: Search Bar Enterprise --}}
         <form action="{{ route('search') }}" method="GET" class="flex-1 max-w-2xl relative group hidden md:block">
-            <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
-                <i class="fas fa-search text-zinc-400 group-focus-within:text-blue-600 transition-colors duration-300"></i>
-            </div>
             <input
                 type="text"
                 id="search-input"
                 name="query"
                 placeholder="Cari semen, baja ringan, vendor..."
                 value="{{ request('query') }}"
-                class="w-full bg-zinc-100 border-2 border-transparent text-zinc-800 text-sm font-medium rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 block pl-12 pr-20 py-3 transition-all outline-none placeholder:text-zinc-400 shadow-inner group-focus-within:shadow-lg group-focus-within:shadow-blue-600/5"
+                class="w-full bg-zinc-100 border-2 border-transparent text-zinc-800 text-sm font-medium rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 block pl-6 pr-14 py-3 transition-all outline-none placeholder:text-zinc-400 shadow-inner group-focus-within:shadow-lg group-focus-within:shadow-blue-600/5"
             >
-            <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                <kbd class="hidden lg:inline-flex items-center gap-1 bg-white border border-zinc-200 text-zinc-400 px-2.5 py-1 rounded-lg text-[10px] font-black shadow-sm tracking-widest">
-                    <i class="fa-solid fa-command text-[8px]"></i> K
-                </kbd>
-            </div>
+            {{-- Tombol Kaca Pembesar (Submit / Enter) --}}
+            <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-xl bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600/50 cursor-pointer">
+                <i class="fas fa-search"></i>
+            </button>
         </form>
 
         {{-- KANAN: Menu & Keranjang --}}
@@ -70,6 +66,10 @@
                 <span class="text-xs font-bold text-zinc-700 group-hover:text-white transition-colors truncate max-w-[80px]">
                     {{ explode(' ', Auth::user()->nama)[0] }}
                 </span>
+            </a>
+            @else
+            <a href="{{ route('login') }}" class="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-black text-white text-sm font-bold hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-600/30 transition-all duration-300">
+                Masuk <i class="fas fa-arrow-right text-xs"></i>
             </a>
             @endauth
         </nav>
@@ -174,11 +174,12 @@
                         </li>
                     @elseif(Auth::user()->level === 'seller')
                         <li class="mt-6 pt-6 border-t border-zinc-800">
-                            <a href="{{ url('/app_seller/dashboard.php') }}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-black font-bold bg-gradient-to-r from-white to-zinc-200 hover:from-white hover:to-white transition-all shadow-[0_10px_20px_rgba(255,255,255,0.1)] group">
+                            {{-- Ganti href menjadi route Laravel yang benar --}}
+                            <a href="{{ route('seller.dashboard') }}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-black font-bold bg-gradient-to-r from-white to-zinc-200 hover:from-white hover:to-white transition-all shadow-[0_10px_20px_rgba(255,255,255,0.1)] group">
                                 <div class="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center">
-                                    <i class="fas fa-chart-line group-hover:scale-110 transition-transform"></i>
+                                    <i class="fas fa-store group-hover:scale-110 transition-transform"></i>
                                 </div>
-                                Seller Dashboard
+                                Toko Saya
                             </a>
                         </li>
                     @endif

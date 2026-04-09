@@ -49,7 +49,7 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="text-zinc-800 antialiased pt-[80px] pb-28 lg:pb-12">
+<body class="flex flex-col min-h-screen text-zinc-800 antialiased pt-[80px]">
 
     {{-- Navbar --}}
     @include('partials.navbar')
@@ -65,7 +65,7 @@
         </div>
     </div>
 
-    <main class="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 lg:py-10">
+    <main class="flex-grow">
 
         {{-- Header Keranjang --}}
         <div class="mb-8 flex items-center justify-between">

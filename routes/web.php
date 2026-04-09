@@ -230,5 +230,5 @@ Route::post('/api/chat', function() {
 Route::post('/webhook/midtrans', [WebhookController::class, 'midtransHandler'])->name('webhook.midtrans');
 
 // 7. EXTERNAL & UTILS
-Route::get('/auth/google', function() { return "Fitur Login Google"; });
-Route::get('/lupa-password', function() { return "Halaman Lupa Password"; });
+Route::get('/auth/google', [\App\Http\Controllers\AuthController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('/auth/google/callback', [\App\Http\Controllers\AuthController::class, 'handleGoogleCallback']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -322,5 +323,59 @@ class AuthController extends Controller
             ->orderBy('name', 'ASC')
             ->get();
         return response()->json($districts);
+    }
+
+    // 1. Mengarahkan user ke halaman login Google
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    // 2. Menerima balasan dari Google setelah user login
+    public function handleGoogleCallback()
+    {
+        try {
+            // Tambahan ->stateless() untuk mencegah error session di localhost
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            // Cek apakah email ini sudah terdaftar di database
+            $existingUser = \Illuminate\Support\Facades\DB::table('tb_user')
+                                ->where('email', $googleUser->getEmail())
+                                ->first();
+
+            if ($existingUser) {
+                // Jika sudah ada, update google_id-nya dan login
+                \Illuminate\Support\Facades\DB::table('tb_user')
+                    ->where('id', $existingUser->id)
+                    ->update(['google_id' => $googleUser->getId()]);
+                
+                Auth::loginUsingId($existingUser->id);
+            } else {
+                // BIKIN USERNAME OTOMATIS (Ini biasanya yang bikin Crash kalau kosong)
+                $baseUsername = \Illuminate\Support\Str::slug($googleUser->getName());
+                $randomString = \Illuminate\Support\Str::random(4);
+                $finalUsername = $baseUsername . '-' . $randomString;
+
+                // Buatkan akun baru otomatis sbg customer
+                $newUserId = \Illuminate\Support\Facades\DB::table('tb_user')->insertGetId([
+                    'nama' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'username' => $finalUsername, // <-- Kolom ini wajib ada!
+                    'google_id' => $googleUser->getId(),
+                    'level' => 'customer',
+                    'password' => Hash::make(\Illuminate\Support\Str::random(16)),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                Auth::loginUsingId($newUserId);
+            }
+
+            return redirect()->route('home')->with('success', 'Berhasil masuk menggunakan Google!');
+
+        } catch (\Exception $e) {
+            // MATIKAN REDIRECT, KITA TAMPILKAN ERROR ASLINYA DI LAYAR PUTIH!
+            dd('TANGKAPAN ERROR BOS: ' . $e->getMessage());
+        }
     }
 }

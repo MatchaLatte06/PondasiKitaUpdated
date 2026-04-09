@@ -14,6 +14,12 @@ return [
     |
     */
 
+    'google' => [
+        'client_id' => '41619739387-mpv4e1f916fu6140vm719abt12si2bkl.apps.googleusercontent.com',
+        'client_secret' => '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',
+        'redirect' => 'http://127.0.0.1:8000/auth/google/callback',
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

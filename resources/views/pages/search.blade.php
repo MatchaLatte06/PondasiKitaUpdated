@@ -4,11 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hasil Pencarian: {{ request('query') }} - Pondasikita</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/navbar_style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         body { background-color: #f8fafc; font-family: 'Inter', sans-serif; color: #334155; }
         .search-container { max-width: 1200px; margin: 40px auto; padding: 0 15px; display: flex; gap: 30px; align-items: flex-start;}
@@ -83,7 +98,7 @@
         }
     </style>
 </head>
-<body>
+<body class="text-zinc-800 antialiased pt-[80px]">
 
     @include('partials.navbar')
 
