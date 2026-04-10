@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor Situs Web Toko - Pondasikita</title>
+    
+    {{-- WAJIB ADA UNTUK AJAX --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Font & Icons --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -38,11 +41,6 @@
         .canvas-item:hover { border-color: #cbd5e1; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
         .canvas-item.is-active { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); z-index: 10; }
 
-        /* Layout Ratios */
-        .ratio-4-1 { aspect-ratio: 4 / 1; }
-        .ratio-3-1 { aspect-ratio: 3 / 1; }
-        .ratio-16-9 { aspect-ratio: 16 / 9; }
-
         /* Modal Animation */
         .modal-enter { animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
@@ -59,7 +57,9 @@
 
     {{-- DATA TOKO --}}
     @php
-        $tokoName = optional(Auth::user()->toko ?? null)->nama_toko ?? 'Nama Toko Saya';
+        $toko = optional(Auth::user()->toko ?? null);
+        $tokoName = $toko->nama_toko ?? 'Nama Toko Saya';
+        $savedDecoration = !empty($toko->dekorasi_desktop) ? $toko->dekorasi_desktop : 'null';
     @endphp
 
     {{-- INPUT UPLOAD TERSEMBUNYI --}}
@@ -72,7 +72,7 @@
          ========================================== --}}
     <header class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-6 flex-shrink-0 z-30 shadow-sm transition-all duration-300">
         <div class="flex items-center gap-4">
-            <a x-show="!isPreviewMode" href="{{ route('seller.shop.decoration.template') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors outline-none">
+            <a x-show="!isPreviewMode" href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors outline-none">
                 <i class="mdi mdi-arrow-left text-xl"></i>
             </a>
             <button x-show="isPreviewMode" @click="togglePreview()" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-100 hover:bg-red-200 text-red-600 transition-colors outline-none">
@@ -94,9 +94,6 @@
                 <span x-text="isPreviewMode ? 'Kembali ke Editor' : 'Pratinjau Situs'"></span>
             </button>
             <div class="w-px h-6 bg-slate-200 mx-2" x-show="!isPreviewMode"></div>
-            <button x-show="!isPreviewMode" @click="simpanDraf()" class="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors outline-none flex items-center gap-2">
-                <i class="mdi mdi-content-save-outline text-lg leading-none"></i> Simpan Draf
-            </button>
             <button x-show="!isPreviewMode" @click="tampilkan()" class="px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-600/30 transition-all outline-none flex items-center gap-2">
                 <i class="mdi mdi-rocket-launch text-lg leading-none"></i> Tayangkan Toko
             </button>
@@ -124,31 +121,31 @@
                 <div class="grid grid-cols-2 gap-4" x-ref="paletteList">
 
                     {{-- Item: Banner --}}
-                    <div class="border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-grab hover:border-blue-400 hover:shadow-md transition-all bg-white group" data-type="banner">
+                    <div @click="addComponent('banner')" class="border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-grab hover:border-blue-400 hover:shadow-md transition-all bg-white group" data-type="banner">
                         <div class="w-12 h-12 bg-blue-50 text-blue-600 flex items-center justify-center rounded-xl mb-3 group-hover:scale-110 transition-transform"><i class="mdi mdi-image-area text-2xl"></i></div>
                         <span class="text-[11px] font-black text-slate-700">Banner Lebar</span>
                     </div>
 
                     {{-- Item: Carousel Grid --}}
-                    <div class="border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-grab hover:border-indigo-400 hover:shadow-md transition-all bg-white group" data-type="carousel">
+                    <div @click="addComponent('carousel')" class="border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-grab hover:border-indigo-400 hover:shadow-md transition-all bg-white group" data-type="carousel">
                         <div class="w-12 h-12 bg-indigo-50 text-indigo-600 flex items-center justify-center rounded-xl mb-3 group-hover:scale-110 transition-transform"><i class="mdi mdi-view-grid-plus text-2xl"></i></div>
                         <span class="text-[11px] font-black text-slate-700">Grid Foto</span>
                     </div>
 
                     {{-- Item: Video --}}
-                    <div class="border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-grab hover:border-red-400 hover:shadow-md transition-all bg-white group" data-type="video">
+                    <div @click="addComponent('video')" class="border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-grab hover:border-red-400 hover:shadow-md transition-all bg-white group" data-type="video">
                         <div class="w-12 h-12 bg-red-50 text-red-600 flex items-center justify-center rounded-xl mb-3 group-hover:scale-110 transition-transform"><i class="mdi mdi-youtube text-2xl"></i></div>
                         <span class="text-[11px] font-black text-slate-700">Video Promo</span>
                     </div>
 
                     {{-- Item: Produk --}}
-                    <div class="border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-grab hover:border-emerald-400 hover:shadow-md transition-all bg-white group" data-type="produk">
+                    <div @click="addComponent('produk')" class="border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-grab hover:border-emerald-400 hover:shadow-md transition-all bg-white group" data-type="produk">
                         <div class="w-12 h-12 bg-emerald-50 text-emerald-600 flex items-center justify-center rounded-xl mb-3 group-hover:scale-110 transition-transform"><i class="mdi mdi-storefront text-2xl"></i></div>
                         <span class="text-[11px] font-black text-slate-700">Daftar Produk</span>
                     </div>
 
                     {{-- Item: Kategori --}}
-                    <div class="col-span-2 border border-slate-200 rounded-2xl p-4 flex items-center gap-5 cursor-grab hover:border-amber-400 hover:shadow-md transition-all bg-white group" data-type="kategori">
+                    <div @click="addComponent('kategori')" class="col-span-2 border border-slate-200 rounded-2xl p-4 flex items-center gap-5 cursor-grab hover:border-amber-400 hover:shadow-md transition-all bg-white group" data-type="kategori">
                         <div class="w-12 h-12 bg-amber-50 text-amber-600 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform"><i class="mdi mdi-shape text-2xl"></i></div>
                         <div class="text-left flex-1">
                             <div class="text-xs font-black text-slate-800">Menu Kategori</div>
@@ -305,10 +302,23 @@
                                             x-text="item.config.title" x-show="item.config.title"></h4>
 
                                         <div class="w-full aspect-[21/9] bg-slate-900 flex flex-col items-center justify-center relative overflow-hidden rounded-xl">
+                                            
                                             <template x-if="item.config.videoSource === 'youtube' && item.config.videoUrl">
-                                                <div class="absolute inset-0 bg-slate-800 flex items-center justify-center bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200');">
-                                                    <div class="absolute inset-0 bg-black/50"></div>
-                                                    <i class="mdi mdi-youtube text-red-600 text-[80px] relative z-10 drop-shadow-2xl hover:scale-110 transition-transform cursor-pointer"></i>
+                                                <div class="absolute inset-0 w-full h-full bg-slate-900">
+                                                    <template x-if="getYoutubeEmbedUrl(item.config.videoUrl)">
+                                                        <iframe 
+                                                            :src="getYoutubeEmbedUrl(item.config.videoUrl)" 
+                                                            class="w-full h-full border-0 pointer-events-none" 
+                                                            allow="autoplay; encrypted-media" 
+                                                            allowfullscreen>
+                                                        </iframe>
+                                                    </template>
+                                                    <template x-if="!getYoutubeEmbedUrl(item.config.videoUrl)">
+                                                        <div class="absolute inset-0 flex flex-col items-center justify-center bg-slate-800/80 text-white">
+                                                            <i class="mdi mdi-link-variant-remove text-[60px] mb-2 text-slate-400"></i>
+                                                            <span class="text-sm font-bold text-slate-300">Tautan YouTube Tidak Valid</span>
+                                                        </div>
+                                                    </template>
                                                 </div>
                                             </template>
 
@@ -735,8 +745,6 @@
         </div>
     </div>
 
-</div>
-
 <script>
     // DATA TEMPLATE (HARDCODE AMAN)
     const TEMPLATES_DATA = [
@@ -764,13 +772,27 @@
     const generateUid = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
     function desktopEditor() {
+        // BACA DATA DARI DATABASE (INJEKSI PHP KE JS)
+        const savedData = {!! $savedDecoration !!};
+        
+        let initialCanvas = [];
+        let initialHeaderColor = 'bg-slate-800';
+        let initialTemplateName = 'Kanvas Desktop Kosong';
+
+        // Jika sudah pernah disimpan, masukkan ke variabel awal
+        if(savedData && savedData.layout) {
+            initialCanvas = savedData.layout;
+            initialHeaderColor = savedData.header || 'bg-slate-800';
+            initialTemplateName = savedData.template || 'Template Kustom';
+        }
+
         return {
             templates: TEMPLATES_DATA,
-            templateName: 'Kanvas Desktop Kosong',
-            canvasItems: [],
+            templateName: initialTemplateName,
+            canvasItems: initialCanvas,
             activeItemId: null,
             currentTime: '12:00',
-            templateHeaderColor: 'bg-slate-800',
+            templateHeaderColor: initialHeaderColor,
             templateAccentColor: 'bg-slate-800',
             isPreviewMode: false,
             uploadedHeader: null,
@@ -797,12 +819,9 @@
                     this.loadTemplate(tplId);
                 }
 
-                // ========================================================
-                // INIT SORTABLE JS (SISTEM DRAG & DROP DENGAN REVERT DOM)
-                // ========================================================
                 this.$nextTick(() => {
-                    const palette = document.getElementById('palette-list');
-                    const canvas = document.getElementById('canvas-dropzone');
+                    const palette = this.$refs.paletteList;
+                    const canvas = this.$refs.canvasDropzone;
 
                     if(palette) {
                         new Sortable(palette, {
@@ -820,13 +839,22 @@
                             onAdd: (evt) => {
                                 const type = evt.item.dataset.type;
 
-                                // Kalkulasi index asli
-                                const itemNodes = Array.from(canvas.querySelectorAll('.group\\/canvas:not(.sortable-ghost)'));
-                                let dropIndex = itemNodes.indexOf(evt.item);
+                                // Lacak posisi akurat berdasarkan elemen di atasnya
+                                let dropIndex = 0;
+                                let sibling = evt.item.previousElementSibling;
+                                
+                                while (sibling) {
+                                    // Hitung hanya elemen kanvas asli (abaikan tag <template> bawaan Alpine)
+                                    if (sibling.classList.contains('group/canvas')) {
+                                        dropIndex++;
+                                    }
+                                    sibling = sibling.previousElementSibling;
+                                }
 
-                                evt.item.remove(); // Cabut elemen DOM cloningan Sortable
+                                // Cabut elemen DOM cloningan Sortable dari Palette
+                                evt.item.remove(); 
 
-                                if(dropIndex === -1) dropIndex = this.canvasItems.length;
+                                // Lempar komponen ke posisi dropIndex yang super presisi
                                 this.addComponent(type, dropIndex);
                             },
                             onUpdate: (evt) => {
@@ -973,8 +1001,22 @@
                 });
             },
 
-            gantiTemplate() { window.location.href = "{{ route('seller.shop.decoration.template') }}"; },
+            gantiTemplate() { window.location.href = "{{ route('seller.shop.decoration.template') ?? '#' }}"; },
             togglePreview() { this.isPreviewMode = !this.isPreviewMode; this.activeItemId = null; },
+
+            // Fungsi sakti untuk ubah URL YouTube jadi URL Embed Autoplay
+            getYoutubeEmbedUrl(url) {
+                if (!url) return '';
+                let videoId = '';
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = url.match(regExp);
+
+                if (match && match[2].length === 11) {
+                    videoId = match[2];
+                    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0`;
+                }
+                return '';
+            },
 
             handleHeaderUpload(event) {
                 const file = event.target.files[0];
@@ -1029,20 +1071,44 @@
                     Swal.fire({icon: 'error', title: 'Gagal Menyimpan', text: 'Kanvas masih kosong.', customClass: { popup: 'rounded-2xl' }});
                     return;
                 }
+                
                 const payload = {
                     template: this.templateName,
                     header: this.uploadedHeader ? 'Custom Image' : this.templateHeaderColor,
                     layout: this.canvasItems
                 };
+                
                 Swal.fire({
-                    title: 'Tayangkan ke Desktop?', text: 'Desain ini akan langsung terlihat oleh pengunjung yang menggunakan komputer.', icon: 'question',
+                    title: 'Tayangkan ke Desktop?', 
+                    text: 'Desain ini akan langsung terlihat oleh pengunjung yang menggunakan komputer.', 
+                    icon: 'question',
                     showCancelButton: true, confirmButtonColor: '#2563eb', cancelButtonText: 'Batal', confirmButtonText: 'Ya, Tayangkan',
                     customClass: { popup: 'rounded-2xl' }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Swal.fire({ title: 'Menerapkan...', timer: 1500, didOpen: () => Swal.showLoading(), customClass: { popup: 'rounded-2xl' } }).then(() => {
-                            console.log("PAYLOAD JSON UNTUK DATABASE:", JSON.stringify(payload));
-                            Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Dekorasi toko desktop berhasil ditayangkan.', timer:2500, showConfirmButton:false, customClass: { popup: 'rounded-2xl' }});
+                        
+                        Swal.fire({ title: 'Menyimpan ke Server...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'rounded-2xl' } });
+
+                        // KIRIM DATA KE LARAVEL MENGGUNAKAN FETCH API (AJAX)
+                        fetch("{{ route('seller.shop.decoration.save') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.success) {
+                                Swal.fire({icon: 'success', title: 'Berhasil!', text: 'Dekorasi toko desktop berhasil ditayangkan.', timer:2500, showConfirmButton:false, customClass: { popup: 'rounded-2xl' }});
+                            } else {
+                                Swal.fire({icon: 'error', title: 'Gagal', text: data.message || 'Terjadi kesalahan sistem.'});
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            Swal.fire({icon: 'error', title: 'Terjadi Kesalahan Server', text: 'Silakan pastikan route "seller.shop.decoration.save" sudah dibuat.'});
                         });
                     }
                 });

@@ -156,29 +156,29 @@ class ShopController extends Controller
         return view('seller.shop.decoration', compact('toko', 'layoutData'));
     }
 
-    // Halaman Pemilihan Template (Mencegah Error 500 Call to undefined method)
+    // Halaman Pemilihan Template
     public function templateSelection()
     {
         $toko = Auth::user()->toko;
         return view('seller.shop.template-selection', compact('toko'));
     }
 
-    // Halaman Editor Drag & Drop (Perbaikan Internal Server Error)
+    // Halaman Editor Drag & Drop
     public function editor()
     {
         $toko = Auth::user()->toko;
         return view('seller.shop.editor', compact('toko'));
     }
 
+    // HALAMAN EDITOR DESKTOP KITA
     public function editorDesktop()
     {
-        $toko = auth()->user()->toko; // Mengambil data toko user yang login
-
-        // Pastikan nama view ini sesuai dengan lokasi file blade desktop Anda
+        $toko = auth()->user()->toko; 
         return view('seller.shop.editor-desktop', compact('toko'));
     }
+
     /**
-     * Update susunan dekorasi via AJAX (Fetch API)
+     * Update susunan dekorasi via AJAX (VERSI LAMA)
      */
     public function updateDecoration(Request $request)
     {
@@ -187,8 +187,6 @@ class ShopController extends Controller
         ]);
 
         $toko = Auth::user()->toko;
-
-        // Simpan array JSON langsung ke database
         $toko->update([
             'layout_data' => $request->layout_data
         ]);
@@ -197,5 +195,25 @@ class ShopController extends Controller
             'status' => 'success',
             'message' => 'Dekorasi toko berhasil disimpan!'
         ]);
+    }
+
+    /**
+     * ==========================================
+     * FUNGSI SAKTI PENYIMPANAN DESKTOP EDITOR
+     * ==========================================
+     */
+    public function saveDecoration(Request $request)
+    {
+        $toko = Auth::user()->toko;
+        
+        if (!$toko) {
+            return response()->json(['success' => false, 'message' => 'Toko tidak ditemukan.']);
+        }
+
+        // Simpan JSON payload mentah-mentah ke kolom dekorasi_desktop
+        $toko->dekorasi_desktop = json_encode($request->all());
+        $toko->save();
+
+        return response()->json(['success' => true, 'message' => 'Dekorasi berhasil ditayangkan!']);
     }
 }

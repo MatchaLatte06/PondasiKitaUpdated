@@ -160,9 +160,11 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
 
         // --- RUTE EDITOR DESKTOP ---
         Route::get('/decoration/editor-desktop', [ShopController::class, 'editorDesktop'])->name('decoration.editor.desktop');
-
         Route::get('/decoration/template', [ShopController::class, 'templateSelection'])->name('decoration.template');
         Route::post('/decoration/update', [ShopController::class, 'updateDecoration'])->name('decoration.update');
+        
+        // ✅ INI RUTE SAKTI YANG BARU SAJA DITAMBAHKAN
+        Route::post('/decoration/save', [ShopController::class, 'saveDecoration'])->name('decoration.save');
 
         Route::get('/settings', [ShopController::class, 'settings'])->name('settings');
         Route::put('/settings/update', [ShopController::class, 'updateSettings'])->name('settings.update');
