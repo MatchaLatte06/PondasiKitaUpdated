@@ -33,12 +33,50 @@ class LandingController extends Controller
         }
 
         // ==========================================
-        // 2. KATEGORI (Limit 8)
+        // 2. DYNAMIC BANNER HERO 
         // ==========================================
-        $categories = DB::table('tb_kategori')->limit(8)->get();
+        /* Kalau nanti Bos sudah buat form admin dan tabel tb_banners, 
+           tinggal hapus array dummy ini dan pakai kode di bawah ini:
+           $promoBanners = DB::table('tb_banners')->where('is_active', 1)->get();
+        */
+
+        // Data dummy berbentuk Object agar panggilannya di Blade ($banner->img) tidak error
+        $promoBanners = [
+            (object)[
+                'title' => 'Pekan Diskon Baja', 
+                'desc' => 'Dapatkan potongan harga khusus untuk pembelian baja ringan volume besar minggu ini.', 
+                'img' => 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1000&auto=format&fit=crop', 
+                'link' => '#'
+            ],
+            (object)[
+                'title' => 'Gratis Ongkir Se-Jawa', 
+                'desc' => 'Subsidi ongkos kirim hingga Rp500.000 untuk minimal transaksi 50 Juta.', 
+                'img' => 'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=1000&auto=format&fit=crop', 
+                'link' => '#'
+            ],
+            (object)[
+                'title' => 'Mitra Baru: Semen Tiga Roda', 
+                'desc' => 'Kini tersedia semen kualitas premium langsung dari pabrik dengan harga termurah.', 
+                'img' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1000&auto=format&fit=crop', 
+                'link' => '#'
+            ]
+        ];
 
         // ==========================================
-        // 3. TOKO POPULER
+        // 3. KATEGORI UTAMA 
+        // ==========================================
+        // Hanya ambil kategori utama (parent_id kosong) agar tidak nyampur sama sub-kategori
+        $kategoriUtama = DB::table('tb_kategori')->whereNull('parent_id')->get();
+        $kategoriAnak = DB::table('tb_kategori')->whereNotNull('parent_id')->get();
+
+        // Menyisipkan anak ke dalam induknya masing-masing
+        foreach ($kategoriUtama as $utama) {
+            $utama->subkategori = $kategoriAnak->where('parent_id', $utama->id)->values();
+        }
+        
+        $categories = $kategoriUtama;
+        // ==========================================
+        // 4. TOKO POPULER
         // ==========================================
         $queryToko = DB::table('tb_toko as t')
             ->join('cities as c', 't.city_id', '=', 'c.id')
@@ -76,7 +114,7 @@ class LandingController extends Controller
         }
 
         // ==========================================
-        // 4. PRODUK TERLARIS (Lokal & Nasional)
+        // 5. PRODUK TERLARIS (Lokal & Nasional)
         // ==========================================
 
         // Produk Lokal (Hanya jika ada lokasi user)
@@ -89,9 +127,10 @@ class LandingController extends Controller
         $listProdukNasional = $this->getBestSellingProducts();
 
         // ==========================================
-        // 5. RETURN VIEW
+        // 6. RETURN VIEW
         // ==========================================
         return view('landing', compact(
+            'promoBanners',
             'categories',
             'listToko',
             'tokoSectionTitle',

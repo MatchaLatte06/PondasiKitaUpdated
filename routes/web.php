@@ -8,6 +8,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController as FrontProductController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\ChatAiController;
 
 // --- IMPORT CONTROLLER SELLER ---
 use App\Http\Controllers\SellerController;
@@ -227,9 +228,7 @@ Route::get('/api/cities/{province_id}', [AuthController::class, 'getCities']);
 Route::get('/api/districts/{city_id}', [PageController::class, 'getDistrictsOnDemand']);
 Route::post('/api/get-or-create-district', [PageController::class, 'getOrCreateDistrict'])->name('api.get.create.district');
 
-Route::post('/api/chat', function() {
-    return response()->json(['reply' => 'Halo! Saya POTA (AI Helper Pondasikita).']);
-})->name('api.chat');
+Route::post('/api/chat', [ChatAiController::class, 'handleChat'])->name('api.chat');
 
 // Webhook Midtrans (Payment Gateway)
 Route::post('/webhook/midtrans', [WebhookController::class, 'midtransHandler'])->name('webhook.midtrans');
