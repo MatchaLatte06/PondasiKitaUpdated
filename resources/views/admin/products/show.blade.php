@@ -4,187 +4,299 @@
 
 @push('styles')
 <style>
-    :root {
-        --glass-bg: rgba(255, 255, 255, 0.95);
-        --p-indigo: #4f46e5;
-    }
+    /* ========================================= */
+    /* ==  PREMIUM DETAIL MODERATION CSS      == */
+    /* ========================================= */
 
-    /* HEADER STYLE */
-    .product-hero {
-        background: white; border-radius: 24px; padding: 30px;
-        border: 1px solid #e2e8f0; display: flex; gap: 30px;
-        margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-    }
-    .main-preview-wrapper { width: 280px; height: 280px; border-radius: 20px; overflow: hidden; border: 1px solid #f1f5f9; flex-shrink: 0; }
-    .main-preview-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .hero-info h1 { font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 10px; }
-    .meta-pill { background: #f1f5f9; padding: 6px 14px; border-radius: 100px; font-size: 13px; font-weight: 600; color: #64748b; }
-    
-    /* BADGES */
-    .mod-badge { padding: 6px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .bg-pending { background: #fef3c7; color: #d97706; }
-    .bg-approved { background: #dcfce7; color: #15803d; }
-    .bg-rejected { background: #fee2e2; color: #b91c1c; }
+    /* Animasi Hover Halus */
+    .hover-lift { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease; }
+    .hover-lift:hover { transform: translateY(-4px); }
 
-    /* GRID LAYOUT */
-    .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
-    .detail-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 24px; }
-    .card-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: block; }
+    /* Scrollbar Khusus Area Deskripsi/Galeri */
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .dark .custom-scroll::-webkit-scrollbar-thumb { background: #475569; }
+    .dark .custom-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-    /* INFO LIST */
-    .spec-list { list-style: none; padding: 0; margin: 0; }
-    .spec-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
-    .spec-item:last-child { border-bottom: none; }
-    .spec-label { color: #64748b; font-size: 14px; }
-    .spec-value { color: #1e293b; font-weight: 700; font-size: 14px; }
+    /* ========================================= */
+    /* == POLYFILL DARK MODE (ANTI-PUTIH)     == */
+    /* ========================================= */
 
-    /* GALLERY */
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-    .gallery-thumb { aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; }
-    .gallery-thumb:hover { border-color: var(--p-indigo); transform: scale(1.05); }
-    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    /* Container Utama & Card */
+    .dark .dark\:bg-slate-950 { background-color: #020617 !important; }
+    .dark .dark\:bg-slate-900 { background-color: #0f172a !important; }
+    .dark .dark\:bg-slate-900\/50 { background-color: rgba(15, 23, 42, 0.5) !important; }
+    .dark .dark\:bg-slate-800 { background-color: #1e293b !important; }
+    .dark .dark\:bg-slate-800\/60 { background-color: rgba(30, 41, 59, 0.6) !important; }
+    .dark .dark\:bg-slate-800\/50 { background-color: rgba(30, 41, 59, 0.5) !important; }
+    .dark .dark\:bg-slate-700 { background-color: #334155 !important; }
 
-    /* ACTION STICKY */
-    .action-panel { position: sticky; top: 100px; }
-    .btn-approve { background: #10b981; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; width: 100%; transition: 0.3s; }
-    .btn-approve:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(16,185,129,0.3); }
-    
-    .btn-reject { background: #fff; color: #ef4444; border: 1px solid #fee2e2; padding: 12px; border-radius: 12px; font-weight: 700; width: 100%; margin-top: 10px; }
-    .btn-reject:hover { background: #fef2f2; }
+    /* Border & Divider */
+    .dark .dark\:border-slate-800 { border-color: #1e293b !important; }
+    .dark .dark\:border-slate-700 { border-color: #334155 !important; }
+    .dark .dark\:border-slate-700\/50 { border-color: rgba(51, 65, 85, 0.5) !important; }
+    .dark .divide-slate-800\/80 > * + * { border-color: rgba(30, 41, 59, 0.8) !important; }
 
-    @media (max-width: 992px) { .content-grid { grid-template-columns: 1fr; } .product-hero { flex-direction: column; } .main-preview-wrapper { width: 100%; height: 350px; } }
+    /* Typography */
+    .dark .dark\:text-white { color: #ffffff !important; }
+    .dark .dark\:text-slate-100 { color: #f1f5f9 !important; }
+    .dark .dark\:text-slate-200 { color: #e2e8f0 !important; }
+    .dark .dark\:text-slate-300 { color: #cbd5e1 !important; }
+    .dark .dark\:text-slate-400 { color: #94a3b8 !important; }
+
+    /* Modals & Forms Overrides */
+    .dark .modal-content { background-color: #0f172a !important; border: 1px solid #1e293b !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; color: #f8fafc !important; }
+    .dark .modal-header, .dark .modal-footer { border-color: #1e293b !important; background-color: #0f172a !important; }
+    .dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+    .dark .form-control { background-color: #1e293b !important; border-color: #334155 !important; color: #f8fafc !important; }
+    .dark .form-control:focus { border-color: #f43f5e !important; box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.15) !important; }
+
+    /* Action Panels & Status Badges */
+    .dark .dark\:bg-blue-500\/10 { background-color: rgba(59, 130, 246, 0.1) !important; }
+    .dark .dark\:bg-blue-500\/20 { background-color: rgba(59, 130, 246, 0.2) !important; }
+    .dark .dark\:bg-blue-500\/50 { background-color: rgba(59, 130, 246, 0.5) !important; }
+    .dark .dark\:border-blue-500\/50 { border-color: rgba(59, 130, 246, 0.5) !important; }
+
+    .dark .dark\:bg-amber-500\/20 { background-color: rgba(245, 158, 11, 0.2) !important; }
+    .dark .dark\:border-amber-500\/30 { border-color: rgba(245, 158, 11, 0.3) !important; }
+
+    .dark .dark\:bg-emerald-500\/20 { background-color: rgba(16, 185, 129, 0.2) !important; }
+    .dark .dark\:border-emerald-500\/30 { border-color: rgba(16, 185, 129, 0.3) !important; }
+
+    .dark .dark\:bg-rose-500\/10 { background-color: rgba(244, 63, 94, 0.1) !important; }
+    .dark .dark\:bg-rose-500\/20 { background-color: rgba(244, 63, 94, 0.2) !important; }
+    .dark .dark\:border-rose-500\/20 { border-color: rgba(244, 63, 94, 0.2) !important; }
+    .dark .dark\:border-rose-500\/30 { border-color: rgba(244, 63, 94, 0.3) !important; }
+
+    .dark .dark\:bg-indigo-500\/20 { background-color: rgba(99, 102, 241, 0.2) !important; }
+
+    /* Interactive Elements */
+    .dark .dark\:hover\:bg-slate-800:hover { background-color: #1e293b !important; }
+    .dark .dark\:hover\:bg-rose-500\/10:hover { background-color: rgba(244, 63, 94, 0.1) !important; }
 </style>
 @endpush
 
 @section('content')
-<div class="dashboard-header mb-4 d-flex justify-content-between">
+
+{{-- HEADER HALAMAN --}}
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
     <div>
-        <a href="{{ route('admin.products.index') }}" class="btn btn-sm btn-light border mb-2 text-muted">
+        <a href="{{ route('admin.products.index') }}" class="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-xs font-bold transition-all text-decoration-none outline-none mb-4 shadow-sm dark:shadow-none">
             <i class="mdi mdi-arrow-left"></i> Kembali ke Daftar
         </a>
-        <h2 class="fw-bold text-dark">Detail Moderasi Produk</h2>
-    </div>
-    <div class="date-badge">Material ID: #{{ str_pad($produk->id, 6, '0', STR_PAD_LEFT) }}</div>
-</div>
-
-{{-- HERO SECTION --}}
-<div class="product-hero">
-    <div class="main-preview-wrapper">
-        <img src="{{ asset('assets/uploads/products/' . ($produk->gambar_utama ?? 'default.jpg')) }}" alt="Product">
-    </div>
-    <div class="hero-info">
-        <div class="mb-2">
-            <span class="mod-badge bg-{{ $produk->status_moderasi }}">
-                <i class="mdi mdi-circle-medium"></i> {{ $produk->status_moderasi }}
-            </span>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-1 transition-colors duration-300">
+            Detail Material
+        </h2>
+        <div class="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 transition-colors duration-300">
+            Pusat Moderasi <i class="mdi mdi-chevron-right text-sm"></i> <span class="text-blue-600 dark:text-blue-400 truncate max-w-[200px]">{{ $produk->nama_barang }}</span>
         </div>
-        <h1>{{ $produk->nama_barang }}</h1>
-        <div class="d-flex flex-wrap gap-2 mt-3">
-            <span class="meta-pill"><i class="mdi mdi-storefront-outline me-1"></i> {{ $produk->nama_toko }}</span>
-            <span class="meta-pill"><i class="mdi mdi-tag-outline me-1"></i> {{ $produk->nama_kategori ?? 'Tanpa Kategori' }}</span>
-            <span class="meta-pill"><i class="mdi mdi-barcode me-1"></i> SKU: {{ $produk->kode_barang ?? '-' }}</span>
+    </div>
+
+    {{-- Badge ID Produk --}}
+    <div class="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 px-4 py-2.5 rounded-xl shadow-sm transition-colors duration-300 flex items-center gap-2">
+        <i class="mdi mdi-barcode-scan text-slate-400 dark:text-slate-500 text-lg"></i>
+        <div class="flex flex-col">
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Sistem ID</span>
+            <span class="text-sm font-black text-slate-800 dark:text-white font-mono mt-0.5">#{{ str_pad($produk->id, 6, '0', STR_PAD_LEFT) }}</span>
         </div>
     </div>
 </div>
 
-<div class="content-grid">
-    {{-- COLUMN LEFT: DETAILS --}}
-    <div class="main-content">
-        <div class="detail-card">
-            <span class="card-label">Deskripsi Material</span>
-            <div style="color: #475569; line-height: 1.8; font-size: 15px; white-space: pre-line;">
+{{-- HERO SECTION (INFO UTAMA) --}}
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row gap-6 lg:gap-8 items-start">
+
+    {{-- Gambar Utama --}}
+    <div class="w-full md:w-64 lg:w-72 aspect-square rounded-[1.5rem] bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-hidden flex-shrink-0 relative shadow-inner dark:shadow-none">
+        <img src="{{ asset('assets/uploads/products/' . ($produk->gambar_utama ?? 'default.jpg')) }}" alt="{{ $produk->nama_barang }}" class="w-full h-full object-cover">
+
+        {{-- Status Badge Mengambang di Gambar --}}
+        @php
+            $st = strtolower($produk->status_moderasi);
+            $badgeBg = $st == 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/30' :
+                      ($st == 'approved' ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30' :
+                      'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-500/20 dark:text-rose-400 dark:border-rose-500/30');
+            $icon = $st == 'pending' ? 'mdi-clock-outline animate-pulse' : ($st == 'approved' ? 'mdi-check-decagram' : 'mdi-cancel');
+        @endphp
+        <div class="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border backdrop-blur-md {{ $badgeBg }}">
+            <i class="mdi {{ $icon }} text-sm"></i> {{ $produk->status_moderasi }}
+        </div>
+    </div>
+
+    {{-- Detail Teks Hero --}}
+    <div class="flex-1 w-full pt-2">
+        <h1 class="text-2xl lg:text-3xl font-black text-slate-800 dark:text-white leading-tight mb-4 transition-colors duration-300">
+            {{ $produk->nama_barang }}
+        </h1>
+
+        <div class="flex flex-wrap gap-3 mt-4">
+            <div class="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl">
+                <div class="w-6 h-6 rounded bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs"><i class="mdi mdi-storefront-outline"></i></div>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $produk->nama_toko }}</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl">
+                <div class="w-6 h-6 rounded bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs"><i class="mdi mdi-tag-outline"></i></div>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $produk->nama_kategori ?? 'Tanpa Kategori' }}</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl">
+                <div class="w-6 h-6 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center text-xs"><i class="mdi mdi-barcode"></i></div>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">SKU: {{ $produk->kode_barang ?? '-' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- GRID KONTEN UTAMA --}}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start mb-10">
+
+    {{-- KOLOM KIRI (DESKRIPSI & GALERI) --}}
+    <div class="lg:col-span-2 space-y-6 lg:space-y-8">
+
+        {{-- Card: Deskripsi --}}
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
+            <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
+                <i class="mdi mdi-text-box-outline text-lg"></i> Deskripsi Material
+            </h4>
+            <div class="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line custom-scroll max-h-[400px] overflow-y-auto">
                 {!! nl2br(e($produk->deskripsi)) !!}
             </div>
         </div>
 
-        <div class="detail-card">
-            <span class="card-label">Galeri Foto Lainnya</span>
-            <div class="gallery-grid">
-                {{-- Foto Utama Juga Masuk Galeri --}}
-                <div class="gallery-thumb"><img src="{{ asset('assets/uploads/products/' . ($produk->gambar_utama ?? 'default.jpg')) }}"></div>
-                @foreach($gallery as $img)
-                    <div class="gallery-thumb"><img src="{{ asset('assets/uploads/products/' . $img->nama_file) }}"></div>
-                @endforeach
-                @if($gallery->isEmpty())
-                    <p class="text-muted small italic">Tidak ada foto tambahan.</p>
-                @endif
+        {{-- Card: Galeri --}}
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
+            <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
+                <i class="mdi mdi-image-multiple-outline text-lg"></i> Galeri Foto Lainnya
+            </h4>
+
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                {{-- Foto Utama masuk galeri juga --}}
+                <div class="aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer group">
+                    <img src="{{ asset('assets/uploads/products/' . ($produk->gambar_utama ?? 'default.jpg')) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                </div>
+
+                {{-- Loop Galeri Tambahan --}}
+                @forelse($gallery as $img)
+                    <div class="aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer group">
+                        <img src="{{ asset('assets/uploads/products/' . $img->nama_file) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                    </div>
+                @empty
+                    @if(empty($produk->gambar_utama))
+                    <div class="col-span-full py-6 text-center bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <p class="text-xs font-bold text-slate-400 m-0 italic">Tidak ada foto tambahan yang diunggah.</p>
+                    </div>
+                    @endif
+                @endforelse
             </div>
         </div>
     </div>
 
-    {{-- COLUMN RIGHT: PRICING & ACTIONS --}}
-    <div class="side-content">
-        <div class="detail-card">
-            <span class="card-label">Informasi Komersial</span>
-            <ul class="spec-list">
-                <li class="spec-item">
-                    <span class="spec-label">Harga Satuan</span>
-                    <span class="spec-value text-primary fs-5">Rp {{ number_format($produk->harga, 0, ',', '.') }}</span>
+    {{-- KOLOM KANAN (INFO HARGA & AKSI STICKY) --}}
+    <div class="lg:col-span-1 space-y-6 lg:space-y-8 sticky top-[100px]">
+
+        {{-- Card: Info Komersial --}}
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-sm transition-colors duration-300">
+            <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
+                <i class="mdi mdi-cash-tag text-lg"></i> Informasi Komersial
+            </h4>
+
+            <ul class="m-0 p-0 list-none divide-y divide-slate-100 dark:divide-slate-800/80">
+                <li class="py-3 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Harga Satuan</span>
+                    <span class="text-lg font-black text-blue-600 dark:text-blue-400">Rp {{ number_format($produk->harga, 0, ',', '.') }}</span>
                 </li>
-                <li class="spec-item">
-                    <span class="spec-label">Stok Ready</span>
-                    <span class="spec-value">{{ $produk->stok }} {{ $produk->satuan_unit }}</span>
+                <li class="py-3 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Stok Ready</span>
+                    <span class="text-sm font-black text-slate-800 dark:text-white">{{ $produk->stok }} <span class="text-xs text-slate-400">{{ $produk->satuan_unit }}</span></span>
                 </li>
-                <li class="spec-item">
-                    <span class="spec-label">Berat Logistik</span>
-                    <span class="spec-value text-danger">{{ $produk->berat_kg }} Kg</span>
+                <li class="py-3 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Berat Logistik</span>
+                    <span class="text-sm font-black text-rose-600 dark:text-rose-400">{{ $produk->berat_kg }} Kg</span>
                 </li>
-                <li class="spec-item">
-                    <span class="spec-label">Diskon Aktif</span>
-                    <span class="spec-value">{{ $produk->nilai_diskon ? ($produk->tipe_diskon == 'PERSEN' ? $produk->nilai_diskon.'%' : 'Rp'.number_format($produk->nilai_diskon)) : '-' }}</span>
+                <li class="py-3 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Diskon Aktif</span>
+                    <span class="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                        {{ $produk->nilai_diskon ? ($produk->tipe_diskon == 'PERSEN' ? $produk->nilai_diskon.'%' : 'Rp '.number_format($produk->nilai_diskon, 0, ',', '.')) : '-' }}
+                    </span>
                 </li>
             </ul>
         </div>
 
+        {{-- PANEL AKSI MODERASI --}}
         @if($produk->status_moderasi == 'pending')
-        <div class="action-panel">
-            <div class="detail-card shadow-lg border-primary">
-                <span class="card-label text-primary">Keputusan Admin</span>
-                <p class="small text-muted mb-4">Pastikan konten material tidak melanggar aturan dan foto terlihat jelas.</p>
-                
-                <form action="{{ route('admin.products.process', $produk->id) }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="action" value="approve">
-                    <button type="submit" class="btn-approve" onclick="return confirm('Setujui produk ini?')">
-                        <i class="mdi mdi-check-decagram me-1"></i> SETUJUI MATERIAL
-                    </button>
-                </form>
+            <div class="bg-white dark:bg-slate-900 border-2 border-blue-500/30 dark:border-blue-500/50 rounded-[2rem] p-6 shadow-lg shadow-blue-500/10 dark:shadow-[0_0_30px_rgba(59,130,246,0.1)] relative overflow-hidden transition-colors duration-300">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500"></div>
 
-                <button type="button" class="btn-reject" data-bs-toggle="modal" data-bs-target="#rejectModal">
-                    <i class="mdi mdi-close-octagon-outline me-1"></i> TOLAK PENGAJUAN
-                </button>
+                <h4 class="text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-2 text-center">
+                    Keputusan Eksekusi
+                </h4>
+                <p class="text-xs font-bold text-slate-500 dark:text-slate-400 text-center mb-6">
+                    Pastikan gambar jelas, tidak mengandung unsur terlarang, dan deskripsi sesuai.
+                </p>
+
+                <div class="space-y-3">
+                    {{-- Form Approve --}}
+                    <form action="{{ route('admin.products.process', $produk->id) }}" method="POST" class="m-0">
+                        @csrf
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black rounded-xl shadow-md shadow-emerald-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all outline-none" onclick="return confirm('Apakah Anda yakin ingin menyetujui produk ini tayang?')">
+                            <i class="mdi mdi-check-decagram text-lg"></i> SETUJUI MATERIAL
+                        </button>
+                    </form>
+
+                    {{-- Tombol Trigger Modal Reject --}}
+                    <button type="button" class="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-white dark:bg-slate-800 border-2 border-rose-100 dark:border-rose-500/30 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-sm font-black rounded-xl transition-all outline-none" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                        <i class="mdi mdi-close-octagon-outline text-lg"></i> TOLAK PENGAJUAN
+                    </button>
+                </div>
             </div>
-        </div>
+
         @elseif($produk->status_moderasi == 'rejected')
-        <div class="detail-card bg-light">
-            <span class="card-label text-danger">Alasan Penolakan</span>
-            <p class="text-dark fw-bold mb-0">"{{ $produk->alasan_penolakan }}"</p>
-        </div>
+            {{-- Panel Alasan Ditolak --}}
+            <div class="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-[2rem] p-6 shadow-sm transition-colors duration-300">
+                <h4 class="text-[11px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-[0.2em] flex items-center gap-2 mb-3">
+                    <i class="mdi mdi-alert-circle text-lg"></i> Alasan Penolakan
+                </h4>
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 leading-relaxed italic m-0">
+                    "{{ $produk->alasan_penolakan }}"
+                </p>
+            </div>
         @endif
+
     </div>
 </div>
 
-{{-- MODAL REJECT --}}
+{{-- ============================================================================== --}}
+{{-- MODAL REJECT (MENDUKUNG DARK MODE BOOTSTRAP)                                   --}}
+{{-- ============================================================================== --}}
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
-            <form action="{{ route('admin.products.process', $produk->id) }}" method="POST">
+        <div class="modal-content rounded-[2rem] overflow-hidden border-0 shadow-2xl">
+            <form action="{{ route('admin.products.process', $produk->id) }}" method="POST" class="m-0">
                 @csrf
                 <input type="hidden" name="action" value="reject">
-                <div class="modal-header border-0 p-4 pb-0">
-                    <h5 class="fw-bold">Kenapa Material Ditolak?</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                <div class="modal-header border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
+                    <h5 class="text-base font-black text-slate-800 dark:text-white m-0 flex items-center gap-2">
+                        <i class="mdi mdi-shield-alert text-rose-500 text-xl"></i> Kenapa Material Ditolak?
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <textarea name="alasan_penolakan" class="form-control rounded-3" rows="4" required placeholder="Contoh: Foto produk buram atau deskripsi kurang jelas..."></textarea>
+
+                <div class="modal-body p-6 bg-slate-50/50 dark:bg-slate-900">
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-4">Berikan alasan yang jelas agar penjual dapat memperbaiki kesalahan pada produk mereka.</p>
+                    <textarea name="alasan_penolakan" class="form-control w-full p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all resize-none shadow-inner dark:shadow-none" rows="4" required placeholder="Contoh: Foto produk sangat buram, atau nama barang mengandung kata tidak pantas..."></textarea>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger px-4">Kirim Penolakan</button>
+
+                <div class="modal-footer border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex justify-end gap-3">
+                    <button type="button" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors outline-none" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-black text-sm text-white bg-rose-500 hover:bg-rose-600 shadow-md shadow-rose-500/20 transition-all outline-none">Kirim Penolakan</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 @endsection

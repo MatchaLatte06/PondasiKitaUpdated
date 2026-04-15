@@ -4,44 +4,60 @@
 
 @push('styles')
 <style>
-    :root {
-        --primary-indigo: #4f46e5;
-        --soft-bg: #f8fafc;
-        --border-color: #e2e8f0;
-    }
+    /* ========================================= */
+    /* ==  PREMIUM USER DIRECTORY CSS         == */
+    /* ========================================= */
+    .hover-lift { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .hover-lift:hover { transform: translateY(-4px); }
 
-    /* QUICK STATS CARDS */
-    .user-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .stat-mini-card { background: white; padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem; transition: all 0.2s; }
-    .stat-mini-card:hover { border-color: var(--primary-indigo); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.05);}
-    .stat-icon-box { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .table-wrapper::-webkit-scrollbar { height: 6px; }
+    .table-wrapper::-webkit-scrollbar-track { background: transparent; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .table-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .dark .table-wrapper::-webkit-scrollbar-thumb { background: #475569; }
+    .dark .table-wrapper::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-    /* TABLE CUSTOMIZATION */
-    .main-card { background: white; border-radius: 20px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .table thead th { background: var(--soft-bg); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; font-weight: 800; color: #64748b; padding: 1.2rem 1.5rem; border: none; }
-    .table tbody td { padding: 1.2rem 1.5rem; vertical-align: middle; border-bottom: 1px solid var(--soft-bg); }
-    .table tbody tr:hover { background-color: #f8fafc; }
-    
-    /* USER PROFILE CELL */
-    .user-avatar-stack { position: relative; width: 42px; height: 42px; flex-shrink: 0; }
-    .user-avatar-stack .avatar-img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; }
-    .status-indicator { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; }
-    .indicator-online { background: #10b981; }
-    .indicator-offline { background: #94a3b8; }
+    /* ========================================= */
+    /* == POLYFILL DARK MODE (ANTI-PUTIH)     == */
+    /* ========================================= */
+    .dark .dark\:bg-slate-900 { background-color: #0f172a !important; }
+    .dark .dark\:bg-slate-800 { background-color: #1e293b !important; }
+    .dark .dark\:bg-slate-800\/50 { background-color: rgba(30, 41, 59, 0.5) !important; }
+    .dark .dark\:bg-slate-800\/40 { background-color: rgba(30, 41, 59, 0.4) !important; }
+    .dark .dark\:bg-slate-800\/30 { background-color: rgba(30, 41, 59, 0.3) !important; }
+    .dark .dark\:bg-slate-700 { background-color: #334155 !important; }
+    .dark .dark\:border-slate-800 { border-color: #1e293b !important; }
+    .dark .dark\:border-slate-800\/80 { border-color: rgba(30, 41, 59, 0.8) !important; }
+    .dark .dark\:border-slate-700 { border-color: #334155 !important; }
+    .dark .dark\:border-slate-700\/50 { border-color: rgba(51, 65, 85, 0.5) !important; }
 
-    /* BADGES */
-    .badge-premium { padding: 0.4rem 0.75rem; border-radius: 8px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; }
-    .badge-admin { background: #fee2e2; color: #b91c1c; }
-    .badge-seller { background: #fef3c7; color: #92400e; }
-    .badge-customer { background: #dbeafe; color: #1e40af; }
-    
-    .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap:4px; }
-    .status-active { background: #d1fae5; color: #065f46; }
-    .status-banned { background: #f1f5f9; color: #475569; text-decoration: line-through; }
+    /* MODAL & FORM BOOTSTRAP OVERRIDE */
+    .dark .modal-content { background-color: #0f172a !important; border: 1px solid #1e293b !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; color: #f8fafc !important; }
+    .dark .modal-header, .dark .border-b { border-bottom-color: #1e293b !important; }
+    .dark .form-control, .dark .form-select { background-color: #1e293b !important; border-color: #334155 !important; color: #f8fafc !important; }
+    .dark .form-control:focus, .dark .form-select:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important; }
+    .dark .form-control::placeholder { color: #64748b !important; }
+    .dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); opacity: 0.5; }
+    .dark .btn-close:hover { opacity: 1; }
+    .dark .pagination .page-link { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
+    .dark .pagination .page-item.active .page-link { background-color: #3b82f6; border-color: #3b82f6; color: white; }
 
-    /* HOVER ACTIONS */
-    .action-btn-group .btn { width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; transition: all 0.2s; }
-    .action-btn-group .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    /* BADGE GLOWING DARK MODE */
+    .dark .dark\:bg-rose-500\/10 { background-color: rgba(244, 63, 94, 0.15) !important; }
+    .dark .dark\:text-rose-400 { color: #fb7185 !important; }
+    .dark .dark\:border-rose-500\/20 { border-color: rgba(244, 63, 94, 0.2) !important; }
+
+    .dark .dark\:bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.15) !important; }
+    .dark .dark\:text-amber-400 { color: #fbbf24 !important; }
+    .dark .dark\:border-amber-500\/20 { border-color: rgba(245, 158, 11, 0.2) !important; }
+
+    .dark .dark\:bg-blue-500\/10 { background-color: rgba(59, 130, 246, 0.15) !important; }
+    .dark .dark\:text-blue-400 { color: #60a5fa !important; }
+    .dark .dark\:border-blue-500\/20 { border-color: rgba(59, 130, 246, 0.2) !important; }
+
+    .dark .dark\:bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.15) !important; }
+    .dark .dark\:text-emerald-400 { color: #34d399 !important; }
+    .dark .dark\:border-emerald-500\/20 { border-color: rgba(16, 185, 129, 0.2) !important; }
 </style>
 @endpush
 
@@ -49,181 +65,220 @@
 
 {{-- Menampilkan Error Validasi Form Modal --}}
 @if($errors->any())
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong><i class="mdi mdi-alert-circle"></i> Proses Gagal:</strong>
-    <ul class="mb-0 mt-1">
-        @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-        @endforeach
-    </ul>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="bg-red-50 dark:bg-rose-500/10 border border-red-200 dark:border-rose-500/20 rounded-2xl p-4 mb-6 shadow-sm flex items-start justify-between">
+    <div class="flex gap-3">
+        <i class="mdi mdi-alert-circle text-red-500 dark:text-rose-400 text-xl mt-0.5"></i>
+        <div>
+            <strong class="text-sm font-black text-red-700 dark:text-rose-400 block mb-1">Proses Gagal:</strong>
+            <ul class="text-xs font-bold text-red-600 dark:text-rose-300 m-0 pl-4 space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+    <button type="button" class="text-red-400 hover:text-red-600 dark:hover:text-rose-300 outline-none" onclick="this.parentElement.style.display='none'"><i class="mdi mdi-close text-lg"></i></button>
 </div>
 @endif
 
-<div class="dashboard-header mb-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">User Directory</h2>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-decoration-none text-muted">Dashboard</a></li>
-                    <li class="breadcrumb-item active fw-bold text-primary">Kelola Pengguna</li>
-                </ol>
-            </nav>
+{{-- HEADER HALAMAN --}}
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
+    <div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-1 transition-colors duration-300">
+            User Directory
+        </h2>
+        <div class="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 transition-colors duration-300">
+            <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-decoration-none">Dashboard</a>
+            <i class="mdi mdi-chevron-right text-sm"></i>
+            <span class="text-blue-600 dark:text-blue-400">Kelola Pengguna</span>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.users.export', ['level' => $level_filter]) }}" class="btn btn-outline-secondary border-dashed px-3 fw-bold">
-                <i class="mdi mdi-file-excel-outline me-1"></i> Export CSV
-            </a>
-            
-            {{-- TOMBOL HANYA UNTUK SUPER ADMIN --}}
-            @if(auth()->user()->admin_role === 'super')
-                <button class="btn btn-primary px-4 shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAddAdmin">
-                    <i class="mdi mdi-shield-plus-outline me-1"></i> Admin Baru
-                </button>
-            @endif
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="{{ route('admin.users.export', ['level' => $level_filter]) }}" class="px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-bold rounded-xl transition-all shadow-sm outline-none flex items-center gap-2 text-decoration-none">
+            <i class="mdi mdi-file-excel-outline text-lg"></i> Export CSV
+        </a>
+
+        {{-- TOMBOL HANYA UNTUK SUPER ADMIN --}}
+        @if(auth()->user()->admin_role === 'super')
+            <button class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all outline-none flex items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalAddAdmin">
+                <i class="mdi mdi-shield-plus-outline text-lg"></i> Admin Baru
+            </button>
+        @endif
+    </div>
+</div>
+
+{{-- GRID STATISTIK CEPAT --}}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+    <div class="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover-lift transition-colors duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
+            <i class="mdi mdi-account-group"></i>
+        </div>
+        <div>
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Total User</div>
+            <div class="text-2xl font-black text-slate-800 dark:text-white leading-none">{{ number_format($stats['total']) }}</div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover-lift transition-colors duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
+            <i class="mdi mdi-storefront"></i>
+        </div>
+        <div>
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Penjual (Seller)</div>
+            <div class="text-2xl font-black text-slate-800 dark:text-white leading-none">{{ number_format($stats['seller']) }}</div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover-lift transition-colors duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
+            <i class="mdi mdi-account-check"></i>
+        </div>
+        <div>
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Customer Aktif</div>
+            <div class="text-2xl font-black text-slate-800 dark:text-white leading-none">{{ number_format($stats['customer']) }}</div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover-lift transition-colors duration-300 group">
+        <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
+            <i class="mdi mdi-account-off"></i>
+        </div>
+        <div>
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Akun Diblokir</div>
+            <div class="text-2xl font-black text-slate-800 dark:text-white leading-none">{{ number_format($stats['banned']) }}</div>
         </div>
     </div>
 </div>
 
-<div class="user-stats-grid">
-    <div class="stat-mini-card">
-        <div class="stat-icon-box" style="background: #eef2ff; color: #4f46e5;"><i class="mdi mdi-account-group"></i></div>
-        <div>
-            <div class="text-muted small fw-bold text-uppercase">Total User</div>
-            <div class="h4 fw-bold mb-0">{{ number_format($stats['total']) }}</div>
-        </div>
-    </div>
-    <div class="stat-mini-card">
-        <div class="stat-icon-box" style="background: #fff7ed; color: #ea580c;"><i class="mdi mdi-storefront"></i></div>
-        <div>
-            <div class="text-muted small fw-bold text-uppercase">Penjual (Seller)</div>
-            <div class="h4 fw-bold mb-0">{{ number_format($stats['seller']) }}</div>
-        </div>
-    </div>
-    <div class="stat-mini-card">
-        <div class="stat-icon-box" style="background: #f0fdf4; color: #16a34a;"><i class="mdi mdi-account-check"></i></div>
-        <div>
-            <div class="text-muted small fw-bold text-uppercase">Customer Aktif</div>
-            <div class="h4 fw-bold mb-0">{{ number_format($stats['customer']) }}</div>
-        </div>
-    </div>
-    <div class="stat-mini-card">
-        <div class="stat-icon-box" style="background: #fef2f2; color: #dc2626;"><i class="mdi mdi-account-off"></i></div>
-        <div>
-            <div class="text-muted small fw-bold text-uppercase">Akun Diblokir</div>
-            <div class="h4 fw-bold mb-0">{{ number_format($stats['banned']) }}</div>
-        </div>
-    </div>
-</div>
+{{-- KARTU UTAMA (TABEL & FILTER) --}}
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden transition-colors duration-300">
 
-<div class="main-card">
-    <div class="card-header bg-white py-3 px-4 border-bottom-0">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div class="btn-group p-1 bg-light rounded-3">
-                @foreach(['semua', 'admin', 'seller', 'customer'] as $lv)
-                    <a href="{{ route('admin.users.index', ['level' => $lv, 'search' => $search]) }}" 
-                       class="btn btn-sm border-0 {{ $level_filter == $lv ? 'bg-white shadow-sm fw-bold text-primary' : 'text-muted' }} px-3" style="text-transform: capitalize;">
-                        {{ $lv }}
-                    </a>
-                @endforeach
-            </div>
+    {{-- Filter Header --}}
+    <div class="p-5 border-b border-slate-100 dark:border-slate-800/80 bg-white dark:bg-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 transition-colors duration-300">
 
-            <form action="{{ route('admin.users.index') }}" method="GET" class="position-relative" style="min-width: 320px;">
-                <input type="hidden" name="level" value="{{ $level_filter }}">
-                <i class="mdi mdi-magnify position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                <input type="text" name="search" class="form-control ps-5 rounded-pill bg-light border-0" 
-                       placeholder="Cari Nama, Email, atau Username..." value="{{ $search }}">
-            </form>
+        {{-- Pill Filters --}}
+        <div class="flex p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/50 w-full md:w-auto overflow-x-auto hide-scrollbar">
+            @foreach(['semua', 'admin', 'seller', 'customer'] as $lv)
+                <a href="{{ route('admin.users.index', ['level' => $lv, 'search' => $search]) }}"
+                   class="px-4 py-2 text-xs font-black capitalize rounded-lg transition-all text-decoration-none outline-none whitespace-nowrap {{ $level_filter == $lv ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-sm border border-slate-200 dark:border-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200' }}">
+                    {{ $lv }}
+                </a>
+            @endforeach
         </div>
+
+        {{-- Search Input --}}
+        <form action="{{ route('admin.users.index') }}" method="GET" class="relative w-full md:w-80">
+            <input type="hidden" name="level" value="{{ $level_filter }}">
+            <i class="mdi mdi-magnify absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-lg"></i>
+            <input type="text" name="search" value="{{ $search }}"
+                   class="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-inner dark:shadow-none"
+                   placeholder="Cari Nama, Email, ID...">
+        </form>
     </div>
 
-    <div class="table-responsive">
-        <table class="table mb-0">
+    {{-- Tabel Data --}}
+    <div class="overflow-x-auto table-wrapper">
+        <table class="w-full text-left border-collapse whitespace-nowrap">
             <thead>
-                <tr>
-                    <th style="width: 40px;"><input type="checkbox" class="form-check-input"></th>
-                    <th>Identitas Pengguna</th>
-                    <th>Kontak & Info</th>
-                    <th>Kasta Akun</th>
-                    <th>Bergabung</th>
-                    <th>Status</th>
-                    <th class="text-end">Aksi</th>
+                <tr class="bg-slate-50 dark:bg-slate-800/30 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+                    <th class="px-6 py-4 w-12 text-center">
+                        <input type="checkbox" class="w-4 h-4 text-blue-600 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 rounded focus:ring-blue-500">
+                    </th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Identitas Pengguna</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Kontak & Info</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Kasta Akun</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Bergabung</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Status</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-right">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
                 @forelse($users as $user)
-                <tr>
-                    <td><input type="checkbox" class="form-check-input"></td>
-                    <td>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="user-avatar-stack">
-                                <img src="{{ $user->profile_picture_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->nama).'&background=random&color=fff' }}" class="avatar-img shadow-sm">
-                                <span class="status-indicator {{ $user->status_online == 'online' ? 'indicator-online' : 'indicator-offline' }}" title="{{ ucfirst($user->status_online) }}"></span>
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors duration-200">
+                    <td class="px-6 py-4 text-center">
+                        <input type="checkbox" class="w-4 h-4 text-blue-600 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 rounded focus:ring-blue-500">
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-4">
+                            <div class="relative w-11 h-11 flex-shrink-0">
+                                <img src="{{ $user->profile_picture_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->nama).'&background=random&color=fff' }}" class="w-full h-full rounded-xl object-cover shadow-sm border border-slate-100 dark:border-slate-700">
+                                <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 {{ $user->status_online == 'online' ? 'bg-emerald-500' : 'bg-slate-400 dark:bg-slate-500' }}" title="{{ ucfirst($user->status_online) }}"></span>
                             </div>
                             <div>
-                                <div class="fw-bold text-dark" style="font-size: 14px;">{{ $user->nama }}</div>
-                                <div class="text-muted" style="font-size: 12px;">ID: #{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }} <span class="mx-1">•</span> <span class="text-primary">@ {{ $user->username }}</span></div>
+                                <div class="text-sm font-black text-slate-800 dark:text-slate-100">{{ $user->nama }}</div>
+                                <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-0.5">
+                                    ID: #{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }} <span class="mx-1 opacity-50">•</span> <span class="text-blue-600 dark:text-blue-400">@ {{ $user->username }}</span>
+                                </div>
                             </div>
                         </div>
                     </td>
-                    <td>
-                        <div class="d-flex flex-column gap-1">
-                            <span class="small fw-bold text-dark"><i class="mdi mdi-email-outline text-muted me-1"></i>{{ $user->email }}</span>
-                            <span class="small text-muted"><i class="mdi mdi-phone-outline me-1"></i>{{ $user->no_telepon ?? 'Tidak ada nomor' }}</span>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col gap-1">
+                            <div class="text-[11px] font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5"><i class="mdi mdi-email-outline text-slate-400 dark:text-slate-500 text-sm"></i> {{ $user->email }}</div>
+                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><i class="mdi mdi-phone-outline text-sm"></i> {{ $user->no_telepon ?? 'Tidak ada nomor' }}</div>
                         </div>
                     </td>
-                    <td>
-                        <span class="badge-premium badge-{{ $user->level }}">
-                            <i class="mdi {{ $user->level == 'seller' ? 'mdi-storefront-outline' : ($user->level == 'admin' ? 'mdi-shield-crown-outline' : 'mdi-account-outline') }}"></i>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black tracking-widest border
+                            @if($user->level == 'admin') bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20
+                            @elseif($user->level == 'seller') bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20
+                            @else bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20 @endif">
+                            <i class="mdi {{ $user->level == 'seller' ? 'mdi-storefront-outline' : ($user->level == 'admin' ? 'mdi-shield-crown-outline' : 'mdi-account-outline') }} text-sm"></i>
                             {{ strtoupper($user->level) }}
                             @if($user->level == 'admin' && $user->admin_role)
                                 ({{ strtoupper($user->admin_role) }})
                             @endif
                         </span>
                     </td>
-                    <td>
-                        <span class="small text-dark fw-bold">{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}</span>
+                    <td class="px-6 py-4">
+                        <div class="text-xs font-black text-slate-700 dark:text-slate-300">{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}</div>
                     </td>
-                    <td>
+                    <td class="px-6 py-4">
                         @if($user->is_banned)
-                            <span class="status-pill status-banned"><i class="mdi mdi-cancel"></i> Diblokir</span>
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black tracking-wider bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 line-through">
+                                <i class="mdi mdi-cancel"></i> Diblokir
+                            </span>
                         @else
-                            <span class="status-pill status-active"><i class="mdi mdi-check-decagram"></i> Aktif</span>
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm dark:shadow-none">
+                                <i class="mdi mdi-check-decagram"></i> Aktif
+                            </span>
                         @endif
                     </td>
-                    <td class="text-end">
-                        <div class="action-btn-group">
-                            <button type="button" class="btn btn-light border text-info btn-detail" 
-                                    data-nama="{{ $user->nama }}" 
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            {{-- Btn Detail --}}
+                            <button type="button" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all shadow-sm dark:shadow-none outline-none btn-detail"
+                                    data-nama="{{ $user->nama }}"
                                     data-username="{{ $user->username }}"
                                     data-email="{{ $user->email }}"
                                     data-phone="{{ $user->no_telepon ?? '-' }}"
                                     data-level="{{ strtoupper($user->level) }} {{ $user->level == 'admin' ? '('.strtoupper($user->admin_role).')' : '' }}"
                                     data-join="{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y, H:i') }}"
                                     data-img="{{ $user->profile_picture_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->nama).'&background=random&color=fff' }}"
-                                    data-bs-toggle="modal" data-bs-target="#modalDetailUser" data-bs-placement="top" title="Lihat Profil">
-                                <i class="mdi mdi-eye"></i>
+                                    data-bs-toggle="modal" data-bs-target="#modalDetailUser" title="Lihat Profil">
+                                <i class="mdi mdi-eye text-base"></i>
                             </button>
-                            
-                            <button type="button" class="btn btn-light border text-primary btn-edit" 
+
+                            {{-- Btn Edit --}}
+                            <button type="button" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:border-amber-200 dark:hover:border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-all shadow-sm dark:shadow-none outline-none btn-edit"
                                     data-url="{{ route('admin.users.update', $user->id) }}"
-                                    data-nama="{{ $user->nama }}" 
+                                    data-nama="{{ $user->nama }}"
                                     data-email="{{ $user->email }}"
                                     data-phone="{{ $user->no_telepon ?? '' }}"
                                     data-level="{{ $user->level }}"
                                     data-role="{{ $user->admin_role }}"
-                                    data-bs-toggle="modal" data-bs-target="#modalEditUser" data-bs-placement="top" title="Edit Pengguna">
-                                <i class="mdi mdi-pencil"></i>
+                                    data-bs-toggle="modal" data-bs-target="#modalEditUser" title="Edit Pengguna">
+                                <i class="mdi mdi-pencil text-base"></i>
                             </button>
 
+                            {{-- Btn Block --}}
                             @if ($user->id !== auth()->id())
-                                <form action="{{ route('admin.users.toggleBan', $user->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('admin.users.toggleBan', $user->id) }}" method="POST" class="m-0">
                                     @csrf
-                                    <button type="submit" class="btn btn-light border {{ $user->is_banned ? 'text-success' : 'text-danger' }}" 
-                                            onclick="return confirm('Apakah Anda yakin ingin mengubah status pemblokiran pengguna ini?')" 
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $user->is_banned ? 'Aktifkan Akun' : 'Blokir Akun' }}">
-                                        <i class="mdi {{ $user->is_banned ? 'mdi-account-check-outline' : 'mdi-account-cancel-outline' }}"></i>
+                                    <button type="submit" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm dark:shadow-none outline-none {{ $user->is_banned ? 'text-emerald-500 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 dark:hover:text-emerald-400 dark:hover:border-emerald-500/30 dark:hover:bg-emerald-500/10' : 'text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-500/30 hover:bg-rose-50 dark:hover:bg-rose-500/10' }}"
+                                            onclick="return confirm('Apakah Anda yakin ingin mengubah status pemblokiran pengguna ini?')"
+                                            title="{{ $user->is_banned ? 'Aktifkan Akun' : 'Blokir Akun' }}">
+                                        <i class="mdi {{ $user->is_banned ? 'mdi-account-check-outline' : 'mdi-account-cancel-outline' }} text-base"></i>
                                     </button>
                                 </form>
                             @endif
@@ -232,9 +287,12 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center py-5">
-                        <i class="mdi mdi-account-search-outline text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
-                        <p class="text-muted fw-bold mt-2 mb-0">Tidak ada pengguna yang cocok dengan filter.</p>
+                    <td colspan="7" class="text-center py-20 px-6">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-50 dark:bg-slate-800/50 mb-4">
+                            <i class="mdi mdi-account-search-outline text-4xl text-slate-300 dark:text-slate-600"></i>
+                        </div>
+                        <h5 class="text-base font-black text-slate-700 dark:text-slate-300 mb-1">Tidak ada pengguna ditemukan</h5>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-500 m-0">Coba gunakan kata kunci pencarian atau filter yang berbeda.</p>
                     </td>
                 </tr>
                 @endforelse
@@ -242,45 +300,52 @@
         </table>
     </div>
 
-    <div class="bg-light py-3 px-4 border-top d-flex justify-content-between align-items-center">
-        <div class="text-muted small fw-bold">
-            Menampilkan <span class="text-primary">{{ $users->firstItem() ?? 0 }}</span> - <span class="text-primary">{{ $users->lastItem() ?? 0 }}</span> dari <span class="text-primary">{{ $users->total() }}</span> pengguna
+    {{-- Footer Tabel & Pagination --}}
+    <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col md:flex-row justify-between items-center gap-4 transition-colors duration-300">
+        <div class="text-xs font-bold text-slate-500 dark:text-slate-400">
+            Menampilkan <span class="text-blue-600 dark:text-blue-400 font-black">{{ $users->firstItem() ?? 0 }}</span> - <span class="text-blue-600 dark:text-blue-400 font-black">{{ $users->lastItem() ?? 0 }}</span> dari <span class="text-slate-800 dark:text-white font-black">{{ $users->total() }}</span> pengguna
         </div>
-        <div>
+        <div class="pagination-wrapper">
             {{ $users->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>
 
+{{-- ============================================================================== --}}
+{{-- MODAL AREA (MENDUKUNG DARK MODE BOOTSTRAP)                                     --}}
+{{-- ============================================================================== --}}
+
 {{-- MODAL TAMBAH ADMIN BARU --}}
 <div class="modal fade" id="modalAddAdmin" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow-lg">
-            <div class="modal-header bg-light border-bottom-0 pb-3">
-                <h5 class="fw-bold text-dark mb-0"><i class="mdi mdi-shield-account-outline text-primary me-2"></i> Tambah Administrator</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="font-black text-slate-800 flex items-center gap-2 m-0 text-base">
+                    <i class="mdi mdi-shield-account-outline text-blue-600 text-xl"></i> Tambah Administrator
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body p-6">
                 <form action="{{ route('admin.users.store') }}" method="POST">
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-muted small">Nama Lengkap</label>
-                        <input type="text" name="nama" class="form-control" placeholder="Cth: Budiman Santoso" required>
+                    <div class="mb-4">
+                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Nama Lengkap</label>
+                        <input type="text" name="nama" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Cth: Budiman Santoso" required>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted small">Username</label>
-                            <input type="text" name="username" class="form-control" placeholder="Cth: budiman" required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Username</label>
+                            <input type="text" name="username" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Cth: budiman" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted small">Email Resmi</label>
-                            <input type="email" name="email" class="form-control" placeholder="Cth: budiman@pondasikita.com" required>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Resmi</label>
+                            <input type="email" name="email" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Cth: budiman@pondasikita.com" required>
                         </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-muted small">Otoritas / Kasta Admin</label>
-                        <select name="admin_role" class="form-select" required>
+
+                    <div class="mb-4">
+                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Otoritas / Hak Akses</label>
+                        <select name="admin_role" class="form-select rounded-xl py-2.5 font-bold text-sm shadow-inner cursor-pointer" required>
                             <option value="" disabled selected>-- Pilih Hak Akses --</option>
                             <option value="cs">Customer Service (Kelola Pengguna & Komplain)</option>
                             <option value="finance">Finance (Keuangan, Payout & Laporan)</option>
@@ -288,14 +353,14 @@
                         </select>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small">Password Akun</label>
-                        <input type="password" name="password" class="form-control" placeholder="Minimal 6 Karakter" required minlength="6">
+                    <div class="mb-6">
+                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Password Akun</label>
+                        <input type="password" name="password" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Minimal 6 Karakter" required minlength="6">
                     </div>
 
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary px-4 fw-bold">Buat Akun Admin</button>
+                    <div class="flex gap-3 justify-end mt-2 border-t border-slate-100 dark:border-slate-800 pt-5">
+                        <button type="button" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors outline-none" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all outline-none">Buat Akun Admin</button>
                     </div>
                 </form>
             </div>
@@ -306,50 +371,52 @@
 {{-- MODAL EDIT PENGGUNA --}}
 <div class="modal fade" id="modalEditUser" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow-lg">
-            <div class="modal-header bg-light border-bottom-0 pb-3">
-                <h5 class="fw-bold text-dark mb-0"><i class="mdi mdi-account-edit-outline text-primary me-2"></i> Edit Data Pengguna</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="font-black text-slate-800 flex items-center gap-2 m-0 text-base">
+                    <i class="mdi mdi-account-edit-outline text-blue-600 text-xl"></i> Edit Data Pengguna
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body p-6">
                 <form id="formEditUser" method="POST">
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-muted small">Nama Lengkap</label>
-                        <input type="text" name="nama" id="editNama" class="form-control" required>
+                    <div class="mb-4">
+                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Nama Lengkap</label>
+                        <input type="text" name="nama" id="editNama" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" required>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted small">Email Resmi</label>
-                            <input type="email" name="email" id="editEmail" class="form-control" required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Resmi</label>
+                            <input type="email" name="email" id="editEmail" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted small">No Telepon</label>
-                            <input type="text" name="no_telepon" id="editPhone" class="form-control">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">No Telepon</label>
+                            <input type="text" name="no_telepon" id="editPhone" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner">
                         </div>
                     </div>
-                    
+
                     {{-- FORM PILIHAN ROLE HANYA BISA DIAKSES OLEH SUPER ADMIN --}}
                     @if(auth()->user()->admin_role === 'super')
-                    <div class="mb-3" id="editRoleContainer" style="display: none;">
-                        <label class="form-label fw-bold text-muted small">Ubah Otoritas Admin</label>
-                        <select name="admin_role" id="editRole" class="form-select">
+                    <div class="mb-4" id="editRoleContainer" style="display: none;">
+                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Ubah Otoritas Admin</label>
+                        <select name="admin_role" id="editRole" class="form-select rounded-xl py-2.5 font-bold text-sm shadow-inner cursor-pointer">
                             <option value="cs">Customer Service</option>
                             <option value="finance">Finance</option>
                             <option value="super">Super Admin</option>
                         </select>
-                        <div class="help-text text-warning mt-1" style="font-size: 11px;"><i class="mdi mdi-alert-circle"></i> Mengubah ini akan mencabut/menambah akses menu mereka.</div>
+                        <div class="text-[10px] font-bold text-amber-500 mt-2 flex items-center gap-1"><i class="mdi mdi-alert-circle"></i> Mengubah ini akan berdampak pada akses menu mereka.</div>
                     </div>
                     @endif
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small">Reset Password (Opsional)</label>
-                        <input type="password" name="password" class="form-control" placeholder="Biarkan kosong jika tidak ingin mengubah sandi">
+                    <div class="mb-6">
+                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Reset Password (Opsional)</label>
+                        <input type="password" name="password" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Biarkan kosong jika tidak diubah">
                     </div>
 
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary px-4 fw-bold">Simpan Perubahan</button>
+                    <div class="flex gap-3 justify-end mt-2 border-t border-slate-100 dark:border-slate-800 pt-5">
+                        <button type="button" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors outline-none" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all outline-none">Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
@@ -360,29 +427,31 @@
 {{-- MODAL DETAIL PENGGUNA --}}
 <div class="modal fade" id="modalDetailUser" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered border-0">
-        <div class="modal-content border-0 rounded-4 overflow-hidden">
-            <div class="modal-header border-bottom-0 bg-light pb-0">
+        <div class="modal-content overflow-hidden">
+            <div class="modal-header border-bottom-0 pb-0">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center pt-0 pb-4 bg-light">
-                <img id="detImg" src="" class="rounded-circle shadow mb-3" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid white;">
-                <h4 class="fw-bold text-dark mb-0" id="detNama">Nama User</h4>
-                <p class="text-muted mb-2">@<span id="detUsername">username</span></p>
-                <span class="badge bg-primary px-3 py-2 rounded-pill" id="detLevel">ROLE</span>
+            <div class="modal-body text-center pt-0 pb-6 border-b border-slate-100 dark:border-slate-800">
+                <div class="w-24 h-24 mx-auto mb-4 relative rounded-2xl p-1 bg-white dark:bg-slate-800 shadow-md">
+                    <img id="detImg" src="" class="w-full h-full rounded-xl object-cover">
+                </div>
+                <h4 class="text-xl font-black text-slate-800 dark:text-white mb-1" id="detNama">Nama User</h4>
+                <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">@<span id="detUsername">username</span></p>
+                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black tracking-widest bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400" id="detLevel">ROLE</span>
             </div>
-            <div class="modal-body p-4">
-                <div class="row g-3">
-                    <div class="col-12 border-bottom pb-2">
-                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 10px;">Email Address</small>
-                        <span class="fw-bold text-dark" id="detEmail">email@domain.com</span>
+            <div class="modal-body p-6 bg-slate-50/50 dark:bg-transparent">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="flex flex-col gap-1 p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Alamat Email</span>
+                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-email-outline text-slate-400"></i> <span id="detEmail">email</span></span>
                     </div>
-                    <div class="col-12 border-bottom pb-2">
-                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 10px;">No Telepon</small>
-                        <span class="fw-bold text-dark" id="detPhone">08xxx</span>
+                    <div class="flex flex-col gap-1 p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nomor Telepon</span>
+                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-phone-outline text-slate-400"></i> <span id="detPhone">phone</span></span>
                     </div>
-                    <div class="col-12">
-                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 10px;">Bergabung Sejak</small>
-                        <span class="fw-bold text-dark" id="detJoin">1 Jan 2024</span>
+                    <div class="flex flex-col gap-1 p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Bergabung</span>
+                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-calendar-clock-outline text-slate-400"></i> <span id="detJoin">date</span></span>
                     </div>
                 </div>
             </div>
@@ -395,15 +464,8 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Aktifkan Bootstrap Tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], [title]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-
-        // Logic Modal Detail User
-        const detailButtons = document.querySelectorAll('.btn-detail');
-        detailButtons.forEach(btn => {
+        // Detail User
+        document.querySelectorAll('.btn-detail').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.getElementById('detImg').src = this.getAttribute('data-img');
                 document.getElementById('detNama').innerText = this.getAttribute('data-nama');
@@ -415,28 +477,21 @@
             });
         });
 
-        // Logic Modal Edit User Dinamis
-        const editButtons = document.querySelectorAll('.btn-edit');
-        const formEdit = document.getElementById('formEditUser');
+        // Edit User
         const roleContainer = document.getElementById('editRoleContainer');
         const roleSelect = document.getElementById('editRole');
 
-        editButtons.forEach(btn => {
+        document.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', function() {
-                // 1. Tembak URL Action Form secara dinamis
-                formEdit.action = this.getAttribute('data-url');
-                
-                // 2. Isi value inputan dari data-attribute tombol
+                document.getElementById('formEditUser').action = this.getAttribute('data-url');
                 document.getElementById('editNama').value = this.getAttribute('data-nama');
                 document.getElementById('editEmail').value = this.getAttribute('data-email');
-                
+
                 let phone = this.getAttribute('data-phone');
                 document.getElementById('editPhone').value = (phone && phone !== '-') ? phone : '';
 
-                // 3. Logika pintar untuk Otoritas Admin (Hanya Super Admin yang bisa lihat)
-                let level = this.getAttribute('data-level');
                 if(roleContainer) {
-                    if (level === 'admin') {
+                    if (this.getAttribute('data-level') === 'admin') {
                         roleContainer.style.display = 'block';
                         roleSelect.value = this.getAttribute('data-role');
                     } else {
