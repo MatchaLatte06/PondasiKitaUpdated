@@ -5,12 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class LandingController extends Controller
 {
     public function index()
     {
+        // ==========================================
+        // 0. PENGATURAN SISTEM & WEBSITE
+        // ==========================================
+        // Mengambil semua pengaturan dari tb_pengaturan agar bisa dipakai di Blade
+        $settingsData = DB::table('tb_pengaturan')->get();
+        $settings = [];
+        foreach ($settingsData as $s) {
+            $settings[$s->setting_nama] = $s->setting_nilai;
+        }
+
         // ==========================================
         // 1. DATA USER & LOKASI
         // ==========================================
@@ -20,7 +30,7 @@ class LandingController extends Controller
         $tokoSectionTitle = "Mitra Toko Populer";
 
         if ($user) {
-            // Cek alamat utama user untuk personalisasi konten
+            // Cek alamat utama user untuk personalisasi konten (Rekomendasi Terdekat)
             $alamatUtama = DB::table('tb_user_alamat')
                 ->where('user_id', $user->id)
                 ->where('is_utama', 1)
@@ -33,37 +43,33 @@ class LandingController extends Controller
         }
 
         // ==========================================
-        // 2. DYNAMIC BANNER HERO 
+        // 2. DYNAMIC BANNER HERO
         // ==========================================
-        /* Kalau nanti Bos sudah buat form admin dan tabel tb_banners, 
-           tinggal hapus array dummy ini dan pakai kode di bawah ini:
-           $promoBanners = DB::table('tb_banners')->where('is_active', 1)->get();
-        */
-
-        // Data dummy berbentuk Object agar panggilannya di Blade ($banner->img) tidak error
+        // Data dummy berbentuk Object. Jika Bos sudah buat CRUD Banner di Admin,
+        // ganti ini dengan: $promoBanners = DB::table('tb_banners')->where('is_active', 1)->get();
         $promoBanners = [
             (object)[
-                'title' => 'Pekan Diskon Baja', 
-                'desc' => 'Dapatkan potongan harga khusus untuk pembelian baja ringan volume besar minggu ini.', 
-                'img' => 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1000&auto=format&fit=crop', 
+                'title' => 'Pekan Diskon Baja',
+                'desc' => 'Dapatkan potongan harga khusus untuk pembelian baja ringan volume besar minggu ini.',
+                'img' => 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1000&auto=format&fit=crop',
                 'link' => '#'
             ],
             (object)[
-                'title' => 'Gratis Ongkir Se-Jawa', 
-                'desc' => 'Subsidi ongkos kirim hingga Rp500.000 untuk minimal transaksi 50 Juta.', 
-                'img' => 'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=1000&auto=format&fit=crop', 
+                'title' => 'Gratis Ongkir Se-Jawa',
+                'desc' => 'Subsidi ongkos kirim hingga Rp500.000 untuk minimal transaksi 50 Juta.',
+                'img' => 'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=1000&auto=format&fit=crop',
                 'link' => '#'
             ],
             (object)[
-                'title' => 'Mitra Baru: Semen Tiga Roda', 
-                'desc' => 'Kini tersedia semen kualitas premium langsung dari pabrik dengan harga termurah.', 
-                'img' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1000&auto=format&fit=crop', 
+                'title' => 'Mitra Baru: Semen Tiga Roda',
+                'desc' => 'Kini tersedia semen kualitas premium langsung dari pabrik dengan harga termurah.',
+                'img' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1000&auto=format&fit=crop',
                 'link' => '#'
             ]
         ];
 
         // ==========================================
-        // 3. KATEGORI UTAMA 
+        // 3. KATEGORI UTAMA
         // ==========================================
         // Hanya ambil kategori utama (parent_id kosong) agar tidak nyampur sama sub-kategori
         $kategoriUtama = DB::table('tb_kategori')->whereNull('parent_id')->get();
@@ -73,14 +79,16 @@ class LandingController extends Controller
         foreach ($kategoriUtama as $utama) {
             $utama->subkategori = $kategoriAnak->where('parent_id', $utama->id)->values();
         }
-        
+
         $categories = $kategoriUtama;
+
         // ==========================================
         // 4. TOKO POPULER
         // ==========================================
         $queryToko = DB::table('tb_toko as t')
             ->join('cities as c', 't.city_id', '=', 'c.id')
-            ->select('t.id', 't.nama_toko', 't.slug', 't.logo_toko', 't.banner_toko', 'c.name as kota')
+            // PERBAIKAN: Menambahkan t.tier_toko ke dalam select
+            ->select('t.id', 't.nama_toko', 't.slug', 't.logo_toko', 't.banner_toko', 't.tier_toko', 'c.name as kota')
             ->selectSub(function ($query) {
                 // Subquery hitung jumlah produk aktif
                 $query->from('tb_barang')
@@ -127,15 +135,41 @@ class LandingController extends Controller
         $listProdukNasional = $this->getBestSellingProducts();
 
         // ==========================================
-        // 6. RETURN VIEW
+        // 6. FLASH SALE (Integrasi)
+        // ==========================================
+        $flashSaleEvent = DB::table('tb_flash_sale_events')
+            ->where('is_active', 1)
+            ->where('tanggal_mulai', '<=', Carbon::now())
+            ->where('tanggal_berakhir', '>=', Carbon::now())
+            ->first();
+
+        $flashSaleProducts = [];
+        $flashSaleEndTime = null;
+
+        if ($flashSaleEvent) {
+            $flashSaleEndTime = $flashSaleEvent->tanggal_berakhir;
+            $flashSaleProducts = DB::table('tb_flash_sale_produk as fsp')
+                ->join('tb_barang as b', 'fsp.barang_id', '=', 'b.id')
+                ->select('b.id', 'b.nama_barang', 'b.harga', 'b.gambar_utama', 'fsp.harga_flash_sale', 'fsp.stok_flash_sale')
+                ->where('fsp.event_id', $flashSaleEvent->id)
+                ->where('fsp.status_moderasi', 'approved')
+                ->where('b.is_active', 1)
+                ->limit(10)->get();
+        }
+
+        // ==========================================
+        // 7. RETURN VIEW
         // ==========================================
         return view('landing', compact(
+            'settings', // Data Pengaturan Website
             'promoBanners',
             'categories',
             'listToko',
             'tokoSectionTitle',
             'listProdukLokal',
             'listProdukNasional',
+            'flashSaleProducts', // Data Produk Flash Sale
+            'flashSaleEndTime',  // Waktu Habis Flash Sale
             'user'
         ));
     }
@@ -149,10 +183,10 @@ class LandingController extends Controller
     {
         $query = DB::table('tb_barang as b')
             ->join('tb_toko as t', 'b.toko_id', '=', 't.id')
-            ->leftJoin('cities as c', 't.city_id', '=', 'c.id') // JOIN KOTA AGAR BISA MUNCUL DI CARD
+            ->leftJoin('cities as c', 't.city_id', '=', 'c.id')
             ->select(
-                'b.id', 'b.nama_barang', 'b.harga', 'b.gambar_utama',
-                't.nama_toko', 't.slug as slug_toko', 'c.name as kota_toko' // SELECT KOTA
+                'b.id', 'b.nama_barang', 'b.harga', 'b.gambar_utama', 'b.tipe_diskon', 'b.nilai_diskon',
+                't.nama_toko', 't.slug as slug_toko', 'c.name as kota_toko'
             )
             ->where('b.is_active', 1)
             ->where('b.status_moderasi', 'approved');
@@ -165,17 +199,17 @@ class LandingController extends Controller
             });
         }
 
-        // Hitung total terjual untuk sorting
+        // PERBAIKAN: Hitung total terjual dialiaskan sebagai stok_terjual agar dibaca oleh Blade
         $query->selectSub(function ($q) {
             $q->from('tb_detail_transaksi')
               ->whereColumn('barang_id', 'b.id')
               ->where('status_pesanan_item', 'sampai_tujuan') // Hitung yg sudah selesai
               ->selectRaw('COALESCE(SUM(jumlah), 0)');
-        }, 'total_terjual');
+        }, 'stok_terjual');
 
-        $query->orderByDesc('total_terjual');
+        $query->orderByDesc('stok_terjual');
 
-        return $query->limit(12)->get(); // Limit 12 agar grid HTML terlihat penuh & rapi
+        return $query->limit(10)->get(); // Limit 10 untuk grid
     }
 
     /**

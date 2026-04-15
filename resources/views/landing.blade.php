@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pondasikita - Premium B2B Material</title>
+    <title>{{ $settings['app_name'] ?? 'Pondasikita' }} - Premium B2B Material</title>
+    <meta name="description" content="{{ $settings['seo_description'] ?? 'Platform Jual Beli Bahan Bangunan Terlengkap se-Indonesia' }}">
 
     {{-- Tailwind CSS CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,6 +26,7 @@
                         'blink': 'blink 0.7s infinite',
                         'blob': 'blob 10s infinite alternate',
                         'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'flash-pulse': 'flash-pulse 1.5s ease-in-out infinite'
                     },
                     keyframes: {
                         blink: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0 } },
@@ -35,6 +37,10 @@
                         'pulse-glow': {
                             '0%, 100%': { opacity: 1, boxShadow: '0 0 0 0 rgba(37, 99, 235, 0.7)' },
                             '50%': { opacity: .8, boxShadow: '0 0 0 15px rgba(37, 99, 235, 0)' }
+                        },
+                        'flash-pulse': {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.5 }
                         }
                     }
                 }
@@ -44,8 +50,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    {{-- Tambahkan AlpineJS untuk Fitur View More --}}
+
+    {{-- Tambahkan AlpineJS untuk Fitur View More, Popup, & Countdown --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
@@ -63,17 +69,51 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f4f4f5; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
-        
+
         /* Utility untuk Animasi AlpineJS */
         [x-cloak] { display: none !important; }
+
+        /* Flash Sale Progress Bar */
+        .progress-bar-striped { background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem; }
     </style>
 </head>
-<body class="text-zinc-900 antialiased selection:bg-primary selection:text-white">
+<body class="text-zinc-900 antialiased selection:bg-primary selection:text-white"
+      x-data="landingPageData()"
+      x-init="initPage()">
+
+    {{-- ========================================================
+         1. POPUP PROMO (ALA SHOPEE/TOKOPEDIA)
+         ======================================================== --}}
+    @if(($settings['enable_welcome_popup'] ?? '0') == '1' && !empty($settings['popup_image']))
+    <div x-show="showPopup" x-cloak
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+         x-transition:enter="transition ease-out duration-500"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+
+        <div class="relative w-full max-w-sm mx-auto" @click.outside="closePopup()">
+            {{-- Tombol Close X --}}
+            <button @click="closePopup()" class="absolute -top-12 right-0 w-10 h-10 bg-white/20 hover:bg-white/40 text-white rounded-full flex items-center justify-center text-xl backdrop-blur transition-all outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+
+            {{-- Poster Promo --}}
+            <a href="{{ $settings['popup_link'] ?? '#' }}" class="block w-full rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform transition-transform hover:scale-[1.02]">
+                <img src="{{ asset('storage/' . $settings['popup_image']) }}" class="w-full h-auto object-cover" alt="Promo Spesial">
+            </a>
+        </div>
+    </div>
+    @endif
 
     {{-- Navbar --}}
     @include('partials.navbar')
 
-    {{-- HERO SECTION : B&W + BLUE PREMIUM EDITION --}}
+    {{-- ========================================================
+         2. HERO SECTION : B&W + BLUE PREMIUM EDITION
+         ======================================================== --}}
     <section class="relative bg-zinc-950 pt-24 pb-20 lg:pt-36 lg:pb-32 overflow-hidden border-b border-zinc-800">
         {{-- Ambient Glow --}}
         <div class="absolute top-0 left-1/4 w-[600px] h-[500px] bg-blue-600/10 rounded-full mix-blend-screen filter blur-[120px] animate-blob"></div>
@@ -89,7 +129,7 @@
 
                 <div class="space-y-2">
                     <h1 class="text-4xl lg:text-6xl font-black text-white leading-tight tracking-tight">
-                        Ekosistem Material,
+                        {{ $settings['hero_title'] ?? 'Ekosistem Material,' }}
                     </h1>
                     {{-- AREA TEKS MENGETIK: Kursor nempel di akhir teks --}}
                     <div class="h-[80px] md:h-[100px] lg:h-[120px] flex items-start justify-center lg:justify-start">
@@ -100,7 +140,7 @@
                 </div>
 
                 <p class="text-base text-zinc-400 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed">
-                    Arsitektur pengadaan B2B masa depan. Temukan ribuan supplier dengan transparansi harga dan manajemen RAB.
+                    {{ $settings['hero_subtitle'] ?? 'Arsitektur pengadaan B2B masa depan. Temukan ribuan supplier dengan transparansi harga dan manajemen RAB.' }}
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -117,13 +157,20 @@
             <div class="lg:col-span-7 relative w-full">
                 <div class="absolute top-8 left-12 flex gap-2 z-40" id="slider-dots"></div>
                 <div class="relative w-full aspect-video lg:aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.7)] border border-white/10 group bg-zinc-900 cursor-pointer">
-                    
+
                     {{-- Invisibile Click Zones --}}
                     <div class="absolute inset-y-0 left-0 w-1/2 z-30" onclick="moveSlider(-1)"></div>
                     <div class="absolute inset-y-0 right-0 w-1/2 z-30" onclick="moveSlider(1)"></div>
 
                     {{-- Slider Track --}}
                     <div id="hero-slider" class="flex w-full h-full transition-transform duration-700 ease-in-out">
+                        @if(!empty($settings['hero_image']))
+                            <div class="min-w-full h-full relative flex-shrink-0">
+                                <img src="{{ asset('storage/' . $settings['hero_image']) }}" class="w-full h-full object-cover" alt="Banner Utama">
+                                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent"></div>
+                            </div>
+                        @endif
+
                         @forelse($promoBanners ?? [] as $banner)
                             <div class="min-w-full h-full relative flex-shrink-0">
                                 <img src="{{ $banner->img ?? $banner['img'] }}" class="w-full h-full object-cover" alt="Banner">
@@ -138,22 +185,82 @@
                                 </div>
                             </div>
                         @empty
+                            @if(empty($settings['hero_image']))
                             <div class="min-w-full h-full bg-zinc-900 flex items-center justify-center">
                                 <p class="text-zinc-500">Belum ada promo aktif</p>
                             </div>
+                            @endif
                         @endforelse
                     </div>
 
-                    {{-- Bottom Navigation Dots --}}
-                    
                 </div>
             </div>
         </div>
     </section>
 
     <main class="container mx-auto px-4 py-6 lg:py-10 space-y-10 lg:space-y-16 relative z-20">
+
         {{-- ========================================================
-             KATEGORI UTAMA (DIROMBAK DENGAN ALPINEJS + VIEW MORE)
+             3. FLASH SALE SECTION (WAKTU TERBATAS)
+             ======================================================== --}}
+        @if(isset($flashSaleProducts) && count($flashSaleProducts) > 0)
+        <section class="relative bg-gradient-to-r from-red-600 to-orange-500 rounded-[2.5rem] p-6 lg:p-10 shadow-xl overflow-hidden">
+            {{-- Flash Sale Ambient --}}
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl"></div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white text-red-600 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
+                        <i class="fas fa-bolt animate-flash-pulse"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-black text-white tracking-tight">FLASH SALE</h2>
+                        <p class="text-red-100 text-sm font-medium">Material murah berakhir dalam:</p>
+                    </div>
+                </div>
+                {{-- Countdown Timer AlpineJS --}}
+                <div class="flex gap-2 text-white font-black font-mono text-xl" x-data="countdown('{{ $flashSaleEndTime ?? '' }}')">
+                    <div class="bg-black/30 backdrop-blur-md px-3 py-2 rounded-xl" x-text="hours">00</div><span class="py-2">:</span>
+                    <div class="bg-black/30 backdrop-blur-md px-3 py-2 rounded-xl" x-text="minutes">00</div><span class="py-2">:</span>
+                    <div class="bg-black/30 backdrop-blur-md px-3 py-2 rounded-xl" x-text="seconds">00</div>
+                </div>
+            </div>
+
+            {{-- Flash Sale Products Scroll --}}
+            <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                @foreach($flashSaleProducts as $fs)
+                    @php
+                        // Logika diskon Flash Sale
+                        $harga_coret = $fs->harga;
+                        $harga_diskon = $fs->harga_flash_sale ?? ($fs->harga * 0.8); // fallback 20% off
+                        $persen = round((($harga_coret - $harga_diskon) / $harga_coret) * 100);
+
+                        $terjual = $fs->stok_terjual ?? rand(10, 50);
+                        $total_stok = $fs->stok_flash_sale ?? 100;
+                        $persen_terjual = min(100, round(($terjual / $total_stok) * 100));
+                    @endphp
+                    <a href="{{ route('produk.detail', $fs->id) }}" class="snap-start shrink-0 w-44 md:w-56 bg-white rounded-2xl p-3 shadow-lg hover:-translate-y-2 transition-transform duration-300 group">
+                        <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-zinc-100 mb-3">
+                            <img src="{{ asset('assets/uploads/products/'.($fs->gambar_utama ?? 'default.jpg')) }}" onerror="this.src='https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="{{ $fs->nama_barang }}">
+                            <div class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-md">-{{ $persen }}%</div>
+                        </div>
+                        <h3 class="text-xs font-bold text-zinc-800 line-clamp-2 min-h-[2rem] leading-snug mb-1">{{ $fs->nama_barang }}</h3>
+                        <div class="font-black text-red-600 text-lg mb-1">Rp {{ number_format($harga_diskon, 0, ',', '.') }}</div>
+                        <div class="text-[10px] text-zinc-400 line-through mb-2">Rp {{ number_format($harga_coret, 0, ',', '.') }}</div>
+
+                        {{-- Progress Bar Stock --}}
+                        <div class="w-full bg-red-100 rounded-full h-3.5 relative overflow-hidden">
+                            <div class="bg-red-500 h-full progress-bar-striped transition-all duration-1000" style="width: {{ $persen_terjual }}%"></div>
+                            <span class="absolute inset-0 flex items-center justify-center text-[8px] font-black text-white drop-shadow-md">TERJUAL {{ $terjual }}</span>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+        @endif
+
+        {{-- ========================================================
+             4. KATEGORI UTAMA (DIROMBAK DENGAN ALPINEJS + VIEW MORE)
              ======================================================== --}}
         <section x-data="{ showAll: false }">
             <div class="text-center max-w-2xl mx-auto mb-10">
@@ -167,33 +274,29 @@
 
             {{-- Grid Kategori --}}
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-8 relative pb-6">
-                
+
                 @forelse($categories ?? [] as $index => $cat)
-                    {{-- Wrapper group/card untuk mendeteksi 2 level hover --}}
                     <div class="relative group/card h-full hover:z-50"
-                         @if($index >= 6) 
-                             x-show="showAll" 
+                         @if($index >= 6)
+                             x-show="showAll"
                              x-transition:enter="transition ease-out duration-500"
                              x-transition:enter-start="opacity-0 translate-y-4"
                              x-transition:enter-end="opacity-100 translate-y-0"
                              x-cloak
                          @endif>
-                         
+
                         @if(isset($cat->subkategori) && count($cat->subkategori) > 0)
-                            {{-- BACK CARD (Menu Sub Kategori) --}}
-                            {{-- Tahap 1: Peek (group-hover) -> Kartu ngintip ke kanan bawah dengan rotasi --}}
-                            {{-- Tahap 2: Reveal (hover) -> Kartu lompat ke depan (z-[60]), membesar, dan menutupi kartu utama --}}
-                            <div class="absolute inset-0 bg-white border border-blue-200 shadow-xl rounded-[1.5rem] z-20 
-                                        transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center 
-                                        opacity-0 pointer-events-none 
+                            <div class="absolute inset-0 bg-white border border-blue-200 shadow-xl rounded-[1.5rem] z-20
+                                        transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center
+                                        opacity-0 pointer-events-none
                                         group-hover/card:opacity-100 group-hover/card:translate-x-8 group-hover/card:translate-y-3 group-hover/card:rotate-[10deg] group-hover/card:pointer-events-auto
                                         hover:!translate-x-2 hover:!translate-y-2 hover:!rotate-0 hover:!scale-105 hover:!z-[60] hover:!shadow-[0_30px_60px_rgba(37,99,235,0.25)] hover:!border-blue-500
                                         flex flex-col p-4">
-                                
+
                                 <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-2 border-b border-blue-100 pb-1.5 shrink-0 flex items-center">
                                     <i class="fas fa-list-ul mr-1.5"></i> Sub Kategori
                                 </span>
-                                
+
                                 <div class="flex-1 overflow-y-auto scrollbar-hide flex flex-col gap-1">
                                     @foreach($cat->subkategori as $sub)
                                         <a href="{{ url('pages/produk?kategori=' . $sub->id) }}" class="block px-2 py-2 text-[11px] font-bold text-zinc-500 hover:text-white hover:bg-blue-600 rounded-lg transition-colors truncate">
@@ -204,18 +307,15 @@
                             </div>
                         @endif
 
-                        {{-- MAIN CARD (Kategori Utama) --}}
-                        <a href="{{ url('pages/produk?kategori=' . $cat->id) }}" 
-                           class="block relative w-full h-full bg-white p-5 md:p-6 rounded-[1.5rem] shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all duration-300 ease-out z-30 
-                                  group-hover/card:shadow-2xl group-hover/card:-translate-y-3 group-hover/card:-translate-x-3 group-hover/card:-rotate-[5deg] 
+                        <a href="{{ url('pages/produk?kategori=' . $cat->id) }}"
+                           class="block relative w-full h-full bg-white p-5 md:p-6 rounded-[1.5rem] shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all duration-300 ease-out z-30
+                                  group-hover/card:shadow-2xl group-hover/card:-translate-y-3 group-hover/card:-translate-x-3 group-hover/card:-rotate-[5deg]
                                   border border-zinc-100/80 group-hover/card:border-blue-300 flex flex-col items-center justify-center gap-4 bg-clip-padding">
-                           
-                            {{-- Ikon --}}
+
                             <div class="relative w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-zinc-50 text-zinc-600 flex items-center justify-center text-xl md:text-2xl group-hover/card:bg-blue-600 group-hover/card:text-white transition-colors duration-300 shadow-inner">
                                 <i class="{{ $cat->icon_class ?? 'fas fa-tools' }}"></i>
                             </div>
-                            
-                            {{-- Nama Kategori --}}
+
                             <p class="font-bold text-zinc-700 text-center text-xs md:text-sm group-hover/card:text-blue-600 transition-colors leading-tight line-clamp-2 px-2">
                                 {{ $cat->nama_kategori }}
                             </p>
@@ -228,31 +328,23 @@
                     </div>
                 @endforelse
 
-                {{-- Overlay Fade Effect (Muncul kalau ada lebih dari 12 kategori dan belum di-expand) --}}
                 @if(isset($categories) && count($categories) > 6)
                     <div x-show="!showAll" class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#fafafa] to-transparent pointer-events-none z-10 translate-y-2"></div>
                 @endif
             </div>
 
-            {{-- Tombol View More --}}
-           {{-- TOMBOL VIEW MORE: PREMIUM INTERACTIVE VERSION --}}
             @if(isset($categories) && count($categories) > 6)
             <div class="mt-8 flex justify-center relative z-20">
-                <button @click="showAll = !showAll" 
+                <button @click="showAll = !showAll"
                         class="group relative inline-flex items-center justify-center px-10 py-4 font-black tracking-tighter text-zinc-700 bg-white rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-500 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_20px_40px_rgba(37,99,235,0.2)] hover:-translate-y-1 active:scale-95">
-                    
-                    {{-- Efek Kilatan Cahaya (Shimmer) --}}
+
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-blue-500/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
-                    
-                    {{-- Background Glow saat Hover --}}
                     <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_center,_rgba(37,99,235,0.05)_0%,_transparent_70%)]"></div>
 
                     <div class="relative flex items-center gap-3">
                         <span class="text-xs uppercase tracking-[0.2em]" x-text="showAll ? 'Ringkas Kategori' : 'Lihat Semua Kategori'"></span>
-                        
-                        {{-- Icon Container dengan Animasi --}}
                         <div class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-zinc-50 group-hover:bg-blue-50 transition-colors duration-500">
-                            <i class="fas text-[10px] transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]" 
+                            <i class="fas text-[10px] transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                                :class="showAll ? 'fa-minus rotate-180' : 'fa-plus group-hover:rotate-90'"></i>
                         </div>
                     </div>
@@ -261,81 +353,65 @@
             @endif
 
             <style>
-                @keyframes shimmer {
-                    100% { transform: translateX(100%); }
-                }
+                @keyframes shimmer { 100% { transform: translateX(100%); } }
             </style>
         </section>
 
-        {{-- SECTION: FLOATING TECH VALUES (PENGISI GAP) --}}
-<section class="relative py-0 overflow-hidden rounded-[3rem] bg-zinc-50/50 border border-zinc-100">
-    {{-- Background Pattern: Blueprint Grid --}}
-    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" 
-         style="background-image: radial-gradient(#2563eb 0.5px, transparent 0.5px); background-size: 24px 24px;"></div>
-    
-    <div class="container mx-auto px-4 relative z-10">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-            
-            {{-- Card 1: Real-Time Inventory --}}
-            <div class="group relative p-8 rounded-[2rem] bg-white/50 backdrop-blur-sm border border-white hover:border-blue-200 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(37,99,235,0.05)] hover:-translate-y-2 animate-float">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-2xl mb-6 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-500">
-                    <i class="fas fa-microchip"></i>
-                </div>
-                <h4 class="text-xl font-black text-zinc-800 mb-3 tracking-tight">Smart Inventory</h4>
-                <p class="text-sm text-zinc-500 font-medium leading-relaxed">Pantau ketersediaan stok material di ribuan gudang supplier secara <span class="text-blue-600">real-time</span> tanpa perlu telepon satu-persatu.</p>
-                {{-- Decorative Line --}}
-                <div class="absolute bottom-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700"></div>
-            </div>
-
-            {{-- Card 2: Transparency (Floating with different delay) --}}
-            <div class="group relative p-8 rounded-[2rem] bg-white/50 backdrop-blur-sm border border-white hover:border-blue-200 transition-all duration-500 hover:shadow-[0_20_50px_rgba(37,99,235,0.05)] hover:-translate-y-2 animate-float" style="animation-delay: 1.5s;">
-                <div class="w-14 h-14 rounded-2xl bg-zinc-900 text-white flex items-center justify-center text-2xl mb-6 shadow-lg shadow-zinc-900/20 group-hover:bg-blue-600 transition-colors duration-500">
-                    <i class="fas fa-handshake-angle"></i>
-                </div>
-                <h4 class="text-xl font-black text-zinc-800 mb-3 tracking-tight">Transparansi B2B</h4>
-                <p class="text-sm text-zinc-500 font-medium leading-relaxed">Dapatkan kontrak digital yang mengikat antara pembeli dan supplier. <span class="text-blue-600">No Hidden Cost</span>, semua biaya terbuka di awal.</p>
-                <div class="absolute bottom-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700"></div>
-            </div>
-
-            {{-- Card 3: Logistics (Floating with different delay) --}}
-            <div class="group relative p-8 rounded-[2rem] bg-white/50 backdrop-blur-sm border border-white hover:border-blue-200 transition-all duration-500 hover:shadow-[0_20_50px_rgba(37,99,235,0.05)] hover:-translate-y-2 animate-float" style="animation-delay: 3s;">
-                <div class="w-14 h-14 rounded-2xl bg-zinc-100 text-zinc-400 flex items-center justify-center text-2xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                    <i class="fas fa-route"></i>
-                </div>
-                <h4 class="text-xl font-black text-zinc-800 mb-3 tracking-tight">Optimal Logistics</h4>
-                <p class="text-sm text-zinc-500 font-medium leading-relaxed">Algoritma kami memilihkan armada terdekat untuk menghemat <span class="text-blue-600">ongkos kirim</span> hingga 30% dari tarif normal.</p>
-                <div class="absolute bottom-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700"></div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<style>
-    @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-15px); }
-        100% { transform: translateY(0px); }
-    }
-    .animate-float {
-        animation: float 6s ease-in-out infinite;
-    }
-</style>    
         {{-- ========================================================
-             MODERN BENTO GRID FEATURE HIGHLIGHT (Pengganti Trust Badge)
+             5. FLOATING TECH VALUES (PENGISI GAP)
              ======================================================== --}}
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-20">
-            
-            {{-- KOLOM BESAR: Promo AI POTA (Dark Theme untuk Kontras) --}}
+        <section class="relative py-0 overflow-hidden rounded-[3rem] bg-zinc-50/50 border border-zinc-100">
+            <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#2563eb 0.5px, transparent 0.5px); background-size: 24px 24px;"></div>
+            <div class="container mx-auto px-4 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+                    {{-- Card 1 --}}
+                    <div class="group relative p-8 rounded-[2rem] bg-white/50 backdrop-blur-sm border border-white hover:border-blue-200 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(37,99,235,0.05)] hover:-translate-y-2 animate-float">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-2xl mb-6 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-zinc-800 mb-3 tracking-tight">Smart Inventory</h4>
+                        <p class="text-sm text-zinc-500 font-medium leading-relaxed">Pantau ketersediaan stok material di gudang supplier secara <span class="text-blue-600">real-time</span>.</p>
+                        <div class="absolute bottom-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700"></div>
+                    </div>
+                    {{-- Card 2 --}}
+                    <div class="group relative p-8 rounded-[2rem] bg-white/50 backdrop-blur-sm border border-white hover:border-blue-200 transition-all duration-500 hover:shadow-[0_20_50px_rgba(37,99,235,0.05)] hover:-translate-y-2 animate-float" style="animation-delay: 1.5s;">
+                        <div class="w-14 h-14 rounded-2xl bg-zinc-900 text-white flex items-center justify-center text-2xl mb-6 shadow-lg shadow-zinc-900/20 group-hover:bg-blue-600 transition-colors duration-500">
+                            <i class="fas fa-handshake-angle"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-zinc-800 mb-3 tracking-tight">Transparansi B2B</h4>
+                        <p class="text-sm text-zinc-500 font-medium leading-relaxed">Dapatkan kontrak digital yang mengikat antara pembeli dan supplier. <span class="text-blue-600">No Hidden Cost</span>.</p>
+                        <div class="absolute bottom-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700"></div>
+                    </div>
+                    {{-- Card 3 --}}
+                    <div class="group relative p-8 rounded-[2rem] bg-white/50 backdrop-blur-sm border border-white hover:border-blue-200 transition-all duration-500 hover:shadow-[0_20_50px_rgba(37,99,235,0.05)] hover:-translate-y-2 animate-float" style="animation-delay: 3s;">
+                        <div class="w-14 h-14 rounded-2xl bg-zinc-100 text-zinc-400 flex items-center justify-center text-2xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-zinc-800 mb-3 tracking-tight">Optimal Logistics</h4>
+                        <p class="text-sm text-zinc-500 font-medium leading-relaxed">Algoritma memilihkan armada terdekat untuk menghemat <span class="text-blue-600">ongkos kirim</span> hingga 30%.</p>
+                        <div class="absolute bottom-0 left-8 right-8 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <style>
+            @keyframes float {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-15px); }
+                100% { transform: translateY(0px); }
+            }
+            .animate-float { animation: float 6s ease-in-out infinite; }
+        </style>
+
+        {{-- ========================================================
+             6. BENTO GRID FEATURE HIGHLIGHT (POTA AI)
+             ======================================================== --}}
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-20 mt-10">
             <div class="lg:col-span-2 relative overflow-hidden bg-zinc-950 rounded-[2.5rem] p-8 md:p-12 flex flex-col justify-center group border border-zinc-800 shadow-2xl">
-                {{-- Efek Glow Latar --}}
                 <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/20 rounded-full mix-blend-screen filter blur-[80px] group-hover:bg-blue-500/30 transition-colors duration-700 pointer-events-none"></div>
                 <div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-indigo-600/10 rounded-full mix-blend-screen filter blur-[80px] pointer-events-none"></div>
-                
-                {{-- Ornamen UI Transparan di Kanan --}}
-                <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
-                    <i class="fas fa-robot text-[250px] text-white"></i>
-                </div>
+                <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none"><i class="fas fa-robot text-[250px] text-white"></i></div>
 
                 <div class="relative z-10">
                     <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-black tracking-widest uppercase mb-6 shadow-[0_0_15px_rgba(37,99,235,0.1)]">
@@ -345,29 +421,24 @@
                         </span>
                         Mandor POTA AI
                     </div>
-                    
                     <h3 class="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-5 leading-[1.1] tracking-tight">
                         Asisten Proyek Cerdas,<br>
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Siap 24 Jam.</span>
                     </h3>
-                    
                     <p class="text-zinc-400 max-w-md text-sm md:text-base font-medium leading-relaxed">
                         Tinggalkan cara lama. Biarkan AI kami menghitung kebutuhan RAB Anda, mencari supplier termurah, dan merekomendasikan material secara real-time.
                     </p>
                 </div>
-                
+
                 <div class="relative z-10 mt-8 md:mt-10">
                     <button onclick="toggleChat()" class="group/btn inline-flex items-center gap-3 bg-white text-zinc-900 font-black px-6 py-3.5 rounded-xl transition-all hover:bg-blue-50 hover:text-blue-600 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:-translate-y-1">
-                        Ngobrol Sekarang 
+                        Ngobrol Sekarang
                         <i class="fas fa-arrow-right text-xs transition-transform group-hover/btn:translate-x-1"></i>
                     </button>
                 </div>
             </div>
 
-            {{-- KOLOM KANAN: Value Proposition (Ditumpuk Atas-Bawah) --}}
             <div class="flex flex-col gap-6">
-                
-                {{-- Kotak Atas (Warna Biru Sangat Lembut) --}}
                 <div class="flex-1 bg-gradient-to-br from-blue-50 to-white rounded-[2.5rem] p-8 border border-blue-100 flex flex-col justify-center relative overflow-hidden group shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-1">
                     <div class="w-14 h-14 bg-white rounded-2xl shadow-[0_4px_15px_rgba(37,99,235,0.1)] flex items-center justify-center text-blue-600 text-2xl mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                         <i class="fas fa-hand-holding-dollar"></i>
@@ -376,7 +447,6 @@
                     <p class="text-xs md:text-sm text-zinc-500 font-medium leading-relaxed">Bandingkan harga langsung dari tangan pertama tanpa perantara yang rumit.</p>
                 </div>
 
-                {{-- Kotak Bawah (Warna Netral) --}}
                 <div class="flex-1 bg-gradient-to-br from-zinc-50 to-white rounded-[2.5rem] p-8 border border-zinc-200 flex flex-col justify-center relative overflow-hidden group shadow-sm hover:shadow-xl hover:shadow-zinc-500/10 transition-all duration-300 hover:-translate-y-1">
                     <div class="w-14 h-14 bg-white rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] flex items-center justify-center text-zinc-800 text-2xl mb-5 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                         <i class="fas fa-truck-fast"></i>
@@ -384,26 +454,23 @@
                     <h4 class="font-black text-xl text-zinc-800 mb-2 tracking-tight">Logistik B2B</h4>
                     <p class="text-xs md:text-sm text-zinc-500 font-medium leading-relaxed">Sistem terintegrasi untuk pengiriman material skala besar (truk/tronton).</p>
                 </div>
-
             </div>
         </section>
 
-        {{-- TOKO POPULER (B&W Edition) --}}
-        {{-- SECTION: MITRA TOKO POPULER (PREMIUM RE-DESIGN) --}}
-        <section id="toko" class="relative">
+        {{-- ========================================================
+             7. MITRA TOKO TERVERIFIKASI
+             ======================================================== --}}
+        @if(($settings['show_top_stores'] ?? '1') == '1')
+        <section id="toko" class="relative mt-12">
             <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-zinc-100 pb-8 gap-6">
                 <div>
                     <h2 class="text-[10px] font-black tracking-[0.3em] text-blue-600 uppercase mb-3">Partner Resmi</h2>
                     <h3 class="text-3xl lg:text-4xl font-black text-black tracking-tight">{{ $tokoSectionTitle ?? 'Mitra Terverifikasi' }}</h3>
                 </div>
 
-                {{-- TOMBOL SEMUA MITRA: CYBER-INTERACTIVE VERSION --}}
-                <a href="{{ url('pages/semua_toko') }}" 
+                <a href="{{ url('pages/semua_toko') }}"
                    class="group relative inline-flex items-center justify-center px-8 py-3.5 font-black tracking-tighter text-zinc-700 bg-white rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-500 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_20px_40px_rgba(37,99,235,0.15)] hover:-translate-y-1 active:scale-95">
-                    
-                    {{-- Efek Kilatan Cahaya (Shimmer) --}}
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-blue-500/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
-                    
                     <div class="relative flex items-center gap-3">
                         <span class="text-[10px] uppercase tracking-[0.2em]">Semua Mitra</span>
                         <div class="relative flex items-center justify-center w-5 h-5 rounded-lg bg-zinc-50 group-hover:bg-blue-50 transition-colors duration-500">
@@ -413,7 +480,7 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @forelse($listToko ?? [] as $toko)
                     @php
                         $bannerPath = 'assets/uploads/banners/' . ($toko->banner_toko ?? '');
@@ -422,47 +489,90 @@
                         $bgStyle = $hasBanner ? "background-image: url(" . asset($bannerPath) . ");" : "background-color: #09090b;";
                         $logoPath = 'assets/uploads/logos/' . ($toko->logo_toko ?? '');
                         $hasLogo = !empty($toko->logo_toko) && file_exists(public_path($logoPath));
+
+                        // Menentukan Style Berdasarkan Tier Toko
+                        $tier = $toko->tier_toko ?? 'regular';
+
+                        if ($tier == 'official_store') {
+                            $cardBorder = "border border-purple-200/50 hover:border-purple-400 hover:shadow-[0_20px_60px_rgba(147,51,234,0.15)]";
+                            $bannerOverlay = "bg-gradient-to-t from-purple-950 via-purple-900/60 to-transparent";
+                            $badgeClass = "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)] border border-purple-400/50";
+                            $badgeIcon = "fas fa-check-decagram";
+                            $badgeText = "Official";
+                            $logoBg = "bg-purple-600";
+                            $nameColor = "group-hover:text-purple-600";
+                            $arrowBg = "group-hover:bg-purple-600 group-hover:shadow-[0_10px_20px_rgba(147,51,234,0.3)]";
+                            $miniIconColor = "text-purple-500";
+                            $miniIconBg = "bg-purple-100";
+                        } elseif ($tier == 'power_merchant') {
+                            $cardBorder = "border border-emerald-200/50 hover:border-emerald-400 hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)]";
+                            $bannerOverlay = "bg-gradient-to-t from-emerald-950 via-emerald-900/60 to-transparent";
+                            $badgeClass = "bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] border border-emerald-300/50";
+                            $badgeIcon = "fas fa-bolt";
+                            $badgeText = "Power";
+                            $logoBg = "bg-emerald-500";
+                            $nameColor = "group-hover:text-emerald-600";
+                            $arrowBg = "group-hover:bg-emerald-500 group-hover:shadow-[0_10px_20px_rgba(16,185,129,0.3)]";
+                            $miniIconColor = "text-emerald-500";
+                            $miniIconBg = "bg-emerald-100";
+                        } else {
+                            $cardBorder = "border border-zinc-100 hover:border-blue-300 hover:shadow-[0_20px_60px_rgba(37,99,235,0.1)]";
+                            $bannerOverlay = "bg-gradient-to-t from-black/80 via-black/20 to-transparent";
+                            $badgeClass = "bg-white/10 backdrop-blur-md border border-white/20 text-white";
+                            $badgeIcon = "fas fa-check-circle text-blue-400";
+                            $badgeText = "Verified";
+                            $logoBg = "bg-zinc-950 group-hover:bg-blue-600";
+                            $nameColor = "group-hover:text-blue-600";
+                            $arrowBg = "group-hover:bg-blue-600 group-hover:shadow-[0_10px_20px_rgba(37,99,235,0.3)]";
+                            $miniIconColor = "text-white";
+                            $miniIconBg = "bg-blue-600";
+                        }
                     @endphp
 
-                    <a href="{{ url('pages/toko?slug=' . ($toko->slug ?? '#')) }}" 
-                       class="group relative bg-white rounded-[2.5rem] shadow-[0_2px_15px_rgba(0,0,0,0.02)] hover:shadow-[0_30px_60px_rgba(37,99,235,0.1)] overflow-hidden transition-all duration-500 hover:-translate-y-2 border border-zinc-100 flex flex-col">
-                        
-                        {{-- Banner Area dengan Grayscale-to-Color Effect --}}
-                        <div class="h-36 bg-cover bg-center relative transition-all duration-700 grayscale group-hover:grayscale-0 scale-100 group-hover:scale-105" style="{{ $bgStyle }}">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity group-hover:opacity-60"></div>
-                            
-                            {{-- Premium Badge --}}
-                            <div class="absolute top-4 right-4 bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full flex items-center gap-2">
-                                <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
-                                <span class="text-[9px] font-black text-white uppercase tracking-widest">Verified</span>
+                    <a href="{{ url('pages/toko?slug=' . ($toko->slug ?? '#')) }}"
+                       class="group relative bg-white rounded-[2.5rem] shadow-[0_2px_15px_rgba(0,0,0,0.02)] overflow-hidden transition-all duration-500 hover:-translate-y-2 flex flex-col {{ $cardBorder }}">
+
+                        {{-- Banner Area --}}
+                        <div class="h-36 bg-cover bg-center relative transition-all duration-700 scale-100 group-hover:scale-105 {{ $tier == 'regular' ? 'grayscale group-hover:grayscale-0' : '' }}" style="{{ $bgStyle }}">
+                            <div class="absolute inset-0 {{ $bannerOverlay }} transition-opacity group-hover:opacity-80"></div>
+
+                            {{-- Tier Badge yang Dinamis --}}
+                            <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all {{ $badgeClass }}">
+                                @if($tier == 'regular')
+                                    <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+                                @else
+                                    <i class="{{ $badgeIcon }} text-[10px]"></i>
+                                @endif
+                                <span class="text-[9px] font-black uppercase tracking-widest">{{ $badgeText }}</span>
                             </div>
                         </div>
 
                         {{-- Content Area --}}
-                        <div class="pt-12 pb-8 px-8 flex-1 bg-white relative rounded-t-[2.5rem] -mt-6 z-10">
+                        <div class="pt-12 pb-8 px-8 flex-1 bg-white relative rounded-t-[2.5rem] -mt-6 z-10 transition-colors">
                             {{-- Logo Float --}}
                             <div class="absolute -top-12 left-8">
                                 <div class="relative">
                                     @if($hasLogo)
-                                        <img src="{{ asset($logoPath) }}" class="w-20 h-20 rounded-2xl object-cover border-[6px] border-white shadow-xl transition-transform duration-500 group-hover:scale-105" alt="Logo">
+                                        <img src="{{ asset($logoPath) }}" class="w-20 h-20 rounded-2xl object-cover border-[6px] border-white shadow-xl transition-transform duration-500 group-hover:scale-105 bg-white" alt="Logo">
                                     @else
-                                        <div class="w-20 h-20 rounded-2xl text-white flex items-center justify-center font-black text-2xl border-[6px] border-white shadow-xl bg-zinc-950 group-hover:bg-blue-600 transition-all duration-500">
+                                        <div class="w-20 h-20 rounded-2xl text-white flex items-center justify-center font-black text-2xl border-[6px] border-white shadow-xl transition-all duration-500 {{ $logoBg }}">
                                             {{ $initials }}
                                         </div>
                                     @endif
-                                    {{-- Mini Icon Overlay --}}
-                                    <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-600 rounded-lg border-4 border-white flex items-center justify-center text-[10px] text-white shadow-lg">
+
+                                    {{-- Mini Store Icon --}}
+                                    <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg border-4 border-white flex items-center justify-center text-[10px] shadow-lg {{ $miniIconBg }} {{ $miniIconColor }}">
                                         <i class="fas fa-store"></i>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="space-y-1">
-                                <h4 class="font-black text-xl text-zinc-900 group-hover:text-blue-600 transition-colors truncate tracking-tight">
+                                <h4 class="font-black text-xl text-zinc-900 transition-colors truncate tracking-tight {{ $nameColor }}">
                                     {{ $toko->nama_toko ?? 'Nama Toko' }}
                                 </h4>
                                 <p class="text-zinc-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                                    <i class="fas fa-location-dot text-blue-500/50"></i> {{ $toko->kota ?? 'Indonesia' }}
+                                    <i class="fas fa-location-dot {{ $tier == 'regular' ? 'text-blue-500/50' : ($tier == 'official_store' ? 'text-purple-500/50' : 'text-emerald-500/50') }}"></i> {{ $toko->kota ?? 'Indonesia' }}
                                 </p>
                             </div>
 
@@ -472,7 +582,7 @@
                                     <span class="text-[10px] font-black text-zinc-300 uppercase tracking-widest leading-none">Koleksi</span>
                                     <span class="text-sm font-black text-zinc-700 mt-1">{{ $toko->jumlah_produk_aktif ?? 0 }} Produk</span>
                                 </div>
-                                <div class="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-zinc-400 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all duration-500">
+                                <div class="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-zinc-400 transition-all duration-500 {{ $arrowBg }} group-hover:text-white">
                                     <i class="fas fa-arrow-right -rotate-45 group-hover:rotate-0 transition-transform"></i>
                                 </div>
                             </div>
@@ -486,101 +596,119 @@
                 @endforelse
             </div>
         </section>
+        @endif
 
         {{-- ========================================================
-             PRODUK GRID: ELEGANT PREMIUM EDITION (NO GRAYSCALE)
+             8. PRODUK GRID (DENGAN LOGIKA DISKON SMART)
              ======================================================== --}}
-        @foreach(['listProdukLokal' => ['title' => 'Rekomendasi Area Anda', 'badge' => 'TERDEKAT'], 'listProdukNasional' => ['title' => 'Tren Nasional', 'badge' => 'TERLARIS']] as $varName => $config)
-            @if(isset($$varName) && count($$varName) > 0)
-            <section class="relative">
-                {{-- Header Section yang Lebih Minimalis --}}
-                <div class="flex items-center gap-4 mb-10">
-                    <div class="w-1.5 h-8 bg-blue-600 rounded-full"></div>
-                    <div>
-                        <span class="text-[9px] font-black tracking-[0.4em] text-blue-600/60 uppercase leading-none">{{ $config['badge'] }}</span>
-                        <h2 class="text-2xl lg:text-3xl font-black text-zinc-900 tracking-tight mt-0.5">{{ $config['title'] }}</h2>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8">
-                    @foreach($$varName as $p)
-    @php
-        $img = !empty($p->gambar_utama) ? 'assets/uploads/products/'.$p->gambar_utama : 'assets/uploads/products/default.jpg';
-        
-        // INTEGRASI DATA REAL DARI tb_review_produk
-        $statUlasan = DB::table('tb_review_produk')
-                        ->where('barang_id', $p->id)
-                        ->selectRaw('COUNT(id) as total, AVG(rating) as rata')
-                        ->first();
-        
-        $avg_rating = $statUlasan->rata ?? 0;
-        $jumlah_ulasan = $statUlasan->total ?? 0;
-    @endphp
-    
-    <a href="{{ route('produk.detail', $p->id) }}" 
-       class="group relative bg-white rounded-[2.5rem] border border-zinc-100 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_30px_60px_rgba(37,99,235,0.1)] flex flex-col overflow-hidden">
-        
-        {{-- 1. Image Container (Full Color & Clean) --}}
-        <div class="aspect-square bg-zinc-50 overflow-hidden relative">
-            <img src="{{ asset($img) }}" 
-                 onerror="this.src='https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600'" 
-                 class="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 ease-out" 
-                 alt="{{ $p->nama_barang }}">
-            
-            {{-- Aksen Overlay Tipis di Bawah Gambar --}}
-            <div class="absolute inset-0 bg-gradient-to-t from-black/[0.03] to-transparent"></div>
-        </div>
-
-        {{-- 2. Info Content Area --}}
-        <div class="p-6 flex flex-col flex-1 relative bg-white border-t border-zinc-50">
-            {{-- Garis Aksen Biru (Slide In) --}}
-            <div class="absolute left-0 top-6 bottom-6 w-1 bg-blue-600 rounded-r-full scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-center"></div>
-
-            {{-- Nama Produk --}}
-            <h3 class="text-sm font-bold text-zinc-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-all duration-500 min-h-[2.5rem] group-hover:pl-3">
-                {{ $p->nama_barang }}
-            </h3>
-
-            {{-- Rating & Ulasan (Real Integration) --}}
-            <div class="flex items-center gap-2 mt-1 mb-4 group-hover:pl-3 transition-all duration-500">
-                <div class="flex text-amber-400 text-[10px]">
-                    <i class="fas fa-star"></i>
-                </div>
-                <span class="text-xs font-black text-zinc-900">{{ number_format($avg_rating, 1) }}</span>
-                <span class="text-[10px] font-bold text-zinc-400">({{ $jumlah_ulasan }} Ulasan)</span>
-            </div>
-
-            {{-- 3. Bottom Section (Price & Store) --}}
-            <div class="mt-auto">
-                <div class="flex flex-col mb-4 group-hover:pl-3 transition-all duration-500">
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1.5">Harga Satuan</span>
-                    <div class="text-xl font-black text-zinc-950 tracking-tight flex items-baseline gap-0.5">
-                        <span class="text-xs font-bold text-blue-600">Rp</span>
-                        <span>{{ number_format($p->harga, 0, ',', '.') }}</span>
-                    </div>
-                </div>
-
-                {{-- Store Footer --}}
-                <div class="pt-4 border-t border-zinc-50 flex items-center justify-between group-hover:border-blue-50 transition-colors">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-7 h-7 rounded-lg bg-zinc-50 flex items-center justify-center shrink-0 border border-zinc-100 group-hover:bg-blue-600 group-hover:border-blue-600 transition-all duration-500">
-                            <i class="fas fa-store text-[10px] text-zinc-400 group-hover:text-white"></i>
-                        </div>
-                        <div class="flex flex-col min-w-0">
-                            <span class="text-[10px] font-black text-zinc-900 truncate uppercase leading-none">{{ $p->nama_toko }}</span>
-                            <span class="text-[9px] font-bold text-zinc-400 truncate mt-0.5">Verified Mitra</span>
+        @if(($settings['show_best_selling'] ?? '1') == '1')
+            @foreach(['listProdukLokal' => ['title' => 'Rekomendasi Area Anda', 'badge' => 'TERDEKAT'], 'listProdukNasional' => ['title' => 'Tren Nasional', 'badge' => 'TERLARIS']] as $varName => $config)
+                @if(isset($$varName) && count($$varName) > 0)
+                <section class="relative mt-12">
+                    <div class="flex items-center gap-4 mb-10">
+                        <div class="w-1.5 h-8 bg-blue-600 rounded-full"></div>
+                        <div>
+                            <span class="text-[9px] font-black tracking-[0.4em] text-blue-600/60 uppercase leading-none">{{ $config['badge'] }}</span>
+                            <h2 class="text-2xl lg:text-3xl font-black text-zinc-900 tracking-tight mt-0.5">{{ $config['title'] }}</h2>
                         </div>
                     </div>
-                    <i class="fas fa-arrow-right text-[10px] text-zinc-300 -rotate-45 group-hover:rotate-0 group-hover:text-blue-600 transition-all duration-500"></i>
-                </div>
-            </div>
-        </div>
-    </a>
-@endforeach
-                </div>
-            </section>
-            @endif
-        @endforeach
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8">
+                        @foreach($$varName as $p)
+                        @php
+                            $img = !empty($p->gambar_utama) ? 'assets/uploads/products/'.$p->gambar_utama : 'assets/uploads/products/default.jpg';
+
+                            // Logika Diskon
+                            $harga_asli = $p->harga;
+                            $harga_tampil = $harga_asli;
+                            $ada_diskon = false;
+                            $badge_diskon = '';
+
+                            if(isset($p->nilai_diskon) && $p->nilai_diskon > 0) {
+                                $ada_diskon = true;
+                                if($p->tipe_diskon == 'PERSEN') {
+                                    $harga_tampil = $harga_asli - ($harga_asli * ($p->nilai_diskon / 100));
+                                    $badge_diskon = round($p->nilai_diskon) . '% OFF';
+                                } else {
+                                    $harga_tampil = $harga_asli - $p->nilai_diskon;
+                                    $badge_diskon = 'Diskon ' . number_format($p->nilai_diskon/1000, 0) . 'RB';
+                                }
+                            }
+
+                            // INTEGRASI DATA REAL DARI tb_review_produk
+                            // (Pastikan logika ini di-load di Controller agar lebih efisien di production)
+                            $statUlasan = \Illuminate\Support\Facades\DB::table('tb_review_produk')
+                                            ->where('barang_id', $p->id)
+                                            ->selectRaw('COUNT(id) as total, AVG(rating) as rata')
+                                            ->first();
+
+                            $avg_rating = $statUlasan->rata ?? 0;
+                            $jumlah_ulasan = $statUlasan->total ?? 0;
+                            $terjual = $p->stok_terjual ?? rand(5, 100); // Fallback dummy data jika belum ada fitur stok_terjual
+                        @endphp
+
+                        <a href="{{ route('produk.detail', $p->id) }}"
+                           class="group relative bg-white rounded-[2.5rem] border border-zinc-100 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_30px_60px_rgba(37,99,235,0.1)] flex flex-col overflow-hidden">
+
+                            <div class="aspect-square bg-zinc-50 overflow-hidden relative">
+                                <img src="{{ asset($img) }}"
+                                     onerror="this.src='https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600'"
+                                     class="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 ease-out"
+                                     alt="{{ $p->nama_barang }}">
+
+                                @if($ada_diskon)
+                                    <div class="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-md shadow-md z-10">{{ $badge_diskon }}</div>
+                                @endif
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/[0.03] to-transparent"></div>
+                            </div>
+
+                            <div class="p-6 flex flex-col flex-1 relative bg-white border-t border-zinc-50">
+                                <div class="absolute left-0 top-6 bottom-6 w-1 bg-blue-600 rounded-r-full scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-center"></div>
+
+                                <h3 class="text-sm font-bold text-zinc-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition-all duration-500 min-h-[2.5rem] group-hover:pl-3">
+                                    {{ $p->nama_barang }}
+                               </h3>
+
+                                <div class="flex items-center gap-2 mt-1 mb-4 group-hover:pl-3 transition-all duration-500">
+                                    <div class="flex text-amber-400 text-[10px]"><i class="fas fa-star"></i></div>
+                                    <span class="text-xs font-black text-zinc-900">{{ number_format($avg_rating, 1) }}</span>
+                                    <span class="text-[10px] font-bold text-zinc-400">({{ $jumlah_ulasan }} Ulasan)</span>
+                                </div>
+
+                                <div class="mt-auto">
+                                    <div class="flex flex-col mb-4 group-hover:pl-3 transition-all duration-500">
+                                        @if($ada_diskon)
+                                            <span class="text-[10px] text-zinc-400 line-through mb-0.5">Rp {{ number_format($harga_asli, 0, ',', '.') }}</span>
+                                        @else
+                                            <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1.5">Harga Satuan</span>
+                                        @endif
+                                        <div class="text-xl font-black text-zinc-950 tracking-tight flex items-baseline gap-0.5">
+                                            <span class="text-xs font-bold text-blue-600">Rp</span>
+                                            <span>{{ number_format($harga_tampil, 0, ',', '.') }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-4 border-t border-zinc-50 flex items-center justify-between group-hover:border-blue-50 transition-colors">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <div class="w-7 h-7 rounded-lg bg-zinc-50 flex items-center justify-center shrink-0 border border-zinc-100 group-hover:bg-blue-600 group-hover:border-blue-600 transition-all duration-500">
+                                                <i class="fas fa-store text-[10px] text-zinc-400 group-hover:text-white"></i>
+                                            </div>
+                                            <div class="flex flex-col min-w-0">
+                                                <span class="text-[10px] font-black text-zinc-900 truncate uppercase leading-none">{{ $p->nama_toko }}</span>
+                                                <span class="text-[9px] font-bold text-zinc-400 truncate mt-0.5">{{ $terjual }} Terjual</span>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-arrow-right text-[10px] text-zinc-300 -rotate-45 group-hover:rotate-0 group-hover:text-blue-600 transition-all duration-500"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                </section>
+                @endif
+            @endforeach
+        @endif
 
     </main>
 
@@ -588,8 +716,6 @@
     <script src="{{ asset('assets/js/navbar.js') }}"></script>
 
     {{-- ===================== CHATBOT POTA : BLACK & WHITE + BLUE GLOW ===================== --}}
-
-    {{-- Toggle Button --}}
     <button id="live-chat-toggle" class="fixed bottom-6 right-6 bg-black text-white p-1 pr-5 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_40px_rgba(37,99,235,0.4)] transition-all duration-300 z-50 flex items-center gap-3 group border border-zinc-800 hover:border-blue-500 overflow-hidden" onclick="toggleChat()">
         <div class="bg-blue-600 w-12 h-12 rounded-full relative flex items-center justify-center">
             <div class="absolute inset-0 rounded-full animate-pulse-glow opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -603,7 +729,6 @@
 
     {{-- Chat Window --}}
     <div id="live-chat-window" class="fixed bottom-24 right-6 w-[380px] h-[580px] bg-white rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-zinc-200 flex-col overflow-hidden z-50 transition-all duration-500 opacity-0 translate-y-10 scale-95 pointer-events-none hidden origin-bottom-right">
-
         {{-- Header (Black) --}}
         <div class="bg-black text-white p-5 flex justify-between items-center shrink-0 border-b border-zinc-800">
             <div class="flex items-center gap-3">
@@ -628,8 +753,6 @@
         {{-- Messages --}}
         <div class="flex-1 p-5 overflow-y-auto bg-zinc-50 flex flex-col gap-4 chat-messages relative" id="chat-messages">
             <div class="text-[10px] text-center text-zinc-400 font-bold uppercase tracking-widest mb-2">Hari ini</div>
-
-            {{-- Bot Initial Message --}}
             <div class="flex gap-2 max-w-[85%]">
                 <div class="w-8 h-8 rounded-xl bg-black flex-shrink-0 flex items-center justify-center text-white text-xs mt-auto"><i class="fas fa-robot text-blue-500"></i></div>
                 <div class="bg-white border border-zinc-200 text-zinc-800 p-3.5 rounded-2xl rounded-bl-sm text-sm shadow-sm relative group font-medium leading-relaxed">
@@ -651,25 +774,77 @@
             </div>
         </div>
 
-        {{-- Voice Call Overlay (Black Theme) --}}
+        {{-- Voice Call Overlay --}}
         <div id="voice-call-overlay" class="absolute inset-0 bg-black/95 backdrop-blur-md z-[100] hidden flex-col items-center justify-center text-white">
             <div class="text-xs font-black tracking-widest text-zinc-500 uppercase mb-16" id="voice-status-text">Menyambungkan...</div>
-
             <div class="relative w-32 h-32 flex items-center justify-center mb-16">
                 <div class="absolute inset-0 bg-blue-600/20 rounded-full animate-ping duration-1000"></div>
                 <div id="voice-visualizer" class="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl shadow-[0_0_30px_rgba(37,99,235,0.4)] z-10 transition-all duration-500">
                     <i class="fas fa-microphone"></i>
                 </div>
             </div>
-
             <button onclick="endVoiceCallMode()" class="bg-zinc-900 border border-zinc-800 text-white hover:text-red-500 hover:border-red-500 px-8 py-3 rounded-full font-bold flex items-center gap-2 transition-all group text-sm">
                 <i class="fas fa-phone-slash group-hover:animate-bounce"></i> Tutup Panggilan
             </button>
         </div>
     </div>
 
-    {{-- Scripts untuk Banner Slider & Chatbot --}}
+    {{-- Script Global Gabungan (Slider, Chatbot, Typewriter) --}}
     <script>
+        function landingPageData() {
+            return {
+                showPopup: false,
+                initPage() {
+                    const popupEnabled = "{{ $settings['enable_welcome_popup'] ?? '0' }}" === "1";
+                    const freq = "{{ $settings['popup_frequency'] ?? 'always' }}";
+
+                    if (popupEnabled) {
+                        if (freq === 'always') {
+                            this.showPopup = true;
+                        } else if (freq === 'once_a_day') {
+                            const lastSeen = localStorage.getItem('popup_last_seen');
+                            const today = new Date().toDateString();
+                            if (lastSeen !== today) {
+                                this.showPopup = true;
+                                localStorage.setItem('popup_last_seen', today);
+                            }
+                        }
+                    }
+
+                    setTimeout(() => initSlider(), 100);
+                    setTimeout(() => typeEffect(), 100);
+                },
+                closePopup() {
+                    this.showPopup = false;
+                }
+            }
+        }
+
+        // Logic Countdown Timer untuk Flash Sale yang aman (Fallback ke 2 jam jika data invalid)
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('countdown', (targetDate) => ({
+                hours: '00', minutes: '00', seconds: '00',
+                init() {
+                    let target = new Date(targetDate).getTime();
+                    if (isNaN(target)) {
+                        target = new Date().getTime() + (2 * 60 * 60 * 1000); // Fallback +2 Jam
+                    }
+
+                    setInterval(() => {
+                        const now = new Date().getTime();
+                        const distance = target - now;
+                        if (distance < 0) {
+                            this.hours = '00'; this.minutes = '00'; this.seconds = '00';
+                            return;
+                        }
+                        this.hours = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                        this.minutes = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                        this.seconds = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+                    }, 1000);
+                }
+            }));
+        });
+
         /* === DYNAMIC BANNER SLIDER LOGIC === */
         const slider = document.getElementById('hero-slider');
         const dotsContainer = document.getElementById('slider-dots');
@@ -678,9 +853,7 @@
         let slideInterval;
 
         function initSlider() {
-            if(totalSlides <= 1) return; // No need to slide if 1 or 0
-
-            // Create dots
+            if(totalSlides <= 1) return;
             for(let i=0; i<totalSlides; i++) {
                 const dot = document.createElement('button');
                 dot.className = `w-2 h-2 rounded-full transition-all duration-300 ${i === 0 ? 'w-6 bg-blue-500' : 'bg-white/40 hover:bg-white'}`;
@@ -709,19 +882,8 @@
             goToSlide(currentSlide);
         }
 
-        function startSlideShow() {
-            slideInterval = setInterval(() => moveSlider(1), 5000); // Slide setiap 5 detik
-        }
-
-        function resetSlideShow() {
-            clearInterval(slideInterval);
-            startSlideShow();
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            initSlider();
-            typeEffect(); // Panggil typewriter effect
-        });
+        function startSlideShow() { slideInterval = setInterval(() => moveSlider(1), 5000); }
+        function resetSlideShow() { clearInterval(slideInterval); startSlideShow(); }
 
         /* === TYPEWRITER EFFECT === */
         const typingText = document.querySelector(".typing-text");
@@ -883,55 +1045,52 @@
             }
 
             try {
-                // Gunakan path '/api/chat' langsung, dan tambahkan header 'Accept'
                 const res = await fetch('/api/chat', {
-                    method: 'POST', 
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Accept': 'application/json', // PENTING: Agar Laravel tidak mereturn HTML jika error
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify({message: text, history: chatHistory.slice(-6)})
                 });
-                
-                // TANGKAP ERROR DARI CONTROLLER LARAVEL KITA
+
                 if (!res.ok) {
                     const errorData = await res.json();
                     throw new Error(errorData.reply || "Gagal terhubung ke otak POTA.");
                 }
-                
+
                 const data = await res.json();
 
                 if(!isCallMode && document.getElementById('loading')) document.getElementById('loading').remove();
                 appendMessage(data.reply, 'bot');
                 chatHistory.push({sender:'bot', text: data.reply.replace(/<[^>]*>?/gm, '')});
                 if(isCallMode) speakText(data.reply, true);
-                
+
             } catch(e) {
                 if(document.getElementById('loading')) document.getElementById('loading').remove();
                 console.error("ERROR POTA:", e);
-                
-                // MUNCULKAN PESAN ERROR ASLINYA KE LAYAR CHAT PELANGGAN
                 appendMessage("⚠️ " + e.message, 'bot');
             }
         }
-            function speakText(text, autoListen = false) {
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm, '').replace(/[*_#]/g, ''));
-                u.lang = 'id-ID'; u.pitch = 0.9; u.rate = 1.0;
 
-                const indoVoice = voices.find(v => v.lang === 'id-ID' && v.name.includes('Google'));
-                if (indoVoice) u.voice = indoVoice;
+        function speakText(text, autoListen = false) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm, '').replace(/[*_#]/g, ''));
+            u.lang = 'id-ID'; u.pitch = 0.9; u.rate = 1.0;
 
-                u.onstart = () => {
-                    if(isCallMode) {
-                        voiceVisualizer.classList.remove('animate-pulse');
-                        voiceStatus.innerText = "Mandor Menjawab...";
-                    }
-                };
-                u.onend = () => { if(isCallMode && autoListen) setTimeout(startListening, 500); };
-                window.speechSynthesis.speak(u);
-            }
+            const indoVoice = voices.find(v => v.lang === 'id-ID' && v.name.includes('Google'));
+            if (indoVoice) u.voice = indoVoice;
+
+            u.onstart = () => {
+                if(isCallMode) {
+                    voiceVisualizer.classList.remove('animate-pulse');
+                    voiceStatus.innerText = "Mandor Menjawab...";
+                }
+            };
+            u.onend = () => { if(isCallMode && autoListen) setTimeout(startListening, 500); };
+            window.speechSynthesis.speak(u);
+        }
 
         // CSS Animation for chat bubbles
         const style = document.createElement('style');

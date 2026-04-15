@@ -4,358 +4,625 @@
 
 @push('styles')
 <style>
-    :root {
-        --st-bg: #f4f6f8;
-        --st-card: #ffffff;
-        --st-border: #dfe3e8;
-        --st-text: #212b36;
-        --st-muted: #637381;
-        --st-primary: #0052cc;
-        --st-primary-hover: #0043a6;
-    }
+    /* ========================================= */
+    /* ==  PREMIUM SYSTEM SETTINGS CSS        == */
+    /* ========================================= */
 
-    /* LAYOUTING */
-    .settings-layout { display: flex; gap: 30px; align-items: flex-start; }
-    
-    /* SIDEBAR NAVIGATION */
-    .settings-nav { width: 260px; flex-shrink: 0; position: sticky; top: 20px; }
-    .nav-pills-custom .nav-link {
-        color: var(--st-muted); font-weight: 600; padding: 12px 16px; border-radius: 8px;
-        margin-bottom: 5px; display: flex; align-items: center; gap: 12px; transition: 0.2s;
-    }
-    .nav-pills-custom .nav-link i { font-size: 20px; }
-    .nav-pills-custom .nav-link:hover { background: #f4f6f8; color: var(--st-text); }
-    .nav-pills-custom .nav-link.active { background: #eef3fb; color: var(--st-primary); }
+    /* Custom Form Input & Focus State */
+    .form-control-custom { width: 100%; border-radius: 0.75rem; font-size: 0.875rem; font-weight: 700; transition: all 0.2s; outline: none; border: 1px solid #e2e8f0; }
+    .form-control-custom:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); border-color: #3b82f6; }
 
-    /* CONTENT AREA */
-    .settings-content { flex-grow: 1; max-width: 850px; }
-    .st-card { background: var(--st-card); border: 1px solid var(--st-border); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); padding: 24px; margin-bottom: 24px; }
-    .st-card-header { border-bottom: 1px solid var(--st-border); padding-bottom: 16px; margin-bottom: 20px; }
-    .st-card-title { font-size: 18px; font-weight: 700; color: var(--st-text); margin: 0; }
-    .st-card-desc { font-size: 13px; color: var(--st-muted); margin-top: 4px; }
+    /* Custom Input Group */
+    .input-group { display: flex; align-items: stretch; width: 100%; flex-wrap: nowrap !important; }
+    .input-group > .form-control-custom { flex: 1 1 0%; min-width: 0; }
+    .input-group-text { display: flex; align-items: center; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 800; border-radius: 0.75rem; border: 1px solid #e2e8f0; white-space: nowrap; }
 
-    /* FORM ELEMENTS */
-    .form-label { font-weight: 600; color: var(--st-text); font-size: 14px; }
-    .form-control, .form-select { border: 1px solid #c4cdd5; border-radius: 8px; padding: 10px 14px; font-size: 14px; transition: 0.2s; }
-    .form-control:focus, .form-select:focus { border-color: var(--st-primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1); }
-    .input-group-text { background: #f9fafb; border: 1px solid #c4cdd5; color: var(--st-muted); font-weight: 600; }
-    .help-text { font-size: 12px; color: var(--st-muted); margin-top: 6px; line-height: 1.4; }
+    /* Perbaikan Sudut Border Radius agar menempel rapi */
+    .input-group > .form-control-custom:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+    .input-group > .input-group-text:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0; }
+    .input-group > .form-control-custom:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 0; }
+    .input-group > .input-group-text:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 0; }
 
-    /* INFO ICON TOOLTIP - CLICKABLE */
-    .info-btn { font-size: 16px; color: #919eab; cursor: pointer; transition: 0.2s; background: none; border: none; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; width: 24px; height: 24px; }
-    .info-btn:hover { color: var(--st-primary); background: #eef3fb; }
-
-    /* CUSTOM TOGGLE SWITCH */
-    .custom-switch { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f4f6f8; }
-    .custom-switch:last-child { border-bottom: none; }
-    .switch-label { font-size: 14px; font-weight: 600; color: var(--st-text); }
-    .switch-desc { font-size: 12px; color: var(--st-muted); }
-    
+    /* MODERN TOGGLE SWITCH */
     .toggle-checkbox { display: none; }
-    .toggle-label { width: 44px; height: 24px; background: #c4cdd5; border-radius: 24px; position: relative; cursor: pointer; transition: background 0.3s; }
-    .toggle-label::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-    .toggle-checkbox:checked + .toggle-label { background: var(--st-primary); }
+    .toggle-label { width: 46px; height: 26px; border-radius: 30px; position: relative; cursor: pointer; transition: 0.3s; flex-shrink: 0; background: #cbd5e1; }
+    .toggle-label::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; transition: 0.3s; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .toggle-checkbox:checked + .toggle-label { background: #10b981; }
     .toggle-checkbox:checked + .toggle-label::after { transform: translateX(20px); }
 
-    /* STICKY SAVE BAR */
-    .save-bar { position: fixed; bottom: 0; right: 0; width: calc(100% - 250px); background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-top: 1px solid var(--st-border); padding: 16px 40px; display: flex; justify-content: flex-end; z-index: 1000; box-shadow: 0 -4px 10px rgba(0,0,0,0.03); }
-    .btn-save { background: var(--st-primary); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: 0.2s; }
-    .btn-save:hover { background: var(--st-primary-hover); transform: translateY(-1px); }
+    /* IMAGE UPLOAD PREVIEW BOX */
+    .img-preview-box { position: relative; width: 100%; border: 2px dashed #cbd5e1; border-radius: 1rem; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #f8fafc; cursor: pointer; transition: all 0.3s; }
+    .img-preview-box:hover { border-color: #3b82f6; background: #eff6ff; }
+    .img-preview-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; display: none; }
+    .img-preview-box img.has-image { display: block; }
 
-    @media (max-width: 992px) { .settings-layout { flex-direction: column; } .settings-nav { width: 100%; position: relative; top: 0; } .save-bar { width: 100%; } }
+    /* Custom Tab Styles */
+    .tab-content > .tab-pane { display: none; }
+    .tab-content > .active { display: block; animation: fade-in 0.4s ease-out; }
+    @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Floating Save Bar */
+    .save-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; transition: padding-left 0.3s ease; border-top: 1px solid #e2e8f0; }
+    @media (min-width: 1024px) { .save-bar { padding-left: 260px; } }
+
+    /* ========================================= */
+    /* == POLYFILL DARK MODE (ANTI-PUTIH)     == */
+    /* ========================================= */
+    .dark .dark\:bg-slate-950 { background-color: #020617 !important; }
+    .dark .dark\:bg-slate-900 { background-color: #0f172a !important; }
+    .dark .dark\:bg-slate-900\/90 { background-color: rgba(15, 23, 42, 0.9) !important; }
+    .dark .dark\:bg-slate-800 { background-color: #1e293b !important; }
+    .dark .dark\:bg-slate-800\/50 { background-color: rgba(30, 41, 59, 0.5) !important; }
+    .dark .dark\:bg-slate-800\/40 { background-color: rgba(30, 41, 59, 0.4) !important; }
+    .dark .dark\:bg-slate-700 { background-color: #334155 !important; }
+    .dark .dark\:bg-transparent { background-color: transparent !important; }
+
+    .dark .dark\:border-slate-800 { border-color: #1e293b !important; }
+    .dark .dark\:border-slate-700 { border-color: #334155 !important; }
+    .dark .dark\:border-slate-700\/50 { border-color: rgba(51, 65, 85, 0.5) !important; }
+
+    .dark .dark\:bg-blue-500\/10 { background-color: rgba(59, 130, 246, 0.1) !important; }
+    .dark .dark\:text-blue-400 { color: #60a5fa !important; }
+    .dark .dark\:shadow-\[inset_0_1px_0_rgba\(255\,255\,255\,0\.05\)\] { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05) !important; }
+
+    .dark .form-control-custom { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
+    .dark .form-control-custom:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important; }
+    .dark .input-group-text { background-color: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
+
+    .dark .img-preview-box { border-color: #334155; background: #0f172a; }
+    .dark .img-preview-box:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+
+    .dark .toggle-label { background: #334155 !important; }
+    .dark .toggle-label::after { background: #94a3b8 !important; box-shadow: none !important; }
+    .dark .toggle-checkbox:checked + .toggle-label { background: #059669 !important; }
+    .dark .toggle-checkbox:checked + .toggle-label::after { background: white !important; }
+
+    .dark .dark\:text-white { color: #ffffff !important; }
+    .dark .dark\:text-slate-100 { color: #f1f5f9 !important; }
+    .dark .dark\:text-slate-200 { color: #e2e8f0 !important; }
+    .dark .dark\:text-slate-300 { color: #cbd5e1 !important; }
+    .dark .dark\:text-slate-400 { color: #94a3b8 !important; }
+    .dark .dark\:text-emerald-500 { color: #10b981 !important; }
+    .dark .dark\:text-amber-500 { color: #f59e0b !important; }
+
+    .dark .modal-content { background-color: #0f172a !important; border: 1px solid #1e293b !important; color: #f8fafc !important; }
+    .dark .modal-header, .dark .modal-footer { border-color: #1e293b !important; }
+    .dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+
+    .dark .dark\:bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.1) !important; }
+    .dark .dark\:border-emerald-500\/30 { border-color: rgba(16, 185, 129, 0.3) !important; }
+    .dark .dark\:text-emerald-400 { color: #34d399 !important; }
+
+    .dark .dark\:bg-purple-500\/10 { background-color: rgba(168, 85, 247, 0.1) !important; }
+    .dark .dark\:border-purple-500\/30 { border-color: rgba(168, 85, 247, 0.3) !important; }
+    .dark .dark\:text-purple-400 { color: #c084fc !important; }
+
+    .dark .dark\:bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.1) !important; }
+    .dark .dark\:border-amber-500\/30 { border-color: rgba(245, 158, 11, 0.3) !important; }
+    .dark .dark\:text-amber-400 { color: #fbbf24 !important; }
 </style>
 @endpush
 
 @section('content')
-<div class="dashboard-header mb-4">
-    <h2 class="fw-bold text-dark mb-1">Pengaturan Sistem</h2>
-    <p class="text-muted small">Kelola seluruh aspek operasional, keuangan, dan integrasi e-commerce.</p>
+
+{{-- HEADER HALAMAN --}}
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
+    <div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-1 transition-colors duration-300">
+            Pengaturan Sistem & Website
+        </h2>
+        <div class="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 transition-colors duration-300">
+            <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-decoration-none">Dashboard</a>
+            <i class="mdi mdi-chevron-right text-sm"></i>
+            <span class="text-blue-600 dark:text-blue-400">Konfigurasi Platform</span>
+        </div>
+        <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-2 m-0 max-w-xl leading-relaxed">
+            Pusat kendali (Engine Room) untuk mengatur identitas, tampilan website, skema pembagian komisi, popup promo, regulasi seller, dan integrasi API.
+        </p>
+    </div>
 </div>
 
-<form action="{{ route('admin.settings.update') }}" method="POST" id="mainSettingsForm">
+{{-- WAJIB: enctype="multipart/form-data" untuk Upload Gambar Website --}}
+<form action="{{ route('admin.settings.update') }}" method="POST" id="mainSettingsForm" enctype="multipart/form-data">
     @csrf
-    <div class="settings-layout pb-5">
-        
-        {{-- TAB NAVIGATION KIRI --}}
-        <div class="settings-nav">
-            <div class="nav flex-column nav-pills-custom" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <button class="nav-link active" id="tab-general" data-bs-toggle="pill" data-bs-target="#panel-general" type="button" role="tab"><i class="mdi mdi-store-cog-outline"></i> Identitas & Umum</button>
-                <button class="nav-link" id="tab-finance" data-bs-toggle="pill" data-bs-target="#panel-finance" type="button" role="tab"><i class="mdi mdi-cash-multiple"></i> Keuangan & Biaya</button>
-                <button class="nav-link" id="tab-logistic" data-bs-toggle="pill" data-bs-target="#panel-logistic" type="button" role="tab"><i class="mdi mdi-truck-delivery-outline"></i> Logistik & Wilayah</button>
-                <button class="nav-link" id="tab-api" data-bs-toggle="pill" data-bs-target="#panel-api" type="button" role="tab"><i class="mdi mdi-code-json"></i> API & Integrasi</button>
-                <button class="nav-link" id="tab-catalog" data-bs-toggle="pill" data-bs-target="#panel-catalog" type="button" role="tab"><i class="mdi mdi-shape-outline"></i> Aturan Katalog</button>
+
+    <div class="flex flex-col lg:flex-row gap-8 pb-32 items-start relative">
+
+        {{-- NAV PILLS (SIDEBAR KIRI PENGATURAN) --}}
+        <div class="w-full lg:w-72 flex-shrink-0 lg:sticky lg:top-[90px] z-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl shadow-sm transition-colors duration-300">
+            <div class="nav flex flex-col space-y-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                @php
+                    $tabs = [
+                        ['id' => 'general', 'icon' => 'mdi-store-cog-outline', 'label' => 'Identitas & Umum'],
+                        ['id' => 'frontend', 'icon' => 'mdi-monitor-dashboard', 'label' => 'Tampilan Website'],
+                        ['id' => 'finance', 'icon' => 'mdi-cash-multiple', 'label' => 'Keuangan & Biaya'],
+                        ['id' => 'logistic', 'icon' => 'mdi-truck-delivery-outline', 'label' => 'Logistik & Wilayah'],
+                        ['id' => 'api', 'icon' => 'mdi-code-json', 'label' => 'API & Integrasi'],
+                        ['id' => 'catalog', 'icon' => 'mdi-shape-outline', 'label' => 'Aturan Katalog']
+                    ];
+                @endphp
+
+                @foreach($tabs as $index => $tab)
+                    <button class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-black transition-all outline-none text-left {{ $index === 0 ? 'active bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-inner dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-slate-200' }}"
+                            id="tab-{{ $tab['id'] }}" data-bs-toggle="pill" data-bs-target="#panel-{{ $tab['id'] }}" type="button" role="tab">
+                        <i class="mdi {{ $tab['icon'] }} text-xl"></i> {{ $tab['label'] }}
+                    </button>
+                @endforeach
             </div>
         </div>
 
-        {{-- KONTEN PENGATURAN KANAN --}}
-        <div class="settings-content tab-content" id="v-pills-tabContent">
-            
-            {{-- PANEL: IDENTITAS & UMUM --}}
+        {{-- AREA KONTEN KANAN --}}
+        <div class="flex-grow w-full max-w-4xl tab-content" id="v-pills-tabContent">
+
+            {{-- 1. PANEL: IDENTITAS & UMUM --}}
             <div class="tab-pane fade show active" id="panel-general" role="tabpanel">
-                <div class="st-card">
-                    <div class="st-card-header">
-                        <h3 class="st-card-title">Profil Platform</h3>
-                        <p class="st-card-desc">Informasi dasar yang akan ditampilkan ke pengguna dan mesin pencari.</p>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
+
+                    {{-- Mode Maintenance --}}
+                    <div class="flex justify-between items-center p-5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl mb-6 transition-colors duration-300">
+                        <div class="pr-4">
+                            <strong class="block text-sm font-black text-rose-600 dark:text-rose-400 mb-1"><i class="mdi mdi-alert-outline"></i> Mode Pemeliharaan (Maintenance)</strong>
+                            <span class="text-[11px] font-bold text-rose-500/80 dark:text-rose-400/80 leading-tight">Tutup akses website dari pembeli sementara waktu untuk perbaikan sistem.</span>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="toggle-checkbox" id="maintenanceToggle" name="maintenance_mode" value="1" {{ ($settings['maintenance_mode'] ?? '0') == '1' ? 'checked' : '' }}>
+                            <label for="maintenanceToggle" class="toggle-label m-0" style="background: #fecaca;"></label>
+                        </div>
                     </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Nama Platform</label>
-                            <input type="text" name="app_name" class="form-control" value="{{ $settings['app_name'] ?? 'Pondasikita' }}">
+
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6 mt-2">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-card-account-details-outline text-blue-500"></i> Profil Platform</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Informasi dasar yang akan ditampilkan ke pengguna web dan mesin pencari.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama Platform</label>
+                            <input type="text" name="app_name" value="{{ $settings['app_name'] ?? 'Pondasikita' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email Kontak Dukungan</label>
-                            <input type="email" name="support_email" class="form-control" value="{{ $settings['support_email'] ?? '' }}">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Kontak Dukungan</label>
+                            <input type="email" name="support_email" value="{{ $settings['support_email'] ?? '' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none" placeholder="cs@pondasikita.com">
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Deskripsi Singkat (SEO Meta)</label>
-                            <textarea name="seo_description" class="form-control" rows="3">{{ $settings['seo_description'] ?? '' }}</textarea>
-                            <div class="help-text">Maksimal 160 karakter untuk optimasi pencarian Google.</div>
+
+                        {{-- Social Media Links --}}
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Link Instagram</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0"><i class="mdi mdi-instagram text-rose-500 text-lg"></i></span>
+                                <input type="url" name="social_instagram" value="{{ $settings['social_instagram'] ?? '' }}" class="form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none" placeholder="https://instagram.com/...">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Link Facebook / Tiktok</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0"><i class="mdi mdi-facebook text-blue-600 text-lg"></i></span>
+                                <input type="url" name="social_facebook" value="{{ $settings['social_facebook'] ?? '' }}" class="form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none" placeholder="https://facebook.com/...">
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2 border-t border-slate-100 dark:border-slate-800 pt-5 mt-2">
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Deskripsi Singkat (SEO Meta)</label>
+                            <textarea name="seo_description" rows="3" class="form-control-custom p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none resize-none leading-relaxed">{{ $settings['seo_description'] ?? '' }}</textarea>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1">Tulis deskripsi memikat maksimal 160 karakter untuk optimasi pencarian di Google.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- PANEL: KEUANGAN & BIAYA --}}
-            <div class="tab-pane fade" id="panel-finance" role="tabpanel">
-                
-                {{-- BIAYA MITRA / SKEMA KOMISI PROGRESIF --}}
-                <div class="st-card border-primary">
-                    <div class="st-card-header">
-                        <h3 class="st-card-title text-primary"><i class="mdi mdi-percent-circle-outline"></i> Skema Komisi Mitra (Seller)</h3>
-                        <p class="st-card-desc">Potongan persentase yang dibebankan kepada penjual setiap transaksi berhasil, dibedakan berdasarkan kasta/tier toko.</p>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label text-muted d-flex justify-content-between align-items-center">
-                                <span><i class="mdi mdi-storefront-outline"></i> Toko Reguler</span>
-                                <button type="button" class="info-btn btn-show-info" data-title="Toko Reguler" data-desc="Toko baru atau penjual standar tanpa legalitas perusahaan. Disarankan diberi komisi sangat rendah (0% - 0.5%) sebagai strategi 'Bakar Uang' untuk menarik minat seller bergabung ke platform Anda.">
-                                    <i class="mdi mdi-help-circle-outline"></i>
-                                </button>
-                            </label>
-                            <div class="input-group">
-                                <input type="number" name="commission_regular_percent" class="form-control" value="{{ $settings['commission_regular_percent'] ?? '0.5' }}" step="0.1" min="0">
-                                <span class="input-group-text">%</span>
-                            </div>
-                            <div class="help-text">Fase akuisisi/Toko baru. Tampil standar di pencarian tanpa badge khusus.</div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label text-success d-flex justify-content-between align-items-center">
-                                <span><i class="mdi mdi-lightning-bolt"></i> Power Merchant</span>
-                                <button type="button" class="info-btn btn-show-info" data-title="Power Merchant" data-desc="Toko yang sudah laris dan punya reputasi baik. Disarankan komisi menengah (1.5% - 2%). Seller bersedia dipotong komisi lebih tinggi karena mereka mendapat 'Badge Hijau' yang meningkatkan kepercayaan pembeli dan posisi pencarian.">
-                                    <i class="mdi mdi-help-circle-outline"></i>
-                                </button>
-                            </label>
-                            <div class="input-group">
-                                <input type="number" name="commission_power_percent" class="form-control border-success" value="{{ $settings['commission_power_percent'] ?? '2.0' }}" step="0.1" min="0">
-                                <span class="input-group-text bg-success text-white border-success">%</span>
-                            </div>
-                            <div class="help-text">Toko laris terpilih. Mendapat badge Hijau & prioritas naik di pencarian.</div>
-                        </div>
+            {{-- 2. PANEL: TAMPILAN WEBSITE (FRONTEND) --}}
+            <div class="tab-pane fade" id="panel-frontend" role="tabpanel">
 
-                        <div class="col-md-4">
-                            <label class="form-label d-flex justify-content-between align-items-center" style="color: #8b5cf6;">
-                                <span><i class="mdi mdi-check-decagram"></i> Official Store</span>
-                                <button type="button" class="info-btn btn-show-info" data-title="Official Store" data-desc="Distributor resmi bersertifikat (PT/CV) yang menjual partai besar. Disarankan komisi tertinggi (3% - 5%) karena platform memberikan mereka akses langsung ke target pasar kelas kakap (Kontraktor B2B / Proyek).">
-                                    <i class="mdi mdi-help-circle-outline"></i>
-                                </button>
-                            </label>
-                            <div class="input-group">
-                                <input type="number" name="commission_official_percent" class="form-control" style="border-color: #8b5cf6;" value="{{ $settings['commission_official_percent'] ?? '4.0' }}" step="0.1" min="0">
-                                <span class="input-group-text text-white" style="background: #8b5cf6; border-color: #8b5cf6;">%</span>
-                            </div>
-                            <div class="help-text">Distributor resmi berbadan hukum. Monopoli proyek besar & B2B.</div>
-                        </div>
-
-                        <div class="col-12 mt-3 pt-3 border-top">
-                            <label class="form-label">Biaya Tetap per Transaksi (Opsional)</label>
-                            <div class="input-group" style="max-width: 300px;">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" name="seller_fixed_fee" class="form-control" value="{{ $settings['seller_fixed_fee'] ?? '0' }}">
-                            </div>
-                            <div class="help-text">Dipotong flat dari semua kasta toko di luar komisi persentase di atas.</div>
-                        </div>
+                {{-- Banner Utama (Hero Section) --}}
+                <div class="bg-white dark:bg-slate-900 border-t-4 border-t-blue-500 border-x border-b border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300 mb-8">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-monitor-dashboard text-blue-500"></i> Banner Utama Website (Hero)</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Atur gambar dan teks sambutan yang pertama kali dilihat pengunjung di halaman beranda.</p>
                     </div>
-                </div>
 
-                {{-- BIAYA PELANGGAN: ANTI-BANGKRUT LOGIC --}}
-                <div class="st-card border-info">
-                    <div class="st-card-header">
-                        <h3 class="st-card-title text-info"><i class="mdi mdi-credit-card-outline"></i> Biaya Pelanggan & Payment Gateway</h3>
-                        <p class="st-card-desc">Atur biaya penanganan (Handling Fee) yang dibebankan ke pembeli sesuai metode pembayaran. Sistem telah mengunci batas bawah agar platform Anda tidak rugi bayar Midtrans.</p>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Biaya Handling QRIS (%)</label>
-                            <div class="input-group">
-                                <input type="number" name="fee_qris_percent" class="form-control" value="{{ $settings['fee_qris_percent'] ?? '1.5' }}" step="0.1" min="0.8">
-                                <span class="input-group-text">%</span>
-                            </div>
-                            <div class="help-text text-danger fw-bold"><i class="mdi mdi-alert-circle"></i> Wajib di atas 0.7% (Potongan asli Midtrans).</div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Biaya Handling Bank Transfer (VA)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" name="fee_va_flat" class="form-control" value="{{ $settings['fee_va_flat'] ?? '5000' }}" min="4500">
-                            </div>
-                            <div class="help-text text-danger fw-bold"><i class="mdi mdi-alert-circle"></i> Wajib di atas Rp 4.000 (Potongan asli Midtrans).</div>
-                        </div>
-
-                        <div class="col-12 mt-3 pt-3 border-top">
-                            <label class="form-label text-success">Biaya Layanan Jasa (Keuntungan Bersih Platform)</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-success text-white border-success">Rp</span>
-                                <input type="number" name="customer_service_fee" class="form-control border-success" value="{{ $settings['customer_service_fee'] ?? '1000' }}">
-                            </div>
-                            <div class="help-text">Biaya flat yang selalu ditambahkan di setiap transaksi sebagai untung bersih Anda (Misal: Rp 1.000/transaksi).</div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- PANEL BARU: SISTEM DP B2B --}}
-                <div class="st-card border-warning mt-4">
-                    <div class="st-card-header">
-                        <h3 class="st-card-title text-warning"><i class="mdi mdi-handshake"></i> Sistem B2B & Uang Muka (DP)</h3>
-                        <p class="st-card-desc">Atur syarat pembelian skala besar dengan sistem DP. Pelunasan dilakukan secara tunai (CASH/COD) kepada pihak toko saat barang sampai.</p>
-                    </div>
-                    
-                    <div class="custom-switch mb-3">
+                    <div class="grid grid-cols-1 gap-6">
                         <div>
-                            <div class="switch-label">Aktifkan Sistem DP</div>
-                            <div class="switch-desc">Jika aktif, pembeli partai besar bisa membayar DP via web dan melunasi sisanya di tempat.</div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Gambar Banner / Poster Utama</label>
+
+                            {{-- Input File Hidden & Custom Box --}}
+                            <input type="file" name="hero_image" id="heroImageInput" class="hidden" accept="image/*" onchange="previewImage(this, 'heroPreview')">
+
+                            <label for="heroImageInput" class="img-preview-box aspect-[21/9] md:aspect-[3/1]">
+                                <div class="text-center z-20 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                    <i class="mdi mdi-cloud-upload-outline text-3xl text-blue-500 mb-1"></i>
+                                    <p class="text-xs font-black text-slate-700 dark:text-slate-300 m-0">Klik untuk Ganti Gambar Banner</p>
+                                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 m-0 mt-1">Rekomendasi: 1920x600px (JPG/PNG)</p>
+                                </div>
+                                {{-- Image Preview Tag --}}
+                                <img id="heroPreview" src="{{ isset($settings['hero_image']) && $settings['hero_image'] != '' ? asset('storage/'.$settings['hero_image']) : '' }}" class="{{ isset($settings['hero_image']) && $settings['hero_image'] != '' ? 'has-image' : '' }}">
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Judul Teks Banner</label>
+                                <input type="text" name="hero_title" value="{{ $settings['hero_title'] ?? 'Pusat Belanja Material B2B' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none" placeholder="Masukkan Judul Besar...">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Sub-judul / Deskripsi Banner</label>
+                                <input type="text" name="hero_subtitle" value="{{ $settings['hero_subtitle'] ?? 'Temukan ribuan supplier material terpercaya.' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none" placeholder="Masukkan sub-judul...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Popup Promo (Ala Shopee) --}}
+                <div class="bg-white dark:bg-slate-900 border-t-4 border-t-amber-500 border-x border-b border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300 mb-8">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-message-image text-amber-500"></i> Popup Promo (Welcome Screen)</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Tampilkan popup promosi otomatis saat user pertama kali membuka website (Seperti event Flash Sale, dll).</p>
+                    </div>
+
+                    <div class="flex justify-between items-center p-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl mb-6 transition-colors duration-300">
+                        <div class="pr-4">
+                            <strong class="block text-sm font-black text-slate-800 dark:text-white mb-1">Aktifkan Popup Promo</strong>
+                            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-tight">Mulai tampilkan popup promosi di halaman utama pengunjung.</span>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="toggle-checkbox" id="popupToggle" name="enable_welcome_popup" value="1" {{ ($settings['enable_welcome_popup'] ?? '0') == '1' ? 'checked' : '' }}>
+                            <label for="popupToggle" class="toggle-label m-0"></label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Gambar Poster Popup</label>
+
+                            <input type="file" name="popup_image" id="popupImageInput" class="hidden" accept="image/*" onchange="previewImage(this, 'popupPreview')">
+
+                            {{-- Aspect ratio portrait ala popup HP --}}
+                            <label for="popupImageInput" class="img-preview-box aspect-[3/4] max-w-xs mx-auto md:mx-0">
+                                <div class="text-center z-20 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm m-4">
+                                    <i class="mdi mdi-image-plus text-3xl text-amber-500 mb-1"></i>
+                                    <p class="text-xs font-black text-slate-700 dark:text-slate-300 m-0">Upload Poster</p>
+                                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 m-0 mt-1">Potret (600x800px)</p>
+                                </div>
+                                <img id="popupPreview" src="{{ isset($settings['popup_image']) && $settings['popup_image'] != '' ? asset('storage/'.$settings['popup_image']) : '' }}" class="{{ isset($settings['popup_image']) && $settings['popup_image'] != '' ? 'has-image' : '' }}">
+                            </label>
+                        </div>
+
+                        <div class="space-y-6 pt-2">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Link Tujuan Popup (Opsional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0"><i class="mdi mdi-link-variant"></i></span>
+                                    <input type="url" name="popup_link" value="{{ $settings['popup_link'] ?? '' }}" class="form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none" placeholder="https://domain.com/promo...">
+                                </div>
+                                <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1">Arahkan user ke halaman tertentu saat poster ditekan.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Frekuensi Tampil</label>
+                                <select name="popup_frequency" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none cursor-pointer">
+                                    <option value="always" {{ ($settings['popup_frequency'] ?? 'always') == 'always' ? 'selected' : '' }}>Selalu tampil saat di-refresh</option>
+                                    <option value="once_a_day" {{ ($settings['popup_frequency'] ?? '') == 'once_a_day' ? 'selected' : '' }}>Tampil 1 kali sehari per User</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Opsi Tampilan Lainnya --}}
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-view-dashboard-variant-outline text-emerald-500"></i> Widget Homepage Beranda</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Atur bagian-bagian khusus yang ingin ditampilkan di halaman depan web pembeli.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex justify-between items-center p-4 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <div>
+                                <strong class="block text-sm font-black text-slate-800 dark:text-white">Section: Toko Resmi Teratas</strong>
+                                <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Tampilkan slider mitra toko "Official Store" di beranda.</span>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="toggle-checkbox" id="showTopStores" name="show_top_stores" value="1" {{ ($settings['show_top_stores'] ?? '1') == '1' ? 'checked' : '' }}>
+                                <label for="showTopStores" class="toggle-label m-0"></label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center p-4 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <div>
+                                <strong class="block text-sm font-black text-slate-800 dark:text-white">Section: Produk Paling Laris</strong>
+                                <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Otomatis menampilkan material dengan penjualan terbanyak.</span>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="toggle-checkbox" id="showBestSelling" name="show_best_selling" value="1" {{ ($settings['show_best_selling'] ?? '1') == '1' ? 'checked' : '' }}>
+                                <label for="showBestSelling" class="toggle-label m-0"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- 3. PANEL: KEUANGAN & BIAYA --}}
+            <div class="tab-pane fade" id="panel-finance" role="tabpanel">
+                {{-- SEGMEN: KOMISI SELLER --}}
+                <div class="bg-white dark:bg-slate-900 border-t-4 border-t-blue-500 border-x border-b border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300 mb-8">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-percent-circle-outline text-blue-500"></i> Skema Komisi Mitra (Seller)</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Potongan persentase yang dibebankan kepada penjual setiap transaksi berhasil, dibedakan berdasarkan kasta/tier toko.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {{-- Reguler --}}
+                        <div>
+                            <label class="flex justify-between items-center text-[11px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                                <span><i class="mdi mdi-storefront-outline"></i> Reguler</span>
+                                <button type="button" class="info-btn btn-show-info flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-blue-50 hover:text-blue-500 dark:hover:bg-blue-500/20 dark:hover:text-blue-400 transition-all duration-300 outline-none group" data-title="Toko Reguler" data-desc="Toko baru atau penjual standar tanpa legalitas perusahaan. Disarankan diberi komisi sangat rendah (0% - 0.5%) sebagai strategi bakar uang untuk menarik minat seller bergabung.">
+                                    <i class="mdi mdi-help text-xs group-hover:scale-110 transition-transform"></i>
+                                </button>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" name="commission_regular_percent" value="{{ $settings['commission_regular_percent'] ?? '0.5' }}" step="0.1" min="0" class="form-control-input form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none text-center text-lg">
+                                <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-l-0 text-slate-500">%</span>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1 text-center">Toko standar baru.</p>
+                        </div>
+
+                        {{-- Power Merchant --}}
+                        <div>
+                            <label class="flex justify-between items-center text-[11px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-2 ml-1">
+                                <span><i class="mdi mdi-lightning-bolt"></i> Power Merchant</span>
+                                <button type="button" class="info-btn btn-show-info flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-emerald-50 hover:text-emerald-500 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400 transition-all duration-300 outline-none group" data-title="Power Merchant" data-desc="Toko yang sudah laris dan punya reputasi baik. Disarankan komisi menengah (1.5% - 2%). Seller bersedia dipotong lebih tinggi karena mendapat Badge Hijau.">
+                                    <i class="mdi mdi-help text-xs group-hover:scale-110 transition-transform"></i>
+                                </button>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" name="commission_power_percent" value="{{ $settings['commission_power_percent'] ?? '2.0' }}" step="0.1" min="0" class="form-control-input form-control-custom bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-400 shadow-inner dark:shadow-none text-center text-lg">
+                                <span class="input-group-text bg-emerald-500 border border-emerald-500 border-l-0 text-white shadow-md shadow-emerald-500/20">%</span>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1 text-center">Toko laris reputasi baik.</p>
+                        </div>
+
+                        {{-- Official Store --}}
+                        <div>
+                            <label class="flex justify-between items-center text-[11px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-2 ml-1">
+                                <span><i class="mdi mdi-check-decagram"></i> Official Store</span>
+                                <button type="button" class="info-btn btn-show-info flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-purple-50 hover:text-purple-500 dark:hover:bg-purple-500/20 dark:hover:text-purple-400 transition-all duration-300 outline-none group" data-title="Official Store" data-desc="Distributor resmi (PT/CV) yang menjual partai besar B2B. Disarankan komisi tertinggi (3% - 5%) karena platform memberikan mereka akses langsung ke proyek kakap.">
+                                    <i class="mdi mdi-help text-xs group-hover:scale-110 transition-transform"></i>
+                                </button>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" name="commission_official_percent" value="{{ $settings['commission_official_percent'] ?? '4.0' }}" step="0.1" min="0" class="form-control-input form-control-custom bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30 text-purple-800 dark:text-purple-400 shadow-inner dark:shadow-none text-center text-lg">
+                                <span class="input-group-text bg-purple-500 border border-purple-500 border-l-0 text-white shadow-md shadow-purple-500/20">%</span>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1 text-center">Distributor / Pabrik B2B.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Biaya Tetap per Transaksi (Opsional)</label>
+                        <div class="input-group w-full md:w-64">
+                            <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0 text-slate-500">Rp</span>
+                            <input type="number" name="seller_fixed_fee" value="{{ $settings['seller_fixed_fee'] ?? '0' }}" class="form-control-input form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none">
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1">Dipotong flat dari pendapatan semua kasta toko di luar komisi persentase di atas.</p>
+                    </div>
+                </div>
+
+                {{-- SEGMEN: BIAYA PELANGGAN --}}
+                <div class="bg-white dark:bg-slate-900 border-t-4 border-t-amber-500 border-x border-b border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300 mb-8">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-credit-card-outline text-amber-500"></i> Biaya Penanganan Pembeli</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Biaya ekstra yang dibebankan ke pembeli untuk menutup biaya layanan Payment Gateway.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Biaya Handling QRIS (%)</label>
+                            <div class="input-group">
+                                <input type="number" name="fee_qris_percent" value="{{ $settings['fee_qris_percent'] ?? '1.5' }}" step="0.1" min="0.8" class="form-control-input form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none">
+                                <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-l-0 text-slate-500">%</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-[10px] font-black text-amber-600 dark:text-amber-500 mt-2 ml-1"><i class="mdi mdi-alert-circle"></i> Wajib di atas 0.7% (Potongan asli Midtrans).</div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Biaya Handling Virtual Account</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0 text-slate-500">Rp</span>
+                                <input type="number" name="fee_va_flat" value="{{ $settings['fee_va_flat'] ?? '5000' }}" min="4500" class="form-control-input form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none">
+                            </div>
+                            <div class="flex items-center gap-1 text-[10px] font-black text-amber-600 dark:text-amber-500 mt-2 ml-1"><i class="mdi mdi-alert-circle"></i> Wajib di atas Rp 4.000.</div>
+                        </div>
+
+                        <div class="md:col-span-2 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+                            <label class="block text-[11px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-2 ml-1">Biaya Layanan Jasa (Keuntungan Bersih Platform)</label>
+                            <div class="input-group w-full md:w-80">
+                                <span class="input-group-text bg-emerald-500 border border-emerald-500 border-r-0 text-white shadow-md shadow-emerald-500/20">Rp</span>
+                                <input type="number" name="customer_service_fee" value="{{ $settings['customer_service_fee'] ?? '1000' }}" class="form-control-input form-control-custom bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-400 shadow-inner dark:shadow-none text-lg">
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1">Biaya flat tambahan di setiap checkout sebagai untung bersih Anda.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- SEGMEN: B2B DOWNPAYMENT --}}
+                <div class="bg-white dark:bg-slate-900 border-t-4 border-t-emerald-500 border-x border-b border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-handshake text-emerald-500"></i> Sistem B2B & Uang Muka (DP)</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Atur syarat pembelian proyek skala besar dengan sistem cicilan awal (DP).</p>
+                    </div>
+
+                    <div class="flex justify-between items-center p-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl mb-6">
+                        <div class="pr-4">
+                            <strong class="block text-sm font-black text-slate-800 dark:text-white mb-1">Aktifkan Pembayaran DP</strong>
+                            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-tight">Jika aktif, pembeli partai besar dapat checkout dengan DP.</span>
                         </div>
                         <div>
                             <input type="checkbox" class="toggle-checkbox" id="dpToggle" name="enable_dp_system" value="1" {{ ($settings['enable_dp_system'] ?? '0') == '1' ? 'checked' : '' }}>
-                            <label for="dpToggle" class="toggle-label"></label>
+                            <label for="dpToggle" class="toggle-label m-0"></label>
                         </div>
                     </div>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Minimal Belanja (Syarat DP)</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Minimal Belanja (Opsi DP Muncul)</label>
                             <div class="input-group">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" name="min_nominal_dp" class="form-control" value="{{ $settings['min_nominal_dp'] ?? '10000000' }}">
+                                <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0 text-slate-500">Rp</span>
+                                <input type="number" name="min_nominal_dp" value="{{ $settings['min_nominal_dp'] ?? '10000000' }}" class="form-control-input form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none">
                             </div>
-                            <div class="help-text">Minimal total harga agar opsi DP muncul saat checkout.</div>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1">Minimal total harga keranjang agar opsi cicilan awal muncul di Checkout (Saran: 10 Juta).</p>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Persentase DP Awal</label>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Persentase Wajib DP</label>
                             <div class="input-group">
-                                <input type="number" name="dp_percent" class="form-control" value="{{ $settings['dp_percent'] ?? '50' }}" max="99">
-                                <span class="input-group-text">%</span>
+                                <input type="number" name="dp_percent" value="{{ $settings['dp_percent'] ?? '50' }}" max="99" class="form-control-input form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none text-center text-lg">
+                                <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-l-0 text-slate-500">%</span>
                             </div>
-                            <div class="help-text">Berapa persen yang harus dibayar via Midtrans.</div>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1 text-center">Persentase total yang wajib dibayar di web.</p>
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            {{-- PANEL: LOGISTIK --}}
+            {{-- 4. PANEL: LOGISTIK --}}
             <div class="tab-pane fade" id="panel-logistic" role="tabpanel">
-                <div class="st-card border-primary" style="background: #f0f7ff;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="st-card-title text-primary"><i class="mdi mdi-database-sync"></i> Sinkronisasi Komerce</h3>
-                            <p class="st-card-desc mb-0">Tarik data Provinsi & Kota terbaru dari database ekspedisi Komerce.</p>
-                            <small class="text-muted d-block mt-2">Terakhir ditarik: {{ $settings['rajaongkir_last_sync'] ?? 'Belum pernah' }}</small>
+                {{-- SINKRONISASI KOMERCE --}}
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-500/30 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <h3 class="text-xl font-black text-blue-800 dark:text-blue-300 m-0 flex items-center gap-2"><i class="mdi mdi-database-sync text-blue-600 dark:text-blue-400"></i> Sinkronisasi Geografi Logistik</h3>
+                        <p class="text-xs font-bold text-blue-600/70 dark:text-blue-300/70 mt-2 mb-0 leading-relaxed max-w-xl">
+                            Tarik dan perbarui data master Wilayah, Provinsi, Kabupaten, dan Kecamatan terbaru dari database ekspedisi Komerce/RajaOngkir agar perhitungan ongkos kirim akurat.
+                        </p>
+                        <div class="mt-4 flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/60 dark:bg-slate-900/50 rounded-lg text-[10px] font-black text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30">
+                                <i class="mdi mdi-history"></i> Terakhir ditarik: {{ $settings['rajaongkir_last_sync'] ?? 'Belum pernah' }}
+                            </span>
                         </div>
-                        <button type="submit" form="syncForm" class="btn btn-primary shadow-sm"><i class="mdi mdi-sync"></i> Sinkronkan Sekarang</button>
                     </div>
+                    <button type="submit" form="syncForm" class="w-full md:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-black rounded-xl shadow-lg shadow-blue-600/30 transition-all outline-none flex items-center justify-center gap-2 flex-shrink-0">
+                        <i class="mdi mdi-sync"></i> SINKRONKAN
+                    </button>
                 </div>
 
-                <div class="st-card">
-                    <div class="st-card-header">
-                        <h3 class="st-card-title">Kurir Aktif Platform</h3>
-                        <p class="st-card-desc">Pilih ekspedisi pengiriman yang diizinkan beroperasi di platform ini.</p>
+                {{-- KURIR AKTIF --}}
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-truck-check-outline text-emerald-500"></i> Kurir Aktif Platform (API)</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Centang ekspedisi pengiriman nasional yang diizinkan beroperasi di platform ini.</p>
                     </div>
-                    <div class="row g-3">
-                        @php 
-                            $active_couriers = json_decode($settings['rajaongkir_active_couriers'] ?? '[]', true);
-                            if (!is_array($active_couriers)) {
-                                $active_couriers = [];
-                            }
-                        @endphp
-                        @foreach($couriers as $code => $name)
-                        <div class="col-md-4 col-sm-6">
-                            <div class="form-check border rounded-3 p-3 bg-light d-flex align-items-center gap-2">
-                                <input class="form-check-input ms-0 mt-0" type="checkbox" name="couriers[]" value="{{ $code }}" id="c_{{ $code }}" {{ in_array($code, $active_couriers) ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold m-0" for="c_{{ $code }}">{{ $name }}</label>
+
+                    @php
+                        $active_couriers = json_decode($settings['rajaongkir_active_couriers'] ?? '[]', true);
+                        if (!is_array($active_couriers)) $active_couriers = [];
+                    @endphp
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        @if(isset($couriers))
+                            @foreach($couriers as $code => $name)
+                                <label class="relative flex items-center justify-center p-4 border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 rounded-xl cursor-pointer transition-colors w-full m-0" style="--checked-border: #3b82f6; --checked-bg: #eff6ff; --checked-text: #1d4ed8;">
+                                    <input type="checkbox" name="couriers[]" value="{{ $code }}" class="tier-radio hidden" {{ in_array($code, $active_couriers) ? 'checked' : '' }}>
+                                    <div class="flex items-center gap-3 w-full">
+                                        <div class="w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center check-icon-wrapper transition-colors">
+                                            <i class="mdi mdi-check text-white text-sm opacity-0 transition-opacity check-mark"></i>
+                                        </div>
+                                        <span class="text-sm font-black text-slate-700 dark:text-slate-300">{{ $name }}</span>
+                                    </div>
+                                </label>
+                            @endforeach
+                            <style>
+                                .tier-radio:checked + div .check-icon-wrapper { background-color: #3b82f6; border-color: #3b82f6; }
+                                .tier-radio:checked + div .check-mark { opacity: 1; }
+                                .dark .tier-radio:checked + div { background-color: transparent !important; }
+                                .dark .tier-radio:checked[name="couriers[]"] + div .text-slate-700 { color: #60a5fa !important; }
+                            </style>
+                        @else
+                            <div class="col-span-full text-slate-500 dark:text-slate-400 text-sm">Data Kurir Belum Tersedia.</div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- 5. PANEL: API & INTEGRASI --}}
+            <div class="tab-pane fade" id="panel-api" role="tabpanel">
+
+                {{-- MIDTRANS --}}
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300 mb-8">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2">
+                                <img src="https://midtrans.com/assets/img/midtrans-logo-black.svg" class="h-6 dark:invert dark:brightness-200" alt="Midtrans"> Payment Gateway
+                            </h3>
+                            <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-2 mb-0">Konfigurasi kunci akses (Keys) agar sistem dapat menerima pembayaran otomatis.</p>
+                        </div>
+
+                        <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <span class="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Live Mode</span>
+                            <div>
+                                <input type="checkbox" class="toggle-checkbox" id="midtransToggle" name="midtrans_is_production" value="1" {{ ($settings['midtrans_is_production'] ?? '0') == '1' ? 'checked' : '' }}>
+                                <label for="midtransToggle" class="toggle-label m-0"></label>
                             </div>
                         </div>
-                        @endforeach
                     </div>
-                </div>
-            </div>
 
-            {{-- PANEL: API & INTEGRASI --}}
-            <div class="tab-pane fade" id="panel-api" role="tabpanel">
-                <div class="st-card">
-                    <div class="st-card-header d-flex justify-content-between align-items-center">
+                    <div class="space-y-5">
                         <div>
-                            <h3 class="st-card-title">Midtrans Payment Gateway</h3>
-                            <p class="st-card-desc">Konfigurasi jalur pembayaran online.</p>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Client Key</label>
+                            <input type="text" name="midtrans_client_key" value="{{ $settings['midtrans_client_key'] ?? '' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none font-mono text-sm">
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="fw-bold" style="font-size:12px;">Live Mode</span>
-                            <input type="checkbox" class="toggle-checkbox" id="midtransToggle" name="midtrans_is_production" value="1" {{ ($settings['midtrans_is_production'] ?? '0') == '1' ? 'checked' : '' }}>
-                            <label for="midtransToggle" class="toggle-label"></label>
-                        </div>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Client Key</label>
-                            <input type="text" name="midtrans_client_key" class="form-control" value="{{ $settings['midtrans_client_key'] ?? '' }}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Server Key <span class="text-danger">*RAHASIA</span></label>
-                            <input type="password" name="midtrans_server_key" class="form-control" value="{{ $settings['midtrans_server_key'] ?? '' }}">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Server Key <span class="text-rose-500 ml-1">*RAHASIA*</span></label>
+                            <input type="password" name="midtrans_server_key" value="{{ $settings['midtrans_server_key'] ?? '' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none font-mono text-sm tracking-[0.2em]" placeholder="Midtrans-server-xxxxxxxxxxxx">
                         </div>
                     </div>
                 </div>
 
-                <div class="st-card">
-                    <div class="st-card-header">
-                        <h3 class="st-card-title">Komerce / RajaOngkir API</h3>
+                {{-- KOMERCE API --}}
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2">
+                            <i class="mdi mdi-api text-blue-500"></i> Komerce / RajaOngkir API
+                        </h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Hubungkan logistik untuk perhitungan tarif ongkir akurat ke seluruh Indonesia.</p>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">API Key</label>
-                        <input type="password" name="rajaongkir_api_key" class="form-control" value="{{ $settings['rajaongkir_api_key'] ?? '' }}">
+
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">API Key Rahasia</label>
+                        <input type="password" name="rajaongkir_api_key" value="{{ $settings['rajaongkir_api_key'] ?? '' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none font-mono text-sm tracking-[0.2em]" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
                     </div>
                 </div>
+
             </div>
 
-            {{-- PANEL: KATALOG & MODERASI --}}
+            {{-- 6. PANEL: ATURAN KATALOG --}}
             <div class="tab-pane fade" id="panel-catalog" role="tabpanel">
-                <div class="st-card">
-                    <div class="st-card-header">
-                        <h3 class="st-card-title">Aturan Toko & Moderasi</h3>
-                        <p class="st-card-desc">Tetapkan bagaimana seller berinteraksi dengan sistem.</p>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
+                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-security text-emerald-500"></i> Aturan Toko & Moderasi</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Tetapkan tingkat keketatan filter platform. Apakah seller dapat langsung berjualan atau harus menunggu izin Anda.</p>
                     </div>
-                    
-                    <div class="custom-switch">
-                        <div>
-                            <div class="switch-label">Auto-Approve Material Baru</div>
-                            <div class="switch-desc">Jika aktif, produk yang diunggah seller langsung tayang tanpa perlu moderasi Admin.</div>
+
+                    <div class="flex justify-between items-center p-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl mb-4 transition-colors duration-300">
+                        <div class="pr-4">
+                            <strong class="block text-sm font-black text-slate-800 dark:text-white mb-1">Auto-Approve Material Baru</strong>
+                            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-tight">Jika aktif, produk yang diunggah seller langsung tayang ke publik tanpa perlu moderasi Admin terlebih dahulu.</span>
                         </div>
                         <div>
                             <input type="checkbox" class="toggle-checkbox" id="autoApproveProd" name="auto_approve_products" value="1" {{ ($settings['auto_approve_products'] ?? '0') == '1' ? 'checked' : '' }}>
-                            <label for="autoApproveProd" class="toggle-label"></label>
+                            <label for="autoApproveProd" class="toggle-label m-0"></label>
                         </div>
                     </div>
 
-                    <div class="custom-switch">
-                        <div>
-                            <div class="switch-label">Auto-Approve Pendaftaran Toko</div>
-                            <div class="switch-desc">Izinkan pendaftar langsung berjualan tanpa menunggu verifikasi.</div>
+                    <div class="flex justify-between items-center p-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl transition-colors duration-300">
+                        <div class="pr-4">
+                            <strong class="block text-sm font-black text-slate-800 dark:text-white mb-1">Auto-Approve Pendaftaran Toko</strong>
+                            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-tight">Izinkan user yang baru mendaftar langsung mendapatkan akses dashboard penjual tanpa verifikasi Manual.</span>
                         </div>
                         <div>
                             <input type="checkbox" class="toggle-checkbox" id="autoApproveStore" name="auto_approve_stores" value="1" {{ ($settings['auto_approve_stores'] ?? '0') == '1' ? 'checked' : '' }}>
-                            <label for="autoApproveStore" class="toggle-label"></label>
+                            <label for="autoApproveStore" class="toggle-label m-0"></label>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -364,56 +631,94 @@
 </form>
 
 {{-- FORM TERPISAH UNTUK SYNC KOMERCE --}}
-<form id="syncForm" action="{{ route('admin.settings.syncKomerce') }}" method="POST">
+<form id="syncForm" action="{{ route('admin.settings.syncKomerce') }}" method="POST" class="hidden">
     @csrf
 </form>
 
 {{-- STICKY BOTTOM ACTION BAR --}}
-<div class="save-bar">
-    <button type="submit" form="mainSettingsForm" class="btn-save shadow-sm">
-        <i class="mdi mdi-content-save-outline me-1"></i> Simpan Perubahan
+<div class="save-bar bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 lg:p-5 flex justify-end shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] transition-colors duration-300">
+    <button type="submit" form="mainSettingsForm" class="flex items-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-black rounded-xl shadow-lg shadow-blue-600/30 hover:-translate-y-1 transition-all outline-none w-full sm:w-auto justify-center">
+        <i class="mdi mdi-content-save-check-outline text-xl leading-none"></i> SIMPAN SEMUA PERUBAHAN
     </button>
 </div>
 
-{{-- MODAL INFO KLIK --}}
+{{-- ============================================================================== --}}
+{{-- MODAL INFO KLIK (MENDUKUNG DARK MODE BOOTSTRAP)                                --}}
+{{-- ============================================================================== --}}
 <div class="modal fade" id="infoTierModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
-            <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold text-primary" id="infoModalTitle"><i class="mdi mdi-information text-primary"></i> Info Kasta Toko</h5>
+        <div class="modal-content rounded-[2rem] border-0 shadow-2xl overflow-hidden transition-colors duration-300">
+            <div class="modal-header border-b border-slate-100 dark:border-slate-800 p-6 bg-white dark:bg-slate-900">
+                <h5 class="text-lg font-black text-blue-600 dark:text-blue-400 m-0" id="infoModalTitle">
+                    <i class="mdi mdi-information-outline"></i> Judul
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body pt-2 text-dark" style="line-height: 1.6;" id="infoModalDesc">
-                </div>
-            <div class="modal-footer border-top-0 pt-0">
-                <button type="button" class="btn btn-light fw-bold w-100 rounded-3" data-bs-dismiss="modal">Paham</button>
+            <div class="modal-body p-6 bg-slate-50/50 dark:bg-slate-900 text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed" id="infoModalDesc">
+                Deskripsi
+            </div>
+            <div class="modal-footer border-t border-slate-100 dark:border-slate-800 p-6 bg-white dark:bg-slate-900">
+                <button type="button" class="w-full px-5 py-3 rounded-xl font-black text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all outline-none" data-bs-dismiss="modal">SAYA PAHAM</button>
             </div>
         </div>
     </div>
 </div>
+
 @endsection
 
 @push('scripts')
 <script>
+    // JS Logic for Image Preview
+    function previewImage(input, previewElementId) {
+        const previewEl = document.getElementById(previewElementId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewEl.src = e.target.result;
+                previewEl.classList.add('has-image');
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewEl.src = '';
+            previewEl.classList.remove('has-image');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Script untuk Modal Info (Bisa dipencet)
-        const infoButtons = document.querySelectorAll('.btn-show-info');
+        // PERBAIKAN BUG: Pindahkan Modal ke Body SETELAH DOM selesai dimuat
+        document.querySelectorAll('.modal').forEach(modal => {
+            document.body.appendChild(modal);
+        });
+
+        // Logika Modal Info (Bisa dipencet icon tanda tanya)
         const modalTitle = document.getElementById('infoModalTitle');
         const modalDesc = document.getElementById('infoModalDesc');
-        const infoModal = new bootstrap.Modal(document.getElementById('infoTierModal'));
 
-        infoButtons.forEach(btn => {
+        document.querySelectorAll('.btn-show-info').forEach(btn => {
             btn.addEventListener('click', function() {
-                // Ambil text dari data atribut
                 const title = this.getAttribute('data-title');
                 const desc = this.getAttribute('data-desc');
-                
-                // Masukkan ke dalam modal
-                modalTitle.innerHTML = `<i class="mdi mdi-information-outline me-1"></i> Strategi ${title}`;
+
+                modalTitle.innerHTML = `<i class="mdi mdi-lightbulb-on-outline me-1"></i> Strategi ${title}`;
                 modalDesc.innerHTML = desc;
-                
-                // Tampilkan Modal
-                infoModal.show();
+
+                new bootstrap.Modal(document.getElementById('infoTierModal')).show();
+            });
+        });
+
+        // Logika Navbar Active State (untuk custom tab)
+        const tabLinks = document.querySelectorAll('[data-bs-toggle="pill"]');
+        tabLinks.forEach(link => {
+            link.addEventListener('shown.bs.tab', function(e) {
+                // Hapus gaya aktif dari semua link
+                tabLinks.forEach(l => {
+                    l.classList.remove('bg-blue-50', 'dark:bg-blue-500/10', 'text-blue-600', 'dark:text-blue-400', 'shadow-inner', 'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]');
+                    l.classList.add('text-slate-500', 'dark:text-slate-400');
+                });
+
+                // Tambahkan gaya aktif ke link yang baru diklik
+                e.target.classList.add('bg-blue-50', 'dark:bg-blue-500/10', 'text-blue-600', 'dark:text-blue-400', 'shadow-inner', 'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]');
+                e.target.classList.remove('text-slate-500', 'dark:text-slate-400');
             });
         });
     });

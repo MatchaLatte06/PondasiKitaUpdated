@@ -4,162 +4,256 @@
 
 @push('styles')
 <style>
-    :root {
-        --log-primary: #2563eb;
-        --log-surface: #ffffff;
-        --log-bg: #f8fafc;
-        --log-border: #e2e8f0;
-    }
+    /* ========================================= */
+    /* ==  PREMIUM LOGISTICS CSS (LIGHT & DARK) == */
+    /* ========================================= */
 
-    .logistic-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 20px; padding: 30px; color: white; margin-bottom: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-    .logistic-header h2 { margin: 0; font-weight: 800; font-size: 24px; }
-    .logistic-header p { margin: 8px 0 0 0; color: #94a3b8; font-size: 14px; }
-    
-    .log-card { background: var(--log-surface); border: 1px solid var(--log-border); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .log-card-title { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-    .log-card-desc { font-size: 13px; color: #64748b; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed var(--log-border); }
+    .hover-lift { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease; }
+    .hover-lift:hover { transform: translateY(-4px); }
 
-    /* COURIER GRID (API) */
-    .courier-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-    .courier-box { border: 1px solid var(--log-border); border-radius: 12px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; transition: 0.2s; cursor: pointer; background: var(--log-bg); }
-    .courier-box:hover { border-color: var(--log-primary); background: #eff6ff; }
-    .courier-box .form-check-input { margin-top: 4px; cursor: pointer; }
-    .c-icon { width: 40px; height: 40px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--log-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    
-    /* CUSTOM FLEET SECTION (ARMADA TOKO) */
-    .fleet-banner { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 20px; margin-bottom: 24px; display: flex; gap: 16px; align-items: flex-start; }
-    .fleet-banner i { font-size: 32px; color: #d97706; }
-    
-    .input-group-text { background: #f1f5f9; border-color: var(--log-border); font-weight: 600; color: #475569; }
-    .form-control { border-color: var(--log-border); font-weight: 500; }
-    .form-control:focus { border-color: var(--log-primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .input-group { display: flex; align-items: stretch; width: 100%; }
+    .input-group-text { display: flex; align-items: center; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 700; border-top-right-radius: 0.75rem; border-bottom-right-radius: 0.75rem; border: 1px solid #e2e8f0; border-left: 0; }
 
-    /* MODERN TOGGLE */
-    .switch-wrapper { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--log-border); border-radius: 12px; margin-bottom: 16px; background: white; }
-    .switch-info strong { display: block; font-size: 15px; color: #1e293b; }
-    .switch-info span { font-size: 12px; color: #64748b; }
+    .form-control-input { flex: 1 1 auto; width: 1%; min-width: 0; padding: 0.625rem 1rem; border-top-left-radius: 0.75rem; border-bottom-left-radius: 0.75rem; outline: none; transition: all 0.2s; border: 1px solid #e2e8f0; }
+
+    /* MODERN TOGGLE SWITCH */
     .toggle-checkbox { display: none; }
-    .toggle-label { width: 50px; height: 26px; background: #cbd5e1; border-radius: 30px; position: relative; cursor: pointer; transition: 0.3s; }
-    .toggle-label::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .toggle-label { width: 50px; height: 26px; border-radius: 30px; position: relative; cursor: pointer; transition: 0.3s; flex-shrink: 0; background: #cbd5e1; }
+    .toggle-label::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; transition: 0.3s; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .toggle-checkbox:checked + .toggle-label { background: #10b981; }
     .toggle-checkbox:checked + .toggle-label::after { transform: translateX(24px); }
 
-    .btn-save-floating { position: fixed; bottom: 30px; right: 40px; background: var(--log-primary); color: white; border: none; padding: 14px 28px; border-radius: 100px; font-weight: 700; font-size: 15px; box-shadow: 0 10px 20px -5px rgba(37,99,235,0.4); transition: 0.3s; z-index: 1000; display: flex; align-items: center; gap: 8px; }
-    .btn-save-floating:hover { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(37,99,235,0.5); }
+    /* COURIER CARD SELECTION */
+    .courier-box { cursor: pointer; transition: all 0.2s; }
+    .courier-checkbox { display: none; }
+    .courier-checkbox:checked + .courier-content { border-color: #3b82f6 !important; background-color: #eff6ff !important; }
+    .courier-checkbox:checked + .courier-content .check-icon { opacity: 1 !important; transform: scale(1) !important; }
+
+    /* Floating Save Button */
+    .btn-save-floating { position: fixed; bottom: 40px; right: 40px; z-index: 50; transition: all 0.3s; }
+    .btn-save-floating:hover { transform: translateY(-5px); }
+
+    /* ========================================= */
+    /* == POLYFILL DARK MODE (ANTI-PUTIH)     == */
+    /* ========================================= */
+    .dark .dark\:bg-slate-950 { background-color: #020617 !important; }
+    .dark .dark\:bg-slate-900 { background-color: #0f172a !important; }
+    .dark .dark\:bg-slate-800 { background-color: #1e293b !important; }
+    .dark .dark\:bg-slate-800\/50 { background-color: rgba(30, 41, 59, 0.5) !important; }
+    .dark .dark\:bg-slate-800\/40 { background-color: rgba(30, 41, 59, 0.4) !important; }
+    .dark .dark\:bg-slate-700 { background-color: #334155 !important; }
+    .dark .dark\:bg-transparent { background-color: transparent !important; }
+
+    .dark .dark\:border-slate-800 { border-color: #1e293b !important; }
+    .dark .dark\:border-slate-700 { border-color: #334155 !important; }
+    .dark .dark\:border-slate-700\/50 { border-color: rgba(51, 65, 85, 0.5) !important; }
+
+    /* Input & Toggle Dark Mode */
+    .dark .input-group-text { background-color: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
+    .dark .form-control-input { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
+    .dark .toggle-label { background: #334155 !important; }
+    .dark .toggle-label::after { background: #94a3b8 !important; box-shadow: none !important; }
+    .dark .toggle-checkbox:checked + .toggle-label { background: #059669 !important; }
+    .dark .toggle-checkbox:checked + .toggle-label::after { background: white !important; }
+
+    /* Courier Card Dark Mode */
+    .dark .courier-checkbox:checked + .courier-content { background-color: rgba(59, 130, 246, 0.1) !important; border-color: #3b82f6 !important; }
+
+    /* Typography & Icons */
+    .dark .dark\:text-white { color: #ffffff !important; }
+    .dark .dark\:text-slate-100 { color: #f1f5f9 !important; }
+    .dark .dark\:text-slate-200 { color: #e2e8f0 !important; }
+    .dark .dark\:text-slate-300 { color: #cbd5e1 !important; }
+    .dark .dark\:text-slate-400 { color: #94a3b8 !important; }
+    .dark .dark\:text-blue-400 { color: #60a5fa !important; }
+    .dark .dark\:text-amber-400 { color: #fbbf24 !important; }
+
+    /* Custom Sections */
+    .dark .dark\:bg-blue-500\/10 { background-color: rgba(59, 130, 246, 0.1) !important; }
+    .dark .dark\:border-blue-500\/20 { border-color: rgba(59, 130, 246, 0.2) !important; }
+    .dark .dark\:bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.1) !important; }
 </style>
 @endpush
 
 @section('content')
-<form action="{{ route('admin.logistics.update') }}" method="POST">
+<form action="{{ route('admin.logistics.update') }}" method="POST" class="pb-24">
     @csrf
 
-    <div class="logistic-header">
-        <div>
-            <h2>Logistik & Distribusi Platform</h2>
-            <p>Atur ekspedisi pihak ketiga dan regulasi armada mandiri untuk mitra toko bangunan Anda.</p>
+    {{-- HERO HEADER --}}
+    <div class="relative bg-gradient-to-br from-slate-800 to-slate-950 dark:from-slate-900 dark:to-slate-950 rounded-3xl p-8 mb-8 overflow-hidden shadow-xl shadow-slate-900/10 dark:shadow-none transition-colors duration-300">
+        {{-- Abstract Decorative Background --}}
+        <div class="absolute -right-20 -top-20 opacity-10 pointer-events-none">
+            <i class="mdi mdi-map-marker-path text-[250px] text-white"></i>
         </div>
-        <div>
-            <i class="mdi mdi-map-marker-path" style="font-size: 48px; opacity: 0.5;"></i>
-        </div>
-    </div>
-
-    @if(session('success'))
-        <div class="alert alert-success fw-bold border-0 shadow-sm rounded-3 mb-4">
-            <i class="mdi mdi-check-circle me-2"></i> {{ session('success') }}
-        </div>
-    @endif
-
-    <div class="row">
-        <div class="col-lg-7">
-            <div class="log-card border-warning" style="border-width: 2px;">
-                <div class="log-card-title text-warning"><i class="mdi mdi-truck-flatbed"></i> Regulasi Armada Mandiri (Toko)</div>
-                <div class="log-card-desc">Fitur krusial untuk e-commerce material. Izinkan seller menggunakan mobil bak/truk mereka sendiri untuk mengirim barang (semen, besi, pasir).</div>
-
-                <div class="fleet-banner shadow-sm" style="background: #eff6ff; border-color: #bfdbfe;">
-                    <i class="mdi mdi-set-all text-primary"></i>
-                    <div>
-                        <strong class="d-block text-dark">Multi-Option Logistics (Berdampingan)</strong>
-                        <span class="text-muted small">Pembeli diberikan kebebasan penuh! Tarif Armada Toko (jika disetting oleh seller) akan tampil berdampingan dengan kurir JNE/J&T. Pembeli bisa bebas memilih antara Ekspedisi Reguler atau Armada Mandiri Toko sesuai kebutuhan dan budget mereka.</span>
-                    </div>
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+                <div class="flex items-center gap-2 text-xs font-bold text-slate-400 mb-2 transition-colors duration-300">
+                    <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-400 transition-colors text-decoration-none">Dashboard</a>
+                    <i class="mdi mdi-chevron-right text-sm"></i>
+                    <span class="text-blue-400">Konfigurasi Sistem</span>
                 </div>
-
-                <div class="switch-wrapper shadow-sm">
-                    <div class="switch-info">
-                        <strong>Aktifkan Fitur Armada Toko (Global)</strong>
-                        <span>Izinkan seller mengatur tarif per-KM untuk pengiriman lokal.</span>
-                    </div>
-                    <div>
-                        <input type="checkbox" class="toggle-checkbox" id="fleetToggle" name="enable_custom_fleet" value="1" {{ ($settings['enable_custom_fleet'] ?? '0') == '1' ? 'checked' : '' }}>
-                        <label for="fleetToggle" class="toggle-label"></label>
-                    </div>
-                </div>
-
-                <div class="switch-wrapper shadow-sm">
-                    <div class="switch-info">
-                        <strong>Pengiriman Darurat (Sameday Toko)</strong>
-                        <span>Beri opsi seller untuk melayani pengiriman CITO (Langsung Kirim) dengan tarif ekstra.</span>
-                    </div>
-                    <div>
-                        <input type="checkbox" class="toggle-checkbox" id="emergencyToggle" name="enable_emergency_delivery" value="1" {{ ($settings['enable_emergency_delivery'] ?? '0') == '1' ? 'checked' : '' }}>
-                        <label for="emergencyToggle" class="toggle-label"></label>
-                    </div>
-                </div>
-
-                <div class="row g-3 mt-2">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small text-muted text-uppercase">Batas Maksimal Jarak (KM)</label>
-                        <div class="input-group">
-                            <input type="number" name="max_custom_fleet_distance" class="form-control" value="{{ $settings['max_custom_fleet_distance'] ?? '50' }}" placeholder="Contoh: 50">
-                            <span class="input-group-text">KM</span>
-                        </div>
-                        <small class="text-muted" style="font-size: 11px;">Maksimal jarak yang diizinkan sistem dari toko ke pembeli.</small>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small text-muted text-uppercase">Batas Berat Minimum Armada</label>
-                        <div class="input-group">
-                            <input type="number" name="min_heavy_cargo_weight" class="form-control" value="{{ $settings['min_heavy_cargo_weight'] ?? '0' }}">
-                            <span class="input-group-text">KG</span>
-                        </div>
-                        <small class="text-muted" style="font-size: 11px;">Isi "0" agar armada toko bisa digunakan untuk barang seringan apapun (bebas dipilih pembeli).</small>
-                    </div>
-                </div>
+                <h2 class="text-3xl font-black text-white tracking-tight mb-2">Logistik & Distribusi Platform</h2>
+                <p class="text-slate-400 text-sm font-bold m-0 max-w-2xl leading-relaxed">
+                    Atur ketersediaan ekspedisi API pihak ketiga (JNE, J&T, dll) dan regulasikan sistem pengiriman menggunakan armada mandiri dari mitra toko bangunan.
+                </p>
             </div>
-        </div>
 
-        <div class="col-lg-5">
-            <div class="log-card">
-                <div class="log-card-title"><i class="mdi mdi-api text-primary"></i> Ekspedisi Sistem (API)</div>
-                <div class="log-card-desc">Pilih kurir pihak ketiga yang tersedia untuk mengirim barang-barang ringan (keran, paku, kuas) ke seluruh Indonesia.</div>
-
-                @php $active_api_couriers = json_decode($settings['api_active_couriers'] ?? '[]', true); @endphp
-                @if(!is_array($active_api_couriers)) @php $active_api_couriers = []; @endphp @endif
-
-                <div class="courier-grid mt-3">
-                    @foreach($api_couriers as $code => $kurir)
-                    <label class="courier-box w-100" for="api_{{ $code }}">
-                        <div class="c-icon"><i class="mdi {{ $kurir['icon'] }}"></i></div>
-                        <div class="flex-grow-1">
-                            <strong class="d-block text-dark">{{ $kurir['name'] }}</strong>
-                            <span class="small text-muted">{{ $kurir['type'] }}</span>
-                        </div>
-                        <div class="form-check m-0">
-                            <input class="form-check-input fs-5" type="checkbox" name="couriers[]" value="{{ $code }}" id="api_{{ $code }}" {{ in_array($code, $active_api_couriers) ? 'checked' : '' }}>
-                        </div>
-                    </label>
-                    @endforeach
+            {{-- Quick Stats Snippet --}}
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 px-5 py-3 rounded-2xl flex items-center gap-4 hidden sm:flex">
+                <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center text-xl">
+                    <i class="mdi mdi-truck-fast"></i>
                 </div>
-                
-                <div class="mt-4 p-3 bg-light rounded-3 border">
-                    <span class="d-block fw-bold text-dark mb-1"><i class="mdi mdi-information text-primary"></i> Info Sinkronisasi</span>
-                    <span class="small text-muted">Tarif kurir API di atas diambil otomatis secara real-time berdasarkan jarak titik koordinat (Komerce/RajaOngkir).</span>
+                <div>
+                    <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Sistem Logistik</div>
+                    <div class="text-sm font-black text-white"><span class="text-emerald-400">Online</span> & Tersinkronisasi</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <button type="submit" class="btn-save-floating">
-        <i class="mdi mdi-content-save"></i> Terapkan Regulasi Logistik
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        {{-- KOLOM KIRI (ARMADA MANDIRI TOKO B2B) --}}
+        <div class="lg:col-span-7 space-y-6">
+
+            <div class="bg-white dark:bg-slate-900 border-t-4 border-t-amber-500 border-x border-b border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors duration-300 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-800 bg-amber-50/30 dark:bg-transparent">
+                    <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2 m-0">
+                        <i class="mdi mdi-truck-flatbed text-amber-500 text-2xl"></i> Regulasi Armada Mandiri (Toko)
+                    </h3>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+                        Fitur logistik B2B krusial untuk material berat. Izinkan toko menggunakan armada pickup/truk mereka sendiri untuk mengirim semen, besi, atau pasir.
+                    </p>
+                </div>
+
+                <div class="p-6 space-y-6">
+
+                    {{-- Banner Penjelasan --}}
+                    <div class="flex items-start gap-4 p-5 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-2xl transition-colors duration-300">
+                        <i class="mdi mdi-set-all text-3xl text-blue-600 dark:text-blue-400 mt-1"></i>
+                        <div>
+                            <strong class="block text-sm font-black text-slate-800 dark:text-white mb-1">Multi-Option Logistics (Berdampingan)</strong>
+                            <p class="text-[11px] font-bold text-slate-600 dark:text-slate-400 m-0 leading-relaxed">
+                                Pembeli di sisi front-end akan melihat dua opsi! Tarif <span class="text-blue-600 dark:text-blue-400">Armada Toko</span> (jika disetting oleh seller) akan tampil berdampingan dengan <span class="text-slate-800 dark:text-slate-200">Kurir API Sistem</span>. Mereka bebas memilih metode pengiriman yang paling efisien berdasarkan berat barang.
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Switch 1: Aktifkan Armada Toko --}}
+                    <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl transition-colors duration-300">
+                        <div class="pr-4">
+                            <strong class="block text-sm font-black text-slate-800 dark:text-white mb-0.5">Aktifkan Fitur Armada Toko (Global)</strong>
+                            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Izinkan seller mengatur tarif per-KM untuk pengiriman lokal mereka.</span>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="toggle-checkbox" id="fleetToggle" name="enable_custom_fleet" value="1" {{ ($settings['enable_custom_fleet'] ?? '0') == '1' ? 'checked' : '' }}>
+                            <label for="fleetToggle" class="toggle-label"></label>
+                        </div>
+                    </div>
+
+                    {{-- Switch 2: Pengiriman Darurat (Sameday) --}}
+                    <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl transition-colors duration-300">
+                        <div class="pr-4">
+                            <strong class="block text-sm font-black text-slate-800 dark:text-white mb-0.5">Pengiriman Darurat (CITO/Sameday)</strong>
+                            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Berikan akses bagi seller untuk melayani pengiriman mendesak proyek dengan tarif ekstra.</span>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="toggle-checkbox" id="emergencyToggle" name="enable_emergency_delivery" value="1" {{ ($settings['enable_emergency_delivery'] ?? '0') == '1' ? 'checked' : '' }}>
+                            <label for="emergencyToggle" class="toggle-label"></label>
+                        </div>
+                    </div>
+
+                    {{-- Input Jarak & Berat --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Batas Maksimal Jarak</label>
+                            <div class="input-group">
+                                <input type="number" name="max_custom_fleet_distance" value="{{ $settings['max_custom_fleet_distance'] ?? '50' }}" placeholder="Contoh: 50" class="form-control-input bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 font-bold text-sm shadow-inner dark:shadow-none">
+                                <span class="input-group-text bg-slate-100 border-slate-200 border-l-0">KM</span>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 m-0 leading-tight">Maksimal radius jangkauan pengiriman yang bisa dilayani armada toko.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Batas Berat Minimum Armada</label>
+                            <div class="input-group">
+                                <input type="number" name="min_heavy_cargo_weight" value="{{ $settings['min_heavy_cargo_weight'] ?? '0' }}" class="form-control-input bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 font-bold text-sm shadow-inner dark:shadow-none">
+                                <span class="input-group-text bg-slate-100 border-slate-200 border-l-0">KG</span>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 m-0 leading-tight">Jika diisi "0", armada toko bisa dipilih pembeli meski belanja barang sangat ringan.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {{-- KOLOM KANAN (EKSPEDISI API) --}}
+        <div class="lg:col-span-5 space-y-6">
+
+            <div class="bg-white dark:bg-slate-900 border-t-4 border-t-blue-500 border-x border-b border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors duration-300 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-800 bg-blue-50/30 dark:bg-transparent">
+                    <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2 m-0">
+                        <i class="mdi mdi-api text-blue-500 text-2xl"></i> Ekspedisi Sistem (API)
+                    </h3>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+                        Pilih layanan kurir pihak ketiga yang akan diaktifkan untuk melayani pengiriman paket material ringan.
+                    </p>
+                </div>
+
+                @php
+                    $active_api_couriers = json_decode($settings['api_active_couriers'] ?? '[]', true);
+                    if(!is_array($active_api_couriers)) $active_api_couriers = [];
+                @endphp
+
+                <div class="p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
+                        @foreach($api_couriers as $code => $kurir)
+                            <label class="courier-box w-full relative m-0" for="api_{{ $code }}">
+                                <input type="checkbox" name="couriers[]" value="{{ $code }}" id="api_{{ $code }}" class="courier-checkbox" {{ in_array($code, $active_api_couriers) ? 'checked' : '' }}>
+
+                                <div class="courier-content flex items-start gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl h-full transition-colors duration-200">
+                                    {{-- Icon Box --}}
+                                    <div class="w-10 h-10 rounded-lg bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                        <i class="mdi {{ $kurir['icon'] }} text-blue-500 dark:text-blue-400 text-xl"></i>
+                                    </div>
+
+                                    {{-- Info --}}
+                                    <div class="flex-1 pr-2">
+                                        <strong class="block text-sm font-black text-slate-800 dark:text-white leading-tight mb-0.5">{{ $kurir['name'] }}</strong>
+                                        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">{{ $kurir['type'] }}</span>
+                                    </div>
+
+                                    {{-- Checkmark Overlay (Absolute) --}}
+                                    <div class="check-icon absolute top-3 right-3 text-blue-600 dark:text-blue-400 opacity-0 scale-50 transition-all duration-300">
+                                        <i class="mdi mdi-check-circle text-lg"></i>
+                                    </div>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    {{-- Info Box --}}
+                    <div class="mt-6 flex items-start gap-3 p-4 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/50 rounded-xl transition-colors duration-300">
+                        <i class="mdi mdi-information text-slate-400 dark:text-slate-500 text-xl flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest mb-1">Informasi Tarikan Data</strong>
+                            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 m-0 leading-relaxed">
+                                Ongkos kirim dari ekspedisi yang dicentang akan ditarik secara <span class="font-black text-blue-600 dark:text-blue-400">Real-Time</span> menggunakan API Gateway (Komerce/RajaOngkir) berdasarkan koordinat lokasi dan total berat keranjang belanja.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {{-- FLOATING ACTION BUTTON --}}
+    <button type="submit" class="btn-save-floating flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-black rounded-full shadow-lg shadow-blue-600/30 hover:-translate-y-1 transition-all outline-none border border-blue-500/50">
+        <i class="mdi mdi-content-save-check-outline text-xl"></i> TERAPKAN REGULASI LOGISTIK
     </button>
 </form>
 @endsection

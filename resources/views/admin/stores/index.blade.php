@@ -333,6 +333,11 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
+        // PERBAIKAN BUG: Pindahkan Modal ke Body SETELAH DOM selesai dimuat
+        document.querySelectorAll('.modal').forEach(modal => {
+            document.body.appendChild(modal);
+        });
+
         // Logika Mengisi Data Modal Edit Tier Toko
         document.querySelectorAll('.btn-upgrade').forEach(button => {
             button.addEventListener('click', function() {
