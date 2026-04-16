@@ -162,4 +162,4 @@ class SettingController extends Controller
             return back()->with('error', 'Sinkronisasi Gagal: ' . $e->getMessage());
         }
     }
-}
+} 

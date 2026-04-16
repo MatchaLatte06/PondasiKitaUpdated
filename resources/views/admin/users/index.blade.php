@@ -20,16 +20,30 @@
     /* ========================================= */
     /* == POLYFILL DARK MODE (ANTI-PUTIH)     == */
     /* ========================================= */
+    
+    /* Layout Backgrounds */
     .dark .dark\:bg-slate-900 { background-color: #0f172a !important; }
     .dark .dark\:bg-slate-800 { background-color: #1e293b !important; }
+    .dark .dark\:bg-slate-800\/80 { background-color: rgba(30, 41, 59, 0.8) !important; } /* INI OBAT BUG-NYA */
     .dark .dark\:bg-slate-800\/50 { background-color: rgba(30, 41, 59, 0.5) !important; }
     .dark .dark\:bg-slate-800\/40 { background-color: rgba(30, 41, 59, 0.4) !important; }
     .dark .dark\:bg-slate-800\/30 { background-color: rgba(30, 41, 59, 0.3) !important; }
     .dark .dark\:bg-slate-700 { background-color: #334155 !important; }
+
+    /* Borders */
     .dark .dark\:border-slate-800 { border-color: #1e293b !important; }
     .dark .dark\:border-slate-800\/80 { border-color: rgba(30, 41, 59, 0.8) !important; }
     .dark .dark\:border-slate-700 { border-color: #334155 !important; }
     .dark .dark\:border-slate-700\/50 { border-color: rgba(51, 65, 85, 0.5) !important; }
+
+    /* Text Colors */
+    .dark .dark\:text-white { color: #ffffff !important; }
+    .dark .dark\:text-slate-100 { color: #f1f5f9 !important; }
+    .dark .dark\:text-slate-200 { color: #e2e8f0 !important; }
+    .dark .dark\:text-slate-300 { color: #cbd5e1 !important; }
+    .dark .dark\:text-slate-400 { color: #94a3b8 !important; }
+    .dark .dark\:text-slate-500 { color: #64748b !important; }
+    .dark .dark\:text-blue-400 { color: #60a5fa !important; }
 
     /* MODAL & FORM BOOTSTRAP OVERRIDE */
     .dark .modal-content { background-color: #0f172a !important; border: 1px solid #1e293b !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; color: #f8fafc !important; }
@@ -39,6 +53,8 @@
     .dark .form-control::placeholder { color: #64748b !important; }
     .dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); opacity: 0.5; }
     .dark .btn-close:hover { opacity: 1; }
+    
+    /* Pagination */
     .dark .pagination .page-link { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
     .dark .pagination .page-item.active .page-link { background-color: #3b82f6; border-color: #3b82f6; color: white; }
 
@@ -52,7 +68,6 @@
     .dark .dark\:border-amber-500\/20 { border-color: rgba(245, 158, 11, 0.2) !important; }
 
     .dark .dark\:bg-blue-500\/10 { background-color: rgba(59, 130, 246, 0.15) !important; }
-    .dark .dark\:text-blue-400 { color: #60a5fa !important; }
     .dark .dark\:border-blue-500\/20 { border-color: rgba(59, 130, 246, 0.2) !important; }
 
     .dark .dark\:bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.15) !important; }
@@ -312,40 +327,40 @@
 </div>
 
 {{-- ============================================================================== --}}
-{{-- MODAL AREA (MENDUKUNG DARK MODE BOOTSTRAP)                                     --}}
+{{-- MODAL AREA (DIROMBAK AGAR SIMETRIS & MENDUKUNG DARK MODE)                      --}}
 {{-- ============================================================================== --}}
 
 {{-- MODAL TAMBAH ADMIN BARU --}}
 <div class="modal fade" id="modalAddAdmin" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="font-black text-slate-800 flex items-center gap-2 m-0 text-base">
+        <div class="modal-content rounded-[2rem] border-0 shadow-2xl overflow-hidden transition-colors duration-300">
+            <div class="modal-header p-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                <h5 class="font-black text-slate-800 dark:text-white flex items-center gap-2 m-0 text-base">
                     <i class="mdi mdi-shield-account-outline text-blue-600 text-xl"></i> Tambah Administrator
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-6">
+            <div class="modal-body p-6 bg-slate-50/50 dark:bg-slate-900">
                 <form action="{{ route('admin.users.store') }}" method="POST">
                     @csrf
                     <div class="mb-4">
-                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Nama Lengkap</label>
-                        <input type="text" name="nama" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Cth: Budiman Santoso" required>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama Lengkap</label>
+                        <input type="text" name="nama" class="form-control rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none" placeholder="Cth: Budiman Santoso" required>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Username</label>
-                            <input type="text" name="username" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Cth: budiman" required>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Username</label>
+                            <input type="text" name="username" class="form-control rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none" placeholder="Cth: budiman" required>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Resmi</label>
-                            <input type="email" name="email" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Cth: budiman@pondasikita.com" required>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Resmi</label>
+                            <input type="email" name="email" class="form-control rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none" placeholder="budiman@pondasikita.com" required>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Otoritas / Hak Akses</label>
-                        <select name="admin_role" class="form-select rounded-xl py-2.5 font-bold text-sm shadow-inner cursor-pointer" required>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Otoritas / Hak Akses</label>
+                        <select name="admin_role" class="form-select rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none cursor-pointer" required>
                             <option value="" disabled selected>-- Pilih Hak Akses --</option>
                             <option value="cs">Customer Service (Kelola Pengguna & Komplain)</option>
                             <option value="finance">Finance (Keuangan, Payout & Laporan)</option>
@@ -354,13 +369,13 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Password Akun</label>
-                        <input type="password" name="password" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Minimal 6 Karakter" required minlength="6">
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Password Akun</label>
+                        <input type="password" name="password" class="form-control rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none" placeholder="Minimal 6 Karakter" required minlength="6">
                     </div>
 
-                    <div class="flex gap-3 justify-end mt-2 border-t border-slate-100 dark:border-slate-800 pt-5">
-                        <button type="button" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors outline-none" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all outline-none">Buat Akun Admin</button>
+                    <div class="flex gap-3 justify-end mt-2 pt-2">
+                        <button type="button" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-200/50 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors outline-none" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="w-full sm:w-auto px-8 py-3 rounded-xl font-black text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all outline-none">BUAT AKUN</button>
                     </div>
                 </form>
             </div>
@@ -371,52 +386,52 @@
 {{-- MODAL EDIT PENGGUNA --}}
 <div class="modal fade" id="modalEditUser" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="font-black text-slate-800 flex items-center gap-2 m-0 text-base">
-                    <i class="mdi mdi-account-edit-outline text-blue-600 text-xl"></i> Edit Data Pengguna
+        <div class="modal-content rounded-[2rem] border-0 shadow-2xl overflow-hidden transition-colors duration-300">
+            <div class="modal-header p-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                <h5 class="font-black text-slate-800 dark:text-white flex items-center gap-2 m-0 text-base">
+                    <i class="mdi mdi-account-edit-outline text-amber-500 text-xl"></i> Edit Data Pengguna
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-6">
+            <div class="modal-body p-6 bg-slate-50/50 dark:bg-slate-900">
                 <form id="formEditUser" method="POST">
                     @csrf
                     <div class="mb-4">
-                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Nama Lengkap</label>
-                        <input type="text" name="nama" id="editNama" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" required>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama Lengkap</label>
+                        <input type="text" name="nama" id="editNama" class="form-control rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none" required>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Resmi</label>
-                            <input type="email" name="email" id="editEmail" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" required>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Resmi</label>
+                            <input type="email" name="email" id="editEmail" class="form-control rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none" required>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">No Telepon</label>
-                            <input type="text" name="no_telepon" id="editPhone" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner">
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">No Telepon</label>
+                            <input type="text" name="no_telepon" id="editPhone" class="form-control rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none">
                         </div>
                     </div>
 
                     {{-- FORM PILIHAN ROLE HANYA BISA DIAKSES OLEH SUPER ADMIN --}}
                     @if(auth()->user()->admin_role === 'super')
-                    <div class="mb-4" id="editRoleContainer" style="display: none;">
-                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Ubah Otoritas Admin</label>
-                        <select name="admin_role" id="editRole" class="form-select rounded-xl py-2.5 font-bold text-sm shadow-inner cursor-pointer">
+                    <div class="mb-4 p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-2xl" id="editRoleContainer" style="display: none;">
+                        <label class="block text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-2 ml-1">Ubah Otoritas Admin</label>
+                        <select name="admin_role" id="editRole" class="form-select rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none cursor-pointer border-amber-200 dark:border-amber-500/30">
                             <option value="cs">Customer Service</option>
                             <option value="finance">Finance</option>
                             <option value="super">Super Admin</option>
                         </select>
-                        <div class="text-[10px] font-bold text-amber-500 mt-2 flex items-center gap-1"><i class="mdi mdi-alert-circle"></i> Mengubah ini akan berdampak pada akses menu mereka.</div>
+                        <div class="text-[10px] font-bold text-amber-500 mt-2 ml-1 flex items-center gap-1"><i class="mdi mdi-alert-circle"></i> Berdampak pada akses menu mereka.</div>
                     </div>
                     @endif
 
                     <div class="mb-6">
-                        <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Reset Password (Opsional)</label>
-                        <input type="password" name="password" class="form-control rounded-xl py-2.5 font-bold text-sm shadow-inner" placeholder="Biarkan kosong jika tidak diubah">
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Reset Password (Opsional)</label>
+                        <input type="password" name="password" class="form-control rounded-xl py-3 font-bold text-sm shadow-inner dark:shadow-none" placeholder="Kosongkan jika tidak diubah">
                     </div>
 
-                    <div class="flex gap-3 justify-end mt-2 border-t border-slate-100 dark:border-slate-800 pt-5">
-                        <button type="button" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors outline-none" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all outline-none">Simpan Perubahan</button>
+                    <div class="flex gap-3 justify-end mt-2 pt-2">
+                        <button type="button" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-200/50 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors outline-none" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="w-full sm:w-auto px-8 py-3 rounded-xl font-black text-sm text-white bg-amber-500 hover:bg-amber-600 shadow-md shadow-amber-500/20 transition-all outline-none">SIMPAN</button>
                     </div>
                 </form>
             </div>
@@ -426,32 +441,32 @@
 
 {{-- MODAL DETAIL PENGGUNA --}}
 <div class="modal fade" id="modalDetailUser" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered border-0">
-        <div class="modal-content overflow-hidden">
-            <div class="modal-header border-bottom-0 pb-0">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-[2rem] border-0 shadow-2xl overflow-hidden transition-colors duration-300">
+            <div class="modal-header border-b-0 p-6 pb-0 bg-white dark:bg-slate-900 relative">
+                <button type="button" class="btn-close absolute top-6 right-6 z-10" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center pt-0 pb-6 border-b border-slate-100 dark:border-slate-800">
-                <div class="w-24 h-24 mx-auto mb-4 relative rounded-2xl p-1 bg-white dark:bg-slate-800 shadow-md">
+            <div class="modal-body text-center pt-0 pb-8 px-6 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+                <div class="w-28 h-28 mx-auto mb-4 relative rounded-[1.5rem] p-1.5 bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700">
                     <img id="detImg" src="" class="w-full h-full rounded-xl object-cover">
                 </div>
-                <h4 class="text-xl font-black text-slate-800 dark:text-white mb-1" id="detNama">Nama User</h4>
-                <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">@<span id="detUsername">username</span></p>
-                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black tracking-widest bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400" id="detLevel">ROLE</span>
+                <h4 class="text-2xl font-black text-slate-800 dark:text-white mb-1 tracking-tight" id="detNama">Nama User</h4>
+                <p class="text-sm font-bold text-blue-500 dark:text-blue-400 mb-5">@<span id="detUsername">username</span></p>
+                <span class="inline-flex items-center px-5 py-2 rounded-full text-xs font-black tracking-widest bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm" id="detLevel">ROLE</span>
             </div>
-            <div class="modal-body p-6 bg-slate-50/50 dark:bg-transparent">
+            <div class="modal-body p-6 bg-slate-50/50 dark:bg-slate-900">
                 <div class="grid grid-cols-1 gap-4">
-                    <div class="flex flex-col gap-1 p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Alamat Email</span>
-                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-email-outline text-slate-400"></i> <span id="detEmail">email</span></span>
+                    <div class="flex flex-col gap-1.5 p-4 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <span class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Alamat Email</span>
+                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-email-outline text-blue-500 text-lg"></i> <span id="detEmail">email</span></span>
                     </div>
-                    <div class="flex flex-col gap-1 p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nomor Telepon</span>
-                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-phone-outline text-slate-400"></i> <span id="detPhone">phone</span></span>
+                    <div class="flex flex-col gap-1.5 p-4 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <span class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Nomor Telepon</span>
+                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-phone-outline text-emerald-500 text-lg"></i> <span id="detPhone">phone</span></span>
                     </div>
-                    <div class="flex flex-col gap-1 p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Bergabung</span>
-                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-calendar-clock-outline text-slate-400"></i> <span id="detJoin">date</span></span>
+                    <div class="flex flex-col gap-1.5 p-4 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <span class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Tanggal Bergabung</span>
+                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="mdi mdi-calendar-clock-outline text-amber-500 text-lg"></i> <span id="detJoin">date</span></span>
                     </div>
                 </div>
             </div>
@@ -464,7 +479,13 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Detail User
+        
+        // PERBAIKAN BUG MODAL TERKUNCI / DI BELAKANG BACKDROP
+        document.querySelectorAll('.modal').forEach(modal => {
+            document.body.appendChild(modal);
+        });
+
+        // Detail User Logic
         document.querySelectorAll('.btn-detail').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.getElementById('detImg').src = this.getAttribute('data-img');
@@ -477,7 +498,7 @@
             });
         });
 
-        // Edit User
+        // Edit User Logic
         const roleContainer = document.getElementById('editRoleContainer');
         const roleSelect = document.getElementById('editRole');
 

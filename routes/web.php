@@ -186,7 +186,15 @@ Route::post('/kunci-brankas-pks', [AdminAuthController::class, 'login'])->name('
 
 Route::prefix('portal-rahasia-pks')->name('admin.')->middleware(['admin'])->group(function () {
 
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard')->middleware('admin.role:super,finance,cs');
+    // Dashboard & Leaderboard
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('admin.role:super,finance,cs');
+        
+    // PERBAIKAN: Name cukup ditulis 'dashboard.top_stores' karena grup sudah punya awalan 'admin.'
+    Route::get('/dashboard/top-stores', [AdminDashboardController::class, 'topStores'])
+        ->name('dashboard.top_stores')
+        ->middleware('admin.role:super,finance,cs');
 
     // Customer Service & Store Management
     Route::middleware(['admin.role:super,cs'])->group(function () {

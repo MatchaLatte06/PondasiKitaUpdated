@@ -233,7 +233,7 @@
     <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm overflow-hidden mb-8 transition-colors duration-500">
         <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-white dark:bg-slate-800 transition-colors duration-500">
             <h3 class="text-sm font-black text-slate-800 dark:text-white transition-colors duration-500">Top Performance Toko Bangunan</h3>
-            <button class="text-xs font-bold text-blue-600 dark:text-white hover:text-blue-800 dark:hover:text-blue-400 transition-colors outline-none bg-blue-50 dark:bg-slate-700 dark:hover:bg-slate-600 px-3 py-1.5 rounded-lg border-0">Lihat Semua</button>
+            <a href="{{ route('admin.dashboard.top_stores') }}" class="text-xs font-bold text-blue-600 dark:text-white hover:text-blue-800 dark:hover:text-blue-400 transition-colors outline-none bg-blue-50 dark:bg-slate-700 dark:hover:bg-slate-600 px-3 py-1.5 rounded-lg border-0 no-underline">Lihat Semua</a>
         </div>
 
         <div class="overflow-x-auto table-container">
