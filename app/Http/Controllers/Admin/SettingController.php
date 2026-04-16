@@ -32,39 +32,73 @@ class SettingController extends Controller
     }
 
     /**
-     * Menyimpan semua pembaruan pengaturan (Pola Dinamis & Bersih)
+     * Menyimpan semua pembaruan pengaturan (Upload Gambar & Data)
      */
     public function update(Request $request)
     {
         // 1. Ambil semua inputan kecuali token dan method
         $settings = $request->except(['_token', '_method']);
 
-        // 2. Keamanan Checkbox: Jika toggle dimatikan, paksa nilainya jadi '0'
-        $toggles = ['midtrans_is_production', 'auto_approve_products', 'auto_approve_stores', 'enable_dp_system'];
+        // 2. LOGIKA UPLOAD GAMBAR (Banner & Popup)
+        $imageFields = ['hero_image_1', 'hero_image_2', 'hero_image_3', 'hero_image_4', 'popup_image'];
+
+        foreach ($imageFields as $field) {
+            // Jika ada gambar baru yang diunggah
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $filename = time() . '_' . $field . '.' . $file->getClientOriginalExtension();
+                
+                // Simpan gambar ke folder storage/app/public/banners
+                $path = $file->storeAs('banners', $filename, 'public');
+                
+                // Masukkan path ke array settings agar ikut tersimpan ke database
+                $settings[$field] = $path;
+            }
+        }
+
+        // 3. Keamanan Checkbox: Jika toggle dimatikan, paksa nilainya jadi '0'
+        $toggles = [
+            'maintenance_mode',
+            'enable_welcome_popup',
+            'show_top_stores',
+            'show_best_selling',
+            'midtrans_is_production', 
+            'auto_approve_products', 
+            'auto_approve_stores', 
+            'enable_dp_system'
+        ];
+        
         foreach ($toggles as $toggle) {
             if (!isset($settings[$toggle])) {
                 $settings[$toggle] = '0';
             }
         }
 
-        // 3. Keamanan Array: Ubah pilihan kurir menjadi format JSON agar bisa disimpan di 1 kolom
+        // 4. Keamanan Array: Ubah pilihan kurir menjadi format JSON agar bisa disimpan di 1 kolom
         if (isset($settings['couriers'])) {
             $settings['rajaongkir_active_couriers'] = json_encode($settings['couriers']);
-            unset($settings['couriers']); // Hapus array asli agar tidak error saat di-looping di bawah
+            unset($settings['couriers']); // Hapus array asli agar tidak error saat di-looping
         } else {
             $settings['rajaongkir_active_couriers'] = json_encode([]);
         }
 
-        // 4. Looping Simpan ke Database (Disesuaikan dengan tabel tb_pengaturan)
+        // 5. Looping Simpan ke Database (Disesuaikan dengan tabel tb_pengaturan)
         foreach ($settings as $key => $value) {
-            DB::table('tb_pengaturan')
-                ->updateOrInsert(
-                    ['setting_nama' => $key],
-                    ['setting_nilai' => $value]
-                );
+            // Pastikan data yang disimpan bukan array atau object (kecuali yang sudah diubah ke JSON)
+            if (is_array($value)) {
+                $value = json_encode($value);
+            }
+
+            if (!is_object($value)) {
+                DB::table('tb_pengaturan')
+                    ->updateOrInsert(
+                        ['setting_nama' => $key],
+                        ['setting_nilai' => $value]
+                    );
+            }
         }
 
-        return redirect()->back()->with('success', 'Pengaturan sistem berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Pengaturan sistem & tampilan website berhasil diperbarui!');
     }
 
     /**

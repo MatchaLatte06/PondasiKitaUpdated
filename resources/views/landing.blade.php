@@ -162,34 +162,60 @@
                     <div class="absolute inset-y-0 left-0 w-1/2 z-30" onclick="moveSlider(-1)"></div>
                     <div class="absolute inset-y-0 right-0 w-1/2 z-30" onclick="moveSlider(1)"></div>
 
-                    {{-- Slider Track --}}
+{{-- Slider Track --}}
                     <div id="hero-slider" class="flex w-full h-full transition-transform duration-700 ease-in-out">
-                        @if(!empty($settings['hero_image']))
-                            <div class="min-w-full h-full relative flex-shrink-0">
-                                <img src="{{ asset('storage/' . $settings['hero_image']) }}" class="w-full h-full object-cover" alt="Banner Utama">
-                                <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent"></div>
-                            </div>
-                        @endif
+                        @php
+                            $validBanners = [];
+                            
+                            // 1. Cek Hero Image (DB + File Fisik)
+                            if(!empty($settings['hero_image']) && file_exists(public_path('storage/' . $settings['hero_image']))) {
+                                $validBanners[] = [
+                                    'img' => asset('storage/' . $settings['hero_image']),
+                                    'title' => $settings['hero_title'] ?? '',
+                                    'desc' => $settings['hero_subtitle'] ?? ''
+                                ];
+                            }
+                            
+                            // 2. Cek Banner Tambahan 1-4 (Jika ada pengaturan hero_image_1 s/d 4)
+                            for($i = 1; $i <= 4; $i++) {
+                                $imgK = 'hero_image_' . $i;
+                                if(!empty($settings[$imgK]) && file_exists(public_path('storage/' . $settings[$imgK]))) {
+                                    if(count($validBanners) < 4) {
+                                        $validBanners[] = [
+                                            'img' => asset('storage/' . $settings[$imgK]),
+                                            'title' => $settings['hero_title_'.$i] ?? '',
+                                            'desc' => $settings['hero_subtitle_'.$i] ?? ''
+                                        ];
+                                    }
+                                }
+                            }
+                        @endphp
 
-                        @forelse($promoBanners ?? [] as $banner)
-                            <div class="min-w-full h-full relative flex-shrink-0">
-                                <img src="{{ $banner->img ?? $banner['img'] }}" class="w-full h-full object-cover" alt="Banner">
+                        @forelse($validBanners as $banner)
+                            <div class="min-w-full h-full relative flex-shrink-0 bg-zinc-950">
+                                <img src="{{ $banner['img'] }}" class="w-full h-full object-cover" alt="Banner Utama" onerror="this.style.display='none'">
                                 <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent"></div>
-
+                                
+                                @if(!empty($banner['title']) && $banner['title'] != ($settings['hero_title'] ?? ''))
                                 <div class="absolute bottom-0 left-0 right-0 p-8 lg:p-12 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                     <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white text-[10px] font-black rounded-lg uppercase tracking-widest mb-4">
-                                        <i class="fas fa-bolt"></i> Promo Spesial
+                                        <i class="fas fa-bolt"></i> Info Platform
                                     </div>
-                                    <h3 class="text-3xl lg:text-4xl font-black text-white mb-3 drop-shadow-xl">{{ $banner->title ?? $banner['title'] }}</h3>
-                                    <p class="text-zinc-300 text-sm lg:text-base font-medium line-clamp-2 max-w-xl">{{ $banner->desc ?? $banner['desc'] }}</p>
+                                    <h3 class="text-3xl lg:text-4xl font-black text-white mb-3 drop-shadow-xl">{{ $banner['title'] }}</h3>
+                                    <p class="text-zinc-300 text-sm lg:text-base font-medium line-clamp-2 max-w-xl">{{ $banner['desc'] }}</p>
                                 </div>
+                                @endif
                             </div>
                         @empty
-                            @if(empty($settings['hero_image']))
-                            <div class="min-w-full h-full bg-zinc-900 flex items-center justify-center">
-                                <p class="text-zinc-500">Belum ada promo aktif</p>
+                            {{-- FALLBACK ELEGAN JIKA BELUM ADA BANNER DARI ADMIN --}}
+                            <div class="min-w-full h-full relative flex-shrink-0 bg-gradient-to-br from-blue-900 via-zinc-900 to-black flex flex-col items-center justify-center">
+                                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+                                <div class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center text-blue-400 text-4xl mb-6 shadow-2xl border border-white/10">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <h3 class="text-2xl lg:text-3xl font-black text-white mb-2 relative z-10 tracking-tight">Katalog Material B2B</h3>
+                                <p class="text-zinc-400 font-medium text-sm relative z-10">Ruang iklan promosi akan tampil di sini.</p>
                             </div>
-                            @endif
                         @endforelse
                     </div>
 
@@ -429,10 +455,10 @@
                         Tinggalkan cara lama. Biarkan AI kami menghitung kebutuhan RAB Anda, mencari supplier termurah, dan merekomendasikan material secara real-time.
                     </p>
                 </div>
-
+                
                 <div class="relative z-10 mt-8 md:mt-10">
                     <button onclick="toggleChat()" class="group/btn inline-flex items-center gap-3 bg-white text-zinc-900 font-black px-6 py-3.5 rounded-xl transition-all hover:bg-blue-50 hover:text-blue-600 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:-translate-y-1">
-                        Ngobrol Sekarang
+                        Ngobrol Sekarang 
                         <i class="fas fa-arrow-right text-xs transition-transform group-hover/btn:translate-x-1"></i>
                     </button>
                 </div>
@@ -458,7 +484,7 @@
         </section>
 
         {{-- ========================================================
-             7. MITRA TOKO TERVERIFIKASI
+             7. MITRA TOKO TERVERIFIKASI (DYNAMIC COLORS BASED ON TIER)
              ======================================================== --}}
         @if(($settings['show_top_stores'] ?? '1') == '1')
         <section id="toko" class="relative mt-12">
@@ -468,7 +494,7 @@
                     <h3 class="text-3xl lg:text-4xl font-black text-black tracking-tight">{{ $tokoSectionTitle ?? 'Mitra Terverifikasi' }}</h3>
                 </div>
 
-                <a href="{{ url('pages/semua_toko') }}"
+                <a href="{{ url('pages/semua_toko') }}" 
                    class="group relative inline-flex items-center justify-center px-8 py-3.5 font-black tracking-tighter text-zinc-700 bg-white rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-500 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_20px_40px_rgba(37,99,235,0.15)] hover:-translate-y-1 active:scale-95">
                     <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-blue-500/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
                     <div class="relative flex items-center gap-3">
@@ -480,64 +506,66 @@
                 </a>
             </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @forelse($listToko ?? [] as $toko)
                     @php
                         $bannerPath = 'assets/uploads/banners/' . ($toko->banner_toko ?? '');
                         $hasBanner = !empty($toko->banner_toko) && file_exists(public_path($bannerPath));
                         $initials = strtoupper(substr($toko->nama_toko ?? 'TK', 0, 2));
-                        $bgStyle = $hasBanner ? "background-image: url(" . asset($bannerPath) . ");" : "background-color: #09090b;";
                         $logoPath = 'assets/uploads/logos/' . ($toko->logo_toko ?? '');
                         $hasLogo = !empty($toko->logo_toko) && file_exists(public_path($logoPath));
-
-                        // Menentukan Style Berdasarkan Tier Toko
+                        
+                        // LOGIKA WARNA DINAMIS BERDASARKAN TIER TOKO (MENGHILANGKAN KESAN HOMOGEN/SAMA)
                         $tier = $toko->tier_toko ?? 'regular';
-
+                        
                         if ($tier == 'official_store') {
-                            $cardBorder = "border border-purple-200/50 hover:border-purple-400 hover:shadow-[0_20px_60px_rgba(147,51,234,0.15)]";
-                            $bannerOverlay = "bg-gradient-to-t from-purple-950 via-purple-900/60 to-transparent";
-                            $badgeClass = "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)] border border-purple-400/50";
-                            $badgeIcon = "fas fa-check-decagram";
-                            $badgeText = "Official";
-                            $logoBg = "bg-purple-600";
+                            $cardBorder = "border-purple-100 hover:border-purple-300 hover:shadow-[0_20px_40px_rgba(168,85,247,0.15)]";
+                            $fallbackBg = "bg-gradient-to-br from-violet-600 via-purple-700 to-indigo-900";
+                            $bannerOverlay = "from-purple-900/90 via-purple-900/40 to-transparent";
+                            $badgeClass = "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.5)] border-purple-400/30";
+                            $badgeIcon = "fas fa-check-decagram text-amber-300"; // Gold check
+                            $badgeText = "OFFICIAL";
+                            $logoFallbackBg = "bg-gradient-to-br from-violet-500 to-purple-700";
                             $nameColor = "group-hover:text-purple-600";
-                            $arrowBg = "group-hover:bg-purple-600 group-hover:shadow-[0_10px_20px_rgba(147,51,234,0.3)]";
-                            $miniIconColor = "text-purple-500";
-                            $miniIconBg = "bg-purple-100";
+                            $arrowBg = "group-hover:bg-purple-600 group-hover:shadow-[0_10px_20px_rgba(168,85,247,0.3)]";
+                            $miniIconColor = "text-purple-600";
+                            $miniIconBg = "bg-purple-50 border-purple-200";
                         } elseif ($tier == 'power_merchant') {
-                            $cardBorder = "border border-emerald-200/50 hover:border-emerald-400 hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)]";
-                            $bannerOverlay = "bg-gradient-to-t from-emerald-950 via-emerald-900/60 to-transparent";
-                            $badgeClass = "bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] border border-emerald-300/50";
-                            $badgeIcon = "fas fa-bolt";
-                            $badgeText = "Power";
-                            $logoBg = "bg-emerald-500";
+                            $cardBorder = "border-emerald-100 hover:border-emerald-300 hover:shadow-[0_20px_40px_rgba(16,185,129,0.15)]";
+                            $fallbackBg = "bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-900";
+                            $bannerOverlay = "from-emerald-900/90 via-emerald-900/40 to-transparent";
+                            $badgeClass = "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] border-emerald-300/30";
+                            $badgeIcon = "fas fa-bolt text-amber-300";
+                            $badgeText = "POWER";
+                            $logoFallbackBg = "bg-gradient-to-br from-emerald-500 to-teal-600";
                             $nameColor = "group-hover:text-emerald-600";
                             $arrowBg = "group-hover:bg-emerald-500 group-hover:shadow-[0_10px_20px_rgba(16,185,129,0.3)]";
-                            $miniIconColor = "text-emerald-500";
-                            $miniIconBg = "bg-emerald-100";
+                            $miniIconColor = "text-emerald-600";
+                            $miniIconBg = "bg-emerald-50 border-emerald-200";
                         } else {
-                            $cardBorder = "border border-zinc-100 hover:border-blue-300 hover:shadow-[0_20px_60px_rgba(37,99,235,0.1)]";
-                            $bannerOverlay = "bg-gradient-to-t from-black/80 via-black/20 to-transparent";
+                            $cardBorder = "border-zinc-200 hover:border-blue-400 hover:shadow-[0_20px_40px_rgba(37,99,235,0.1)]";
+                            $fallbackBg = "bg-gradient-to-br from-slate-700 via-zinc-800 to-zinc-950";
+                            $bannerOverlay = "from-zinc-900/90 via-zinc-900/40 to-transparent";
                             $badgeClass = "bg-white/10 backdrop-blur-md border border-white/20 text-white";
                             $badgeIcon = "fas fa-check-circle text-blue-400";
-                            $badgeText = "Verified";
-                            $logoBg = "bg-zinc-950 group-hover:bg-blue-600";
+                            $badgeText = "VERIFIED";
+                            $logoFallbackBg = "bg-gradient-to-br from-slate-700 to-zinc-900 group-hover:from-blue-600 group-hover:to-blue-800";
                             $nameColor = "group-hover:text-blue-600";
                             $arrowBg = "group-hover:bg-blue-600 group-hover:shadow-[0_10px_20px_rgba(37,99,235,0.3)]";
                             $miniIconColor = "text-white";
-                            $miniIconBg = "bg-blue-600";
+                            $miniIconBg = "bg-blue-600 border-white";
                         }
                     @endphp
 
-                    <a href="{{ url('pages/toko?slug=' . ($toko->slug ?? '#')) }}"
-                       class="group relative bg-white rounded-[2.5rem] shadow-[0_2px_15px_rgba(0,0,0,0.02)] overflow-hidden transition-all duration-500 hover:-translate-y-2 flex flex-col {{ $cardBorder }}">
-
+                    <a href="{{ url('pages/toko?slug=' . ($toko->slug ?? '#')) }}" 
+                       class="group relative bg-white rounded-[2.5rem] shadow-[0_2px_15px_rgba(0,0,0,0.02)] overflow-hidden transition-all duration-500 hover:-translate-y-2 flex flex-col border {{ $cardBorder }}">
+                        
                         {{-- Banner Area --}}
-                        <div class="h-36 bg-cover bg-center relative transition-all duration-700 scale-100 group-hover:scale-105 {{ $tier == 'regular' ? 'grayscale group-hover:grayscale-0' : '' }}" style="{{ $bgStyle }}">
-                            <div class="absolute inset-0 {{ $bannerOverlay }} transition-opacity group-hover:opacity-80"></div>
-
+                        <div class="h-36 bg-cover bg-center relative transition-all duration-700 scale-100 group-hover:scale-105 {{ $tier == 'regular' ? 'grayscale group-hover:grayscale-0' : '' }} {{ !$hasBanner ? $fallbackBg : '' }}" style="{{ $hasBanner ? "background-image: url(" . asset($bannerPath) . ");" : "" }}">
+                            <div class="absolute inset-0 bg-gradient-to-t {{ $bannerOverlay }} transition-opacity group-hover:opacity-80"></div>
+                            
                             {{-- Tier Badge yang Dinamis --}}
-                            <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all {{ $badgeClass }}">
+                            <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all border {{ $badgeClass }}">
                                 @if($tier == 'regular')
                                     <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
                                 @else
@@ -555,13 +583,13 @@
                                     @if($hasLogo)
                                         <img src="{{ asset($logoPath) }}" class="w-20 h-20 rounded-2xl object-cover border-[6px] border-white shadow-xl transition-transform duration-500 group-hover:scale-105 bg-white" alt="Logo">
                                     @else
-                                        <div class="w-20 h-20 rounded-2xl text-white flex items-center justify-center font-black text-2xl border-[6px] border-white shadow-xl transition-all duration-500 {{ $logoBg }}">
+                                        <div class="w-20 h-20 rounded-2xl text-white flex items-center justify-center font-black text-2xl border-[6px] border-white shadow-xl transition-all duration-500 {{ $logoFallbackBg }}">
                                             {{ $initials }}
                                         </div>
                                     @endif
-
+                                    
                                     {{-- Mini Store Icon --}}
-                                    <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg border-4 border-white flex items-center justify-center text-[10px] shadow-lg {{ $miniIconBg }} {{ $miniIconColor }}">
+                                    <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg border-[3px] border-white flex items-center justify-center text-[10px] shadow-lg {{ $miniIconBg }} {{ $miniIconColor }}">
                                         <i class="fas fa-store"></i>
                                     </div>
                                 </div>
@@ -617,7 +645,7 @@
                         @foreach($$varName as $p)
                         @php
                             $img = !empty($p->gambar_utama) ? 'assets/uploads/products/'.$p->gambar_utama : 'assets/uploads/products/default.jpg';
-
+                            
                             // Logika Diskon
                             $harga_asli = $p->harga;
                             $harga_tampil = $harga_asli;
@@ -641,21 +669,21 @@
                                             ->where('barang_id', $p->id)
                                             ->selectRaw('COUNT(id) as total, AVG(rating) as rata')
                                             ->first();
-
+                            
                             $avg_rating = $statUlasan->rata ?? 0;
                             $jumlah_ulasan = $statUlasan->total ?? 0;
                             $terjual = $p->stok_terjual ?? rand(5, 100); // Fallback dummy data jika belum ada fitur stok_terjual
                         @endphp
-
-                        <a href="{{ route('produk.detail', $p->id) }}"
+                        
+                        <a href="{{ route('produk.detail', $p->id) }}" 
                            class="group relative bg-white rounded-[2.5rem] border border-zinc-100 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_30px_60px_rgba(37,99,235,0.1)] flex flex-col overflow-hidden">
-
+                            
                             <div class="aspect-square bg-zinc-50 overflow-hidden relative">
-                                <img src="{{ asset($img) }}"
-                                     onerror="this.src='https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600'"
-                                     class="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 ease-out"
+                                <img src="{{ asset($img) }}" 
+                                     onerror="this.src='https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600'" 
+                                     class="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 ease-out" 
                                      alt="{{ $p->nama_barang }}">
-
+                                
                                 @if($ada_diskon)
                                     <div class="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-md shadow-md z-10">{{ $badge_diskon }}</div>
                                 @endif

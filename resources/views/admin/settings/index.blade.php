@@ -34,8 +34,7 @@
     .img-preview-box { position: relative; width: 100%; border: 2px dashed #cbd5e1; border-radius: 1rem; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #f8fafc; cursor: pointer; transition: all 0.3s; }
     .img-preview-box:hover { border-color: #3b82f6; background: #eff6ff; }
     .img-preview-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; display: none; }
-    .img-preview-box img.has-image { display: block; }
-
+    
     /* Custom Tab Styles */
     .tab-content > .tab-pane { display: none; }
     .tab-content > .active { display: block; animation: fade-in 0.4s ease-out; }
@@ -213,41 +212,57 @@
             {{-- 2. PANEL: TAMPILAN WEBSITE (FRONTEND) --}}
             <div class="tab-pane fade" id="panel-frontend" role="tabpanel">
 
-                {{-- Banner Utama (Hero Section) --}}
+                {{-- Banner Utama Website (Slider 4 Slot) --}}
                 <div class="bg-white dark:bg-slate-900 border-t-4 border-t-blue-500 border-x border-b border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300 mb-8">
                     <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-monitor-dashboard text-blue-500"></i> Banner Utama Website (Hero)</h3>
-                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Atur gambar dan teks sambutan yang pertama kali dilihat pengunjung di halaman beranda.</p>
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-monitor-dashboard text-blue-500"></i> Banner Utama Website (Slider)</h3>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Maksimal 4 gambar banner untuk ditampilkan bergantian (slider) di halaman utama. Semua murni dari Anda.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-6">
-                        <div>
-                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Gambar Banner / Poster Utama</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        @for($i = 1; $i <= 4; $i++)
+                            @php
+                                $imgKey = 'hero_image_' . $i;
+                                $titleKey = 'hero_title_' . $i;
+                                $descKey = 'hero_subtitle_' . $i;
+                                
+                                // LOGIKA BARU ANTI-ERROR: Siapkan URL gambar jika ada
+                                $imgSrc = !empty($settings[$imgKey]) ? asset('storage/' . $settings[$imgKey]) : '';
+                            @endphp
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 transition-colors">
+                                <label class="block text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">{{ $i }}</span> Slide Banner
+                                </label>
 
-                            {{-- Input File Hidden & Custom Box --}}
-                            <input type="file" name="hero_image" id="heroImageInput" class="hidden" accept="image/*" onchange="previewImage(this, 'heroPreview')">
+                                <input type="file" name="{{ $imgKey }}" id="{{ $imgKey }}Input" class="hidden" accept="image/*" onchange="previewImage(this, '{{ $imgKey }}Preview', '{{ $imgKey }}Placeholder')">
 
-                            <label for="heroImageInput" class="img-preview-box aspect-[21/9] md:aspect-[3/1]">
-                                <div class="text-center z-20 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                                    <i class="mdi mdi-cloud-upload-outline text-3xl text-blue-500 mb-1"></i>
-                                    <p class="text-xs font-black text-slate-700 dark:text-slate-300 m-0">Klik untuk Ganti Gambar Banner</p>
-                                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 m-0 mt-1">Rekomendasi: 1920x600px (JPG/PNG)</p>
+                                {{-- Preview Box yang Menghilangkan Gambar Rusak Menggunakan onerror HTML --}}
+                                <label for="{{ $imgKey }}Input" class="img-preview-box aspect-[21/9] md:aspect-[3/1] mb-4 border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-400 rounded-xl overflow-hidden relative flex items-center justify-center cursor-pointer bg-white dark:bg-slate-900 transition-colors">
+                                    
+                                    {{-- Elemen Upload Standby (Akan disembunyikan jika gambar berhasil dimuat) --}}
+                                    <div id="{{ $imgKey }}Placeholder" class="text-center z-20 p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-colors" style="{{ $imgSrc ? 'display: none;' : 'display: block;' }}">
+                                        <i class="mdi mdi-cloud-upload-outline text-2xl text-blue-500 mb-1"></i>
+                                        <p class="text-[10px] font-black text-slate-700 dark:text-slate-300 m-0 uppercase tracking-widest">Upload Slide {{ $i }}</p>
+                                    </div>
+                                    
+                                    {{-- Tag Image dengan fallback onerror yang kebal error --}}
+                                    <img id="{{ $imgKey }}Preview" src="{{ $imgSrc }}" 
+                                         style="{{ $imgSrc ? 'display: block;' : 'display: none;' }}" 
+                                         onerror="this.style.display='none'; document.getElementById('{{ $imgKey }}Placeholder').style.display='block';"
+                                         class="absolute inset-0 w-full h-full object-cover z-10">
+                                         
+                                </label>
+
+                                <div class="space-y-3">
+                                    <div>
+                                        <input type="text" name="{{ $titleKey }}" value="{{ $settings[$titleKey] ?? '' }}" class="form-control-custom p-3 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700" placeholder="Judul Teks Banner (Opsional)">
+                                    </div>
+                                    <div>
+                                        <input type="text" name="{{ $descKey }}" value="{{ $settings[$descKey] ?? '' }}" class="form-control-custom p-3 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700" placeholder="Sub-judul Banner (Opsional)">
+                                    </div>
                                 </div>
-                                {{-- Image Preview Tag --}}
-                                <img id="heroPreview" src="{{ isset($settings['hero_image']) && $settings['hero_image'] != '' ? asset('storage/'.$settings['hero_image']) : '' }}" class="{{ isset($settings['hero_image']) && $settings['hero_image'] != '' ? 'has-image' : '' }}">
-                            </label>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-                            <div>
-                                <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Judul Teks Banner</label>
-                                <input type="text" name="hero_title" value="{{ $settings['hero_title'] ?? 'Pusat Belanja Material B2B' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none" placeholder="Masukkan Judul Besar...">
                             </div>
-                            <div>
-                                <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Sub-judul / Deskripsi Banner</label>
-                                <input type="text" name="hero_subtitle" value="{{ $settings['hero_subtitle'] ?? 'Temukan ribuan supplier material terpercaya.' }}" class="form-control-custom p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none" placeholder="Masukkan sub-judul...">
-                            </div>
-                        </div>
+                        @endfor
                     </div>
                 </div>
 
@@ -273,16 +288,24 @@
                         <div>
                             <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Gambar Poster Popup</label>
 
-                            <input type="file" name="popup_image" id="popupImageInput" class="hidden" accept="image/*" onchange="previewImage(this, 'popupPreview')">
+                            <input type="file" name="popup_image" id="popupImageInput" class="hidden" accept="image/*" onchange="previewImage(this, 'popupPreview', 'popupPlaceholder')">
 
-                            {{-- Aspect ratio portrait ala popup HP --}}
-                            <label for="popupImageInput" class="img-preview-box aspect-[3/4] max-w-xs mx-auto md:mx-0">
-                                <div class="text-center z-20 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm m-4">
+                            {{-- Aspect ratio portrait ala popup HP dengan Onerror Fallback --}}
+                            @php
+                                $popupSrc = !empty($settings['popup_image']) ? asset('storage/' . $settings['popup_image']) : '';
+                            @endphp
+                            <label for="popupImageInput" class="img-preview-box aspect-[3/4] max-w-xs mx-auto md:mx-0 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 rounded-xl overflow-hidden relative flex items-center justify-center cursor-pointer bg-white dark:bg-slate-900 transition-colors">
+                                
+                                <div id="popupPlaceholder" class="text-center z-20 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm m-4 transition-colors" style="{{ $popupSrc ? 'display: none;' : 'display: block;' }}">
                                     <i class="mdi mdi-image-plus text-3xl text-amber-500 mb-1"></i>
                                     <p class="text-xs font-black text-slate-700 dark:text-slate-300 m-0">Upload Poster</p>
                                     <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 m-0 mt-1">Potret (600x800px)</p>
                                 </div>
-                                <img id="popupPreview" src="{{ isset($settings['popup_image']) && $settings['popup_image'] != '' ? asset('storage/'.$settings['popup_image']) : '' }}" class="{{ isset($settings['popup_image']) && $settings['popup_image'] != '' ? 'has-image' : '' }}">
+                                
+                                <img id="popupPreview" src="{{ $popupSrc }}" 
+                                     style="{{ $popupSrc ? 'display: block;' : 'display: none;' }}" 
+                                     onerror="this.style.display='none'; document.getElementById('popupPlaceholder').style.display='block';"
+                                     class="absolute inset-0 w-full h-full object-cover z-10">
                             </label>
                         </div>
 
@@ -469,7 +492,7 @@
                                 <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-r-0 text-slate-500">Rp</span>
                                 <input type="number" name="min_nominal_dp" value="{{ $settings['min_nominal_dp'] ?? '10000000' }}" class="form-control-input form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none">
                             </div>
-                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1">Minimal total harga keranjang agar opsi cicilan awal muncul di Checkout (Saran: 10 Juta).</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1">Minimal total harga keranjang agar opsi cicilan awal muncul di Checkout.</p>
                         </div>
                         <div>
                             <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Persentase Wajib DP</label>
@@ -477,7 +500,7 @@
                                 <input type="number" name="dp_percent" value="{{ $settings['dp_percent'] ?? '50' }}" max="99" class="form-control-input form-control-custom bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white shadow-inner dark:shadow-none text-center text-lg">
                                 <span class="input-group-text bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-l-0 text-slate-500">%</span>
                             </div>
-                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1 text-center">Persentase total yang wajib dibayar di web.</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 mb-0 ml-1 text-center">Persentase dari total belanja yang wajib dibayar.</p>
                         </div>
                     </div>
                 </div>
@@ -491,7 +514,7 @@
                     <div>
                         <h3 class="text-xl font-black text-blue-800 dark:text-blue-300 m-0 flex items-center gap-2"><i class="mdi mdi-database-sync text-blue-600 dark:text-blue-400"></i> Sinkronisasi Geografi Logistik</h3>
                         <p class="text-xs font-bold text-blue-600/70 dark:text-blue-300/70 mt-2 mb-0 leading-relaxed max-w-xl">
-                            Tarik dan perbarui data master Wilayah, Provinsi, Kabupaten, dan Kecamatan terbaru dari database ekspedisi Komerce/RajaOngkir agar perhitungan ongkos kirim akurat.
+                            Tarik dan perbarui data master Wilayah, Provinsi, Kabupaten, dan Kecamatan terbaru dari database ekspedisi Komerce/RajaOngkir.
                         </p>
                         <div class="mt-4 flex items-center gap-2">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/60 dark:bg-slate-900/50 rounded-lg text-[10px] font-black text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30">
@@ -598,7 +621,7 @@
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
                     <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
                         <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-security text-emerald-500"></i> Aturan Toko & Moderasi</h3>
-                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Tetapkan tingkat keketatan filter platform. Apakah seller dapat langsung berjualan atau harus menunggu izin Anda.</p>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Tetapkan tingkat keketatan filter platform.</p>
                     </div>
 
                     <div class="flex justify-between items-center p-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl mb-4 transition-colors duration-300">
@@ -668,19 +691,31 @@
 
 @push('scripts')
 <script>
-    // JS Logic for Image Preview
-    function previewImage(input, previewElementId) {
+    // JS Logic for Image Preview with Foolproof Null checking
+    function previewImage(input, previewElementId, placeholderId) {
         const previewEl = document.getElementById(previewElementId);
+        const placeholderEl = document.getElementById(placeholderId);
+        
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                previewEl.src = e.target.result;
-                previewEl.classList.add('has-image');
+                if(previewEl) {
+                    previewEl.src = e.target.result;
+                    previewEl.style.display = 'block'; 
+                }
+                if(placeholderEl) {
+                    placeholderEl.style.display = 'none'; 
+                }
             }
             reader.readAsDataURL(input.files[0]);
         } else {
-            previewEl.src = '';
-            previewEl.classList.remove('has-image');
+            if(previewEl) {
+                previewEl.src = '';
+                previewEl.style.display = 'none'; 
+            }
+            if(placeholderEl) {
+                placeholderEl.style.display = 'block';
+            }
         }
     }
 
@@ -693,15 +728,15 @@
         // Logika Modal Info (Bisa dipencet icon tanda tanya)
         const modalTitle = document.getElementById('infoModalTitle');
         const modalDesc = document.getElementById('infoModalDesc');
-
+        
         document.querySelectorAll('.btn-show-info').forEach(btn => {
             btn.addEventListener('click', function() {
                 const title = this.getAttribute('data-title');
                 const desc = this.getAttribute('data-desc');
-
+                
                 modalTitle.innerHTML = `<i class="mdi mdi-lightbulb-on-outline me-1"></i> Strategi ${title}`;
                 modalDesc.innerHTML = desc;
-
+                
                 new bootstrap.Modal(document.getElementById('infoTierModal')).show();
             });
         });
@@ -715,7 +750,7 @@
                     l.classList.remove('bg-blue-50', 'dark:bg-blue-500/10', 'text-blue-600', 'dark:text-blue-400', 'shadow-inner', 'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]');
                     l.classList.add('text-slate-500', 'dark:text-slate-400');
                 });
-
+                
                 // Tambahkan gaya aktif ke link yang baru diklik
                 e.target.classList.add('bg-blue-50', 'dark:bg-blue-500/10', 'text-blue-600', 'dark:text-blue-400', 'shadow-inner', 'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]');
                 e.target.classList.remove('text-slate-500', 'dark:text-slate-400');
