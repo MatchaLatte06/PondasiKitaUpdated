@@ -138,8 +138,12 @@
                 </div>
 
                 <div class="flex items-center justify-end pt-1">
-                    <a href="{{ url('lupa-password') }}" class="text-xs font-bold text-zinc-500 hover:text-blue-600 transition-colors">Lupa Kata Sandi?</a>
-                </div>
+    {{-- Menggunakan helper route() lebih aman dan profesional daripada url() --}}
+    <a href="{{ route('password.request') }}" 
+       class="text-xs font-bold text-zinc-500 hover:text-blue-600 transition-colors">
+       Lupa Kata Sandi?
+    </a>
+</div>
 
                 {{-- Submit Button --}}
                 <button type="submit" {{ ($sisaDetik ?? 0) > 0 ? 'disabled' : '' }} class="w-full bg-black hover:bg-blue-600 text-white font-black py-4 rounded-2xl transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(37,99,235,0.3)] hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:bg-black disabled:cursor-not-allowed mt-2">

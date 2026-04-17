@@ -188,16 +188,7 @@
         @endauth
     </div>
 
-    @auth
-        <div class="p-6 border-t border-zinc-800 bg-zinc-900/50">
-            <form action="{{ route('logout') }}" method="POST" class="m-0">
-                @csrf
-                <button type="submit" class="w-full flex items-center justify-center gap-3 bg-transparent border border-zinc-700 text-zinc-400 px-4 py-3.5 rounded-2xl font-bold hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300 group">
-                    <i class="fas fa-power-off group-hover:animate-pulse"></i> Terminate Session
-                </button>
-            </form>
-        </div>
-    @endauth
+    
 </div>
 
 <script>

@@ -9,6 +9,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController as FrontProductController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\ChatAiController;
+use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\ForgotPasswordController;
 
 // --- IMPORT CONTROLLER SELLER ---
 use App\Http\Controllers\SellerController;
@@ -47,12 +49,30 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/pages/toko', 'detailToko')->name('toko.detail');
     Route::get('/pages/search', 'search')->name('search');
 
+
+   // Route untuk menampilkan halaman (Link yang dipanggil di halaman Login)
+Route::get('/lupa-password', [ForgotPasswordController::class, 'showLinkRequestForm'])
+    ->name('password.request');
+
+// Route untuk menangani submit form email
+Route::post('/lupa-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->name('password.email');
+
     // Keranjang Belanja
     Route::get('/pages/keranjang', 'keranjang')->name('keranjang.index');
     Route::post('/api/keranjang/tambah', 'tambahKeranjang')->name('keranjang.tambah');
     Route::post('/api/keranjang/update', 'updateKeranjang')->name('keranjang.update');
     Route::post('/api/keranjang/hapus', 'hapusKeranjang')->name('keranjang.hapus');
-
+    
+Route::middleware(['auth'])->group(function () {
+    
+    // Rute untuk tombol "+ Keranjang" (AJAX JSON)
+    Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
+    
+    // Rute untuk tombol "Beli Sekarang" (Form Submit)
+    Route::post('/checkout/langsung', [KeranjangController::class, 'checkoutLangsung'])->name('checkout.langsung');
+    
+});
     // Checkout
     Route::match(['get', 'post'], '/checkout', 'checkout')->name('checkout');
     Route::post('/checkout/proses', 'prosesCheckout')->name('checkout.process');

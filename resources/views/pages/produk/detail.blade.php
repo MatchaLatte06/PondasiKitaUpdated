@@ -290,29 +290,46 @@
 
     @include('partials.footer')
 
+    {{-- SWEETALERT & JAVASCRIPT LOGIC --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        const basePrice = {{ $product->harga }};
-        const maxStock = {{ $product->stok }};
+        // 1. Variabel Global (Gunakan ?? 0 agar tidak error jika data kosong)
+        const basePrice = {{ $product->harga ?? 0 }};
+        const maxStock = {{ $product->stok ?? 0 }};
         const inputQty = document.getElementById('inputQty');
         const subtotalDisplay = document.getElementById('subtotalDisplay');
+        const formKeranjang = document.getElementById('formTambahKeranjang');
 
+        // 2. Fungsi Format Rupiah
         function formatRupiah(angka) { 
             return 'Rp' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); 
         }
 
+        // 3. Fungsi Tambah/Kurang QTY
         function updateQty(change) {
-            let val = parseInt(inputQty.value) + change;
-            if (val >= 1 && val <= maxStock) {
-                inputQty.value = val;
+            let currentVal = parseInt(inputQty.value);
+            if (isNaN(currentVal)) currentVal = 1; // Jaga-jaga kalau input kosong
+
+            let newVal = currentVal + change;
+            
+            if (newVal >= 1 && newVal <= maxStock) {
+                inputQty.value = newVal;
+                
+                // Animasi subtotal
                 subtotalDisplay.style.transform = "scale(0.95)";
                 setTimeout(() => {
-                    subtotalDisplay.innerText = formatRupiah(basePrice * val);
+                    subtotalDisplay.innerText = formatRupiah(basePrice * newVal);
                     subtotalDisplay.style.transform = "scale(1)";
                 }, 50);
+            } else if (newVal > maxStock) {
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: 'warning',
+                    title: 'Maksimal stok tercapai!', showConfirmButton: false, timer: 2000
+                });
             }
         }
 
+        // 4. Fungsi Ganti Gambar (Gallery)
         function changeImage(btn, url) {
             const mainImg = document.getElementById('mainProductImage');
             mainImg.style.opacity = "0.5";
@@ -328,6 +345,93 @@
             btn.classList.add('border-brand-600', 'shadow-md', 'ring-4', 'ring-brand-50');
             btn.classList.remove('opacity-60');
         }
+
+        // 5. DOM Ready (Nyawa untuk Tombol Keranjang & Beli)
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const btnKeranjang = document.getElementById('btnKeranjang');
+            const btnBeliLangsung = document.getElementById('btnBeliLangsung');
+
+            // --- A. LOGIKA TOMBOL "+ KERANJANG" ---
+            if (btnKeranjang) {
+                btnKeranjang.addEventListener('click', async function() {
+                    // Validasi Login (Opsional, pastikan route sudah benar)
+                    @guest
+                        window.location.href = "{{ route('login') }}";
+                        return;
+                    @endguest
+
+                    // Animasi Loading
+                    const originalText = btnKeranjang.innerHTML;
+                    btnKeranjang.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+                    btnKeranjang.disabled = true;
+
+                    try {
+                        const formData = new FormData(formKeranjang);
+                        
+                        // PASTIKAN NAMA ROUTE DI BAWAH INI SESUAI DENGAN web.php BOS!
+                        const response = await fetch('{{ route('keranjang.tambah') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: 'Material ditambahkan ke keranjang.',
+                                confirmButtonColor: '#2563eb',
+                                customClass: { popup: 'rounded-3xl' }
+                            });
+                            // Refresh untuk update badge keranjang di navbar
+                            setTimeout(() => window.location.reload(), 1500); 
+                        } else {
+                            throw new Error(result.message || 'Gagal menambahkan ke keranjang');
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error', title: 'Oops...', text: error.message,
+                            confirmButtonColor: '#000', customClass: { popup: 'rounded-3xl' }
+                        });
+                    } finally {
+                        btnKeranjang.innerHTML = originalText;
+                        btnKeranjang.disabled = false;
+                    }
+                });
+            }
+
+            // --- B. LOGIKA TOMBOL "BELI SEKARANG" ---
+            if (btnBeliLangsung) {
+                btnBeliLangsung.addEventListener('click', function() {
+                    @guest
+                        window.location.href = "{{ route('login') }}";
+                        return;
+                    @endguest
+
+                    // Ubah action form untuk direct checkout
+                    // PASTIKAN NAMA ROUTE DI BAWAH INI SESUAI DENGAN web.php BOS!
+                    formKeranjang.action = "{{ route('checkout.langsung') }}"; 
+                    formKeranjang.method = "POST";
+                    
+                    // Tambahkan CSRF manual jika form belum punya (biasanya butuh jika dikirim murni via HTML)
+                    if (!formKeranjang.querySelector('input[name="_token"]')) {
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
+                        formKeranjang.appendChild(csrfInput);
+                    }
+
+                    formKeranjang.submit();
+                });
+            }
+        });
     </script>
 </body>
 </html>

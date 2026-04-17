@@ -122,6 +122,7 @@
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-shield-alt text-zinc-400 group-focus-within:text-blue-600 transition-colors"></i></div>
                         <input type="password" name="password_confirmation" id="reg-password-conf" class="w-full bg-zinc-50 border border-zinc-200 text-black text-sm font-semibold rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 block pl-11 pr-12 py-3.5 transition-all outline-none placeholder:text-zinc-400" placeholder="Ulangi kata sandi" required>
+                        <button type="button" onclick="toggleRegPassword('reg-password-conf', 'eyeRegConf')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-black transition-colors focus:outline-none"><i class="fas fa-eye" id="eyeRegConf"></i></button>
                     </div>
                 </div>
 

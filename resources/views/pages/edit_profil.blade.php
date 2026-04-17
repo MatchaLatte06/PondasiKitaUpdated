@@ -43,6 +43,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
+        html {
+        scroll-behavior: smooth;
+        }
         body { font-family: 'Inter', sans-serif; background-color: #f4f4f5; scroll-behavior: smooth; }
 
         /* Remove arrows from number input */
@@ -199,7 +202,7 @@
                     {{-- ======================================================== --}}
                     {{-- CARD 2: MAPS BOX --}}
                     {{-- ======================================================== --}}
-                    <div class="bg-white rounded-[2.5rem] shadow-premium border border-zinc-200 p-2 sm:p-4 relative overflow-hidden">
+                    <div id="titik-lokasi" class="scroll-mt-24 bg-white rounded-[2.5rem] shadow-premium border border-zinc-200 p-2 sm:p-4 relative overflow-hidden">
                         <div class="p-4 sm:p-6 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 z-10 relative">
                             <div>
                                 <h2 class="text-xl font-black text-black flex items-center gap-3">

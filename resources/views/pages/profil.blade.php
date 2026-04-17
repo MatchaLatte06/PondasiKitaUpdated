@@ -113,6 +113,14 @@
                             <a href="{{ route('profil.edit') }}" class="w-full bg-white border-2 border-zinc-200 text-zinc-700 hover:border-black hover:text-black hover:bg-zinc-50 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-sm">
                                 <i class="fas fa-user-edit"></i> Edit Profil
                             </a>
+                            @auth
+                            <form action="{{ route('logout') }}" method="POST" class="m-0"> 
+                                @csrf
+                                <button type="submit" class="w-full flex items-center justify-center gap-2 bg-white border-2 border-zinc-100 text-zinc-400 hover:text-red-600 hover:border-red-100 hover:bg-red-50 font-bold py-3 rounded-xl transition-all text-sm group">
+                                    <i class="fas fa-power-off group-hover:rotate-12 transition-transform"></i> Logout
+                                </button>
+                            </form>
+                            @endauth
                             <a href="{{ route('profil.password') }}" class="w-full bg-transparent text-zinc-500 hover:text-blue-600 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm hover:bg-blue-50">
                                 <i class="fas fa-shield-alt"></i> Pengaturan Keamanan
                             </a>
@@ -200,7 +208,10 @@
                         <h3 class="text-lg font-black text-black flex items-center gap-2">
                             <i class="fas fa-map-marked-alt text-blue-600"></i> Alamat Pengiriman
                         </h3>
-                        <a href="#" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">Ubah Alamat</a>
+                        <a href="{{ route('profil.edit') }}#titik-lokasi" 
+                        class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+                        Ubah Alamat
+                        </a>
                     </div>
 
                     @if(strip_tags($alamatLengkapFormatted) !== '')

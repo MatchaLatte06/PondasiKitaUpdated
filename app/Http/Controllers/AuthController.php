@@ -224,7 +224,7 @@ class AuthController extends Controller
             'is_banned'   => 0
         ]);
 
-        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan masuk menggunakan akun baru Anda.');
+        return redirect()->back()->with('success', 'Akun Anda berhasil dibuat. Silakan login untuk mulai berbelanja.');
     }
 
     // ==========================================================

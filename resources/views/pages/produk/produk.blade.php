@@ -1,229 +1,341 @@
 @extends('layouts.app')
 
-@section('title', 'Jelajahi Produk - Pondasikita')
+@section('title', 'Katalog Material - Pondasikita B2B')
 
 @section('content')
-{{-- === PERBAIKAN: Tambahkan CSS Navbar Disini === --}}
-<link rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/navbar_style.css') }}"> {{-- INI YANG TADINYA HILANG --}}
-<link rel="stylesheet" href="{{ asset('assets/css/produk_page_style.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/vendors/mdi/css/materialdesignicons.min.css') }}">
 
-<div class="filter-overlay" id="filter-overlay"></div>
+{{-- Konfigurasi Tailwind (Jika belum ada di app.blade.php) --}}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+                colors: { brand: { 50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' } },
+            }
+        }
+    }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="page-container" style="margin-top: 80px; padding: 20px;">
+<style>
+    /* Styling Scrollbar Khusus Area Filter */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #cbd5e1; }
     
-    {{-- SIDEBAR FILTER --}}
-    <aside class="sidebar-filters" id="sidebar-filters">
-        <form action="{{ route('produk.index') }}" method="GET">
-            
-            {{-- Jika ada query pencarian dari navbar, ikutkan dalam filter --}}
-            @if(request('query'))
-                <input type="hidden" name="query" value="{{ request('query') }}">
-            @endif
+    /* Smooth Transition for Accordion */
+    .accordion-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+    .accordion-content.open { max-height: 500px; opacity: 1; }
+</style>
 
-            <div class="filter-header">
-                <span><i class="mdi mdi-filter-variant"></i> FILTER</span>
-                <button type="button" class="close-filter-btn" id="close-filter-btn">&times;</button>
-            </div>
-
-            <div class="filter-group">
-                <h4 class="filter-title">KATEGORI</h4>
-                <div class="category-list">
-                    @php $counter = 0; $limit = 7; @endphp
-                    @foreach($categories as $k)
-                        @php 
-                            $counter++;
-                            $isChecked = in_array($k->id, request('kategori', [])) ? 'checked' : '';
-                            $hiddenClass = ($counter > $limit) ? 'hidden-category' : '';
-                        @endphp
-                        <label class="filter-option {{ $hiddenClass }}" style="{{ $counter > $limit ? 'display:none;' : 'display:flex;' }}">
-                            <input type="checkbox" name="kategori[]" value="{{ $k->id }}" {{ $isChecked }}>
-                            {{ $k->nama_kategori }}
-                        </label>
-                    @endforeach
-                    
-                    @if($counter > $limit)
-                        <div class="show-more-container">
-                            <button type="button" id="toggle-categories" class="btn-show-more" style="background:none; border:none; color:#007bff; cursor:pointer; margin-top:5px;">
-                                Lihat Selengkapnya <i class="mdi mdi-chevron-down"></i>
-                            </button>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <div class="filter-group">
-                <h4 class="filter-title">LOKASI TOKO</h4>
-                <div class="location-select-wrapper">
-                    <select name="lokasi" class="filter-select" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
-                        <option value="">Semua Lokasi</option>
-                        @foreach($locations as $l)
-                            <option value="{{ $l->city_id }}" {{ request('lokasi') == $l->city_id ? 'selected' : '' }}>
-                                {{ $l->nama_kota }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="filter-group">
-                <h4 class="filter-title">HARGA</h4>
-                <div class="filter-harga" style="display: flex; gap: 10px;">
-                    <input type="number" name="harga_min" placeholder="Rp Min" value="{{ request('harga_min') }}" style="width: 50%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                    <input type="number" name="harga_max" placeholder="Rp Max" value="{{ request('harga_max') }}" style="width: 50%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-            </div>
-
-            <button type="submit" class="apply-filter-btn" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; margin-top: 15px; cursor: pointer;">Terapkan Filter</button>
-            
-            {{-- Tombol Reset --}}
-            @if(request()->hasAny(['kategori', 'lokasi', 'harga_min', 'harga_max', 'query']))
-                <a href="{{ route('produk.index') }}" style="display: block; text-align: center; margin-top: 10px; color: #666; text-decoration: none; font-size: 14px;">Reset Filter</a>
-            @endif
-        </form>
-    </aside>
-
-    {{-- KONTEN PRODUK --}}
-    <main class="main-content" style="flex: 1;">
-        <div class="top-bar" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <span>Menampilkan <strong>{{ $products->total() }} produk</strong> ditemukan.</span>
-            
-            {{-- Tombol Filter Mobile --}}
-            <button class="mobile-btn" id="mobile-filter-btn" style="display: none;">
-                <i class="mdi mdi-filter-variant"></i> Filter
-            </button>
+<div class="bg-[#fafafa] min-h-screen pt-[80px] pb-24 font-sans text-zinc-900">
+    
+    {{-- Breadcrumb --}}
+    <div class="bg-white border-b border-zinc-100 hidden md:block">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-4">
+            <nav class="flex text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 items-center gap-3">
+                <a href="{{ url('/') }}" class="hover:text-blue-600 transition-colors">Beranda</a>
+                <i class="fas fa-chevron-right text-[8px] opacity-30"></i>
+                <span class="text-zinc-900">Katalog Material</span>
+            </nav>
         </div>
+    </div>
 
-        <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
-            @forelse($products as $b)
-                @php
-                    $img = !empty($b->gambar_utama) ? 'assets/uploads/products/'.$b->gambar_utama : 'assets/uploads/products/default.jpg';
-                @endphp
-                <a href="{{ url('pages/detail_produk?id=' . $b->id . '&toko_slug=' . ($b->toko_slug ?? '#')) }}" class="product-link" style="text-decoration: none; color: inherit;">
-                    <div class="product-card" style="border: 1px solid #eee; border-radius: 10px; overflow: hidden; transition: transform 0.2s; background: white;">
-                        <div class="product-image" style="height: 200px; overflow: hidden;">
-                            <img src="{{ asset($img) }}" alt="{{ $b->nama_barang }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='{{ asset('assets/uploads/products/default.jpg') }}';">
+    <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-8 lg:py-12 flex flex-col lg:flex-row gap-8 items-start">
+        
+        {{-- ========================================== --}}
+        {{-- SIDEBAR FILTER (KIRI) --}}
+        {{-- ========================================== --}}
+        
+        {{-- Overlay Mobile --}}
+        <div id="filter-overlay" class="fixed inset-0 bg-zinc-950/60 backdrop-blur-sm z-[60] opacity-0 invisible transition-all duration-300 lg:hidden"></div>
+
+        <aside id="sidebar-filters" class="fixed inset-y-0 left-0 z-[70] w-[85%] max-w-[320px] bg-white lg:bg-transparent lg:static lg:w-1/4 lg:max-w-none transform -translate-x-full lg:translate-x-0 transition-transform duration-500 ease-out flex flex-col h-full lg:h-auto lg:block lg:sticky lg:top-28">
+            
+            <form action="{{ route('produk.index') }}" method="GET" class="flex flex-col h-full lg:bg-white lg:rounded-[2rem] lg:border lg:border-zinc-100 lg:shadow-sm overflow-hidden">
+                
+                @if(request('query'))
+                    <input type="hidden" name="query" value="{{ request('query') }}">
+                @endif
+
+                {{-- Header Filter --}}
+                <div class="px-6 py-5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+                    <h3 class="text-sm font-black text-zinc-900 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-sliders-h text-blue-600"></i> Filter Pencarian
+                    </h3>
+                    <button type="button" id="close-filter-btn" class="lg:hidden w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-red-500 hover:text-white transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                {{-- Body Filter --}}
+                <div class="p-6 flex-1 overflow-y-auto custom-scrollbar space-y-8">
+                    
+                    {{-- 1. Kategori (Accordion Model) --}}
+                    <div>
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Kategori Utama</h4>
+                        <div class="space-y-2" id="category-accordion">
+                            
+                            @foreach($categories as $k)
+                                <div class="accordion-item border border-zinc-100 rounded-2xl bg-zinc-50/50 overflow-hidden">
+                                    {{-- Header Kategori Utama --}}
+                                    <button type="button" class="accordion-header w-full px-4 py-3 flex items-center justify-between text-sm font-bold text-zinc-700 hover:text-blue-600 transition-colors">
+                                        <span class="flex items-center gap-2">
+                                            <i class="fas fa-folder text-zinc-300 text-xs"></i> {{ $k->nama_kategori }}
+                                        </span>
+                                        <i class="fas fa-chevron-down text-[10px] text-zinc-400 transition-transform duration-300 icon-arrow"></i>
+                                    </button>
+                                    
+                                    {{-- Sub Kategori Dropdown --}}
+                                    {{-- PASTIKAN NAMA RELASI '$k->subKategori' SESUAI DENGAN MODEL BOS --}}
+                                    <div class="accordion-content bg-white">
+                                        <div class="p-4 pt-1 space-y-3">
+                                            {{-- Jika tidak punya relasi subkategori di DB, gunakan looping manual atau biarkan checkbox ada disini --}}
+                                            @if(isset($k->subKategori) && count($k->subKategori) > 0)
+                                                @foreach($k->subKategori as $sub)
+                                                    <label class="flex items-start gap-3 cursor-pointer group">
+                                                        <div class="relative flex items-center justify-center shrink-0 mt-0.5">
+                                                            <input type="checkbox" name="kategori[]" value="{{ $sub->id }}" class="peer sr-only" {{ in_array($sub->id, request('kategori', [])) ? 'checked' : '' }}>
+                                                            <div class="w-4 h-4 rounded border-2 border-zinc-200 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-all flex items-center justify-center">
+                                                                <i class="fas fa-check text-white text-[8px] opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                                            </div>
+                                                        </div>
+                                                        <span class="text-xs font-semibold text-zinc-600 group-hover:text-zinc-900 transition-colors">{{ $sub->nama_kategori }}</span>
+                                                    </label>
+                                                @endforeach
+                                            @else
+                                                {{-- Fallback jika hanya ada 1 level kategori --}}
+                                                <label class="flex items-start gap-3 cursor-pointer group">
+                                                    <div class="relative flex items-center justify-center shrink-0 mt-0.5">
+                                                        <input type="checkbox" name="kategori[]" value="{{ $k->id }}" class="peer sr-only" {{ in_array($k->id, request('kategori', [])) ? 'checked' : '' }}>
+                                                        <div class="w-4 h-4 rounded border-2 border-zinc-200 peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-all flex items-center justify-center">
+                                                            <i class="fas fa-check text-white text-[8px] opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-xs font-semibold text-zinc-600 group-hover:text-zinc-900 transition-colors">Semua {{ $k->nama_kategori }}</span>
+                                                </label>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
                         </div>
-                        <div class="product-details" style="padding: 15px;">
-                            <h3 style="font-size: 16px; margin: 0 0 10px; height: 40px; overflow: hidden;">{{ Str::limit($b->nama_barang, 40) }}</h3>
-                            <p class="price" style="font-weight: bold; color: #d32f2f; margin: 0 0 10px;">Rp{{ number_format($b->harga, 0, ',', '.') }}</p>
-                            <div class="product-seller-info" style="font-size: 12px; color: #666;">
-                                <div class="store-name" style="margin-bottom: 3px;"><i class="mdi mdi-store"></i> {{ $b->nama_toko }}</div>
-                                <div class="store-location"><i class="mdi mdi-map-marker"></i> {{ $b->nama_kota ?? 'Indonesia' }}</div>
+                    </div>
+
+                    {{-- 2. Lokasi --}}
+                    <div>
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Lokasi Pengiriman</h4>
+                        <div class="relative">
+                            <select name="lokasi" class="w-full bg-zinc-50 border border-zinc-200 text-zinc-700 text-sm font-bold rounded-xl px-4 py-3 appearance-none outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all cursor-pointer">
+                                <option value="">Semua Wilayah</option>
+                                @foreach($locations as $l)
+                                    <option value="{{ $l->city_id }}" {{ request('lokasi') == $l->city_id ? 'selected' : '' }}>
+                                        {{ $l->nama_kota }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <i class="fas fa-map-marker-alt text-zinc-400"></i>
                             </div>
                         </div>
                     </div>
-                </a>
-            @empty
-                <div class="no-results" style="grid-column: 1 / -1; text-align: center; padding: 50px;">
-                    <img src="{{ asset('assets/image/empty-box.png') }}" alt="Kosong" style="width: 100px; opacity: 0.5; margin-bottom: 20px;">
-                    <h3>Oops! Produk tidak ditemukan.</h3>
-                    <p>Coba ubah kata kunci atau filter pencarian Anda.</p>
-                    <a href="{{ route('produk.index') }}" class="btn btn-primary" style="margin-top: 10px; display: inline-block;">Lihat Semua Produk</a>
-                </div>
-            @endforelse
-        </div>
 
-        {{-- PAGINATION LARAVEL --}}
-        <div style="margin-top: 40px; display: flex; justify-content: center;">
-            {{ $products->links() }} 
-        </div>
-    </main>
+                    {{-- 3. Rentang Harga --}}
+                    <div>
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Rentang Harga</h4>
+                        <div class="flex items-center gap-3">
+                            <div class="relative w-full">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-400 pointer-events-none">Rp</span>
+                                <input type="number" name="harga_min" value="{{ request('harga_min') }}" placeholder="Min" class="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 text-sm font-bold rounded-xl pl-9 pr-3 py-3 outline-none focus:border-blue-600 transition-all">
+                            </div>
+                            <span class="text-zinc-300 font-bold">-</span>
+                            <div class="relative w-full">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-400 pointer-events-none">Rp</span>
+                                <input type="number" name="harga_max" value="{{ request('harga_max') }}" placeholder="Max" class="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 text-sm font-bold rounded-xl pl-9 pr-3 py-3 outline-none focus:border-blue-600 transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- Footer Filter (Action Buttons) --}}
+                <div class="p-6 border-t border-zinc-100 bg-white">
+                    <button type="submit" class="w-full bg-zinc-950 hover:bg-blue-600 text-white font-black text-xs uppercase tracking-widest py-4 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                        Terapkan Filter
+                    </button>
+                    
+                    @if(request()->hasAny(['kategori', 'lokasi', 'harga_min', 'harga_max', 'query', 'sort']))
+                        <a href="{{ route('produk.index') }}" class="block text-center mt-4 text-xs font-bold text-red-500 hover:text-red-600 transition-colors">
+                            <i class="fas fa-sync-alt mr-1"></i> Reset Semua
+                        </a>
+                    @endif
+                </div>
+
+            </form>
+        </aside>
+
+        {{-- ========================================== --}}
+        {{-- KONTEN PRODUK (KANAN) --}}
+        {{-- ========================================== --}}
+        <main class="w-full lg:w-3/4 flex flex-col min-w-0">
+            
+            {{-- Top Bar (Sort & Mobile Button) --}}
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-4 rounded-2xl border border-zinc-100 shadow-sm">
+                
+                <div class="text-sm font-medium text-zinc-500">
+                    Menampilkan <span class="font-black text-zinc-900">{{ $products->total() }}</span> material ditemukan.
+                </div>
+                
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    {{-- Mobile Filter Button --}}
+                    <button type="button" id="mobile-filter-btn" class="lg:hidden flex-1 sm:flex-none flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold text-xs uppercase tracking-widest px-5 py-3 rounded-xl transition-colors">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+
+                    {{-- Sort Dropdown Form (Icon Standar) --}}
+                    <form action="{{ route('produk.index') }}" method="GET" class="flex-1 sm:flex-none relative" id="sort-form">
+                        {{-- Pertahankan filter yang ada --}}
+                        @foreach(request()->except('sort', 'page') as $key => $value)
+                            @if(is_array($value))
+                                @foreach($value as $v) <input type="hidden" name="{{ $key }}[]" value="{{ $v }}"> @endforeach
+                            @else
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endif
+                        @endforeach
+
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-sort-amount-down text-zinc-400"></i>
+                        </div>
+                        <select name="sort" onchange="document.getElementById('sort-form').submit()" class="w-full bg-zinc-50 border border-zinc-200 text-zinc-700 text-sm font-bold rounded-xl pl-10 pr-10 py-3 appearance-none outline-none focus:border-blue-600 transition-all cursor-pointer">
+                            <option value="terbaru" {{ request('sort') == 'terbaru' ? 'selected' : '' }}>Paling Baru</option>
+                            <option value="termurah" {{ request('sort') == 'termurah' ? 'selected' : '' }}>Harga Terendah</option>
+                            <option value="termahal" {{ request('sort') == 'termahal' ? 'selected' : '' }}>Harga Tertinggi</option>
+                            <option value="abjad" {{ request('sort') == 'abjad' ? 'selected' : '' }}>A - Z</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-[10px] text-zinc-400"></i>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{-- Grid Produk --}}
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-10">
+                @forelse($products as $b)
+                    <a href="{{ url('pages/detail_produk?id=' . $b->id . '&toko_slug=' . ($b->toko_slug ?? '#')) }}" class="group bg-white rounded-[1.5rem] border border-zinc-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-blue-100 hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                        
+                        {{-- Image --}}
+                        <div class="w-full aspect-square bg-zinc-50 overflow-hidden relative p-4">
+                            @php $img = !empty($b->gambar_utama) ? 'assets/uploads/products/'.$b->gambar_utama : 'assets/uploads/products/default.jpg'; @endphp
+                            <img src="{{ asset($img) }}" alt="{{ $b->nama_barang }}" class="w-full h-full object-cover rounded-xl mix-blend-multiply group-hover:scale-110 transition-transform duration-700" onerror="this.onerror=null; this.src='{{ asset('assets/uploads/products/default.jpg') }}';">
+                        </div>
+                        
+                        {{-- Detail --}}
+                        <div class="p-4 sm:p-5 flex flex-col flex-1">
+                            <h3 class="text-xs sm:text-sm font-bold text-zinc-800 line-clamp-2 mb-2 leading-snug group-hover:text-blue-600 transition-colors">{{ $b->nama_barang }}</h3>
+                            <div class="text-base sm:text-lg font-black text-zinc-900 tracking-tight mt-auto mb-3">Rp{{ number_format($b->harga, 0, ',', '.') }}</div>
+                            
+                            <div class="pt-3 border-t border-zinc-50 space-y-1.5">
+                                <div class="text-[10px] sm:text-xs font-semibold text-zinc-500 truncate flex items-center gap-1.5">
+                                    <i class="fas fa-store text-blue-500 w-3 text-center"></i> {{ $b->nama_toko }}
+                                </div>
+                                <div class="text-[10px] sm:text-xs font-semibold text-zinc-400 truncate flex items-center gap-1.5">
+                                    <i class="fas fa-map-marker-alt text-red-400 w-3 text-center"></i> {{ $b->nama_kota ?? 'Lokasi Nasional' }}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                @empty
+                    {{-- Empty State --}}
+                    <div class="col-span-full bg-white rounded-[2rem] border border-zinc-100 py-20 flex flex-col items-center justify-center text-center px-4">
+                        <div class="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center text-4xl text-zinc-300 mb-6">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-zinc-900 mb-2">Material Tidak Ditemukan</h3>
+                        <p class="text-sm font-medium text-zinc-500 max-w-md mb-6">Maaf, kami tidak dapat menemukan material dengan filter yang Anda pilih. Silakan sesuaikan kriteria pencarian Anda.</p>
+                        <a href="{{ route('produk.index') }}" class="bg-black hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl transition-all">
+                            Lihat Semua Material
+                        </a>
+                    </div>
+                @endforelse
+            </div>
+
+            {{-- Pagination --}}
+            <div class="flex justify-center mt-auto">
+                {{ $products->appends(request()->query())->links('pagination::tailwind') }}
+            </div>
+
+        </main>
+    </div>
 </div>
 
-{{-- SCRIPT JAVASCRIPT --}}
+{{-- SCRIPT INTERAKSI --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Mobile Filter Logic
+        
+        // 1. MOBILE SIDEBAR LOGIC
         const mobileFilterBtn = document.getElementById('mobile-filter-btn');
         const sidebarFilters = document.getElementById('sidebar-filters');
         const closeFilterBtn = document.getElementById('close-filter-btn');
         const filterOverlay = document.getElementById('filter-overlay');
         
-        // Cek ukuran layar untuk tombol mobile
-        function checkMobile() {
-            if (window.innerWidth <= 768) {
-                if(mobileFilterBtn) mobileFilterBtn.style.display = 'block';
-                if(sidebarFilters) sidebarFilters.classList.add('mobile-hidden');
-            } else {
-                if(mobileFilterBtn) mobileFilterBtn.style.display = 'none';
-                if(sidebarFilters) sidebarFilters.classList.remove('mobile-hidden');
-                if(sidebarFilters) sidebarFilters.classList.remove('active');
-                if(filterOverlay) filterOverlay.classList.remove('active');
+        function openSidebar() {
+            sidebarFilters.classList.remove('-translate-x-full');
+            filterOverlay.classList.remove('opacity-0', 'invisible');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeSidebar() {
+            sidebarFilters.classList.add('-translate-x-full');
+            filterOverlay.classList.add('opacity-0', 'invisible');
+            document.body.style.overflow = '';
+        }
+
+        if (mobileFilterBtn) mobileFilterBtn.addEventListener('click', openSidebar);
+        if (closeFilterBtn) closeFilterBtn.addEventListener('click', closeSidebar);
+        if (filterOverlay) filterOverlay.addEventListener('click', closeSidebar);
+
+        // 2. ACCORDION KATEGORI (Hanya boleh 1 yang terbuka)
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        
+        // Buka otomatis jika ada checkbox yang tercentang di dalamnya
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            const hasChecked = item.querySelector('input[type="checkbox"]:checked');
+            if (hasChecked) {
+                const content = item.querySelector('.accordion-content');
+                const icon = item.querySelector('.icon-arrow');
+                content.classList.add('open');
+                icon.classList.add('rotate-180');
             }
-        }
-        
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
+        });
 
-        if (mobileFilterBtn) {
-            mobileFilterBtn.addEventListener('click', () => {
-                sidebarFilters.classList.add('active');
-                sidebarFilters.classList.remove('mobile-hidden');
-                filterOverlay.classList.add('active');
-            });
-        }
-        
-        const hideFilter = () => {
-            sidebarFilters.classList.remove('active');
-            sidebarFilters.classList.add('mobile-hidden');
-            filterOverlay.classList.remove('active');
-        };
-        
-        if (closeFilterBtn) closeFilterBtn.addEventListener('click', hideFilter);
-        if (filterOverlay) filterOverlay.addEventListener('click', hideFilter);
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const currentItem = this.parentElement;
+                const currentContent = currentItem.querySelector('.accordion-content');
+                const currentIcon = this.querySelector('.icon-arrow');
+                const isOpen = currentContent.classList.contains('open');
 
-        // Show More Categories Logic
-        const toggleBtn = document.getElementById('toggle-categories');
-        if(toggleBtn) {
-            toggleBtn.addEventListener('click', function() {
-                const hiddenItems = document.querySelectorAll('.hidden-category');
-                const isExpanded = toggleBtn.classList.contains('expanded');
-
-                hiddenItems.forEach(item => {
-                    item.style.display = isExpanded ? 'none' : 'flex';
+                // Tutup semua konten yang lain dulu
+                document.querySelectorAll('.accordion-content').forEach(content => {
+                    content.classList.remove('open');
+                });
+                document.querySelectorAll('.icon-arrow').forEach(icon => {
+                    icon.classList.remove('rotate-180');
                 });
 
-                if (!isExpanded) {
-                    toggleBtn.innerHTML = 'Sembunyikan <i class="mdi mdi-chevron-up"></i>';
-                    toggleBtn.classList.add('expanded');
-                } else {
-                    toggleBtn.innerHTML = 'Lihat Selengkapnya <i class="mdi mdi-chevron-down"></i>';
-                    toggleBtn.classList.remove('expanded');
+                // Jika tadinya tertutup, maka buka yang ini
+                if (!isOpen) {
+                    currentContent.classList.add('open');
+                    currentIcon.classList.add('rotate-180');
                 }
             });
-        }
+        });
+
     });
 </script>
-
-<style>
-    /* CSS Tambahan untuk Pagination & Mobile Responsiveness */
-    .mobile-hidden { display: none; }
-    
-    @media (max-width: 768px) {
-        .page-container { flex-direction: column; }
-        .sidebar-filters { 
-            position: fixed; top: 0; left: -100%; width: 80%; height: 100vh; 
-            background: white; z-index: 1000; padding: 20px; transition: 0.3s; 
-            overflow-y: auto; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        .sidebar-filters.active { left: 0; }
-        .filter-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 999; display: none;
-        }
-        .filter-overlay.active { display: block; }
-    }
-
-    /* Style Pagination Bawaan Laravel (Tailwind/Bootstrap Friendly) */
-    .pagination { display: flex; list-style: none; gap: 5px; }
-    .pagination li a, .pagination li span {
-        padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; 
-        text-decoration: none; color: #333;
-    }
-    .pagination li.active span {
-        background-color: #007bff; color: white; border-color: #007bff;
-    }
-</style>
 @endsection

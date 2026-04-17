@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Katalog Material - Pondasikita</title>
+    <title>Katalog Material - Pondasikita B2B</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {{-- Tailwind CSS CDN --}}
@@ -13,13 +13,11 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'] },
                     colors: {
-                        brand: {
-                            50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
-                        }
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
                     },
                     boxShadow: {
-                        'card': '0 1px 6px 0 rgba(49,53,59,0.12)',
-                        'card-hover': '0 4px 12px 0 rgba(49,53,59,0.2)',
+                        'soft': '0 4px 40px -4px rgba(0,0,0,0.03)',
+                        'hover': '0 10px 30px -5px rgba(37,99,235,0.1)',
                         'mobile-drawer': '4px 0 24px rgba(0,0,0,0.15)',
                     }
                 }
@@ -27,190 +25,267 @@
         }
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Background abu-abu muda khas e-commerce */
-        body { font-family: 'Inter', sans-serif; background-color: #f5f5f5; }
+        body { font-family: 'Inter', sans-serif; background-color: #fafafa; }
 
         /* Scrollbar Minimalis */
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px;}
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #94a3b8; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #cbd5e1; }
 
         /* Sembunyikan Panah di Input Number */
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
-        /* Custom Checkbox UI */
-        .custom-checkbox { appearance: none; background-color: #fff; margin: 0; width: 1.25rem; height: 1.25rem; border: 2px solid #cbd5e1; border-radius: 0.25rem; display: grid; place-content: center; cursor: pointer; transition: all 0.2s ease-in-out; flex-shrink: 0; }
+        /* Custom Checkbox UI Dewa */
+        .custom-checkbox { appearance: none; background-color: #fff; margin: 0; width: 1.25rem; height: 1.25rem; border: 2px solid #e2e8f0; border-radius: 0.375rem; display: grid; place-content: center; cursor: pointer; transition: all 0.2s ease-in-out; flex-shrink: 0; }
         .custom-checkbox::before { content: ""; width: 0.65rem; height: 0.65rem; transform: scale(0); transition: 120ms transform ease-in-out; background-color: white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
         .custom-checkbox:checked { background-color: #2563eb; border-color: #2563eb; }
         .custom-checkbox:checked::before { transform: scale(1); }
 
-        /* Pagination Fix */
-        .pagination-wrap nav { display: flex; justify-content: center; width: 100%; margin: 2.5rem 0; }
-        .pagination-wrap .pagination { display: flex; gap: 0.5rem; background: white; padding: 0.5rem; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .pagination-wrap .page-item .page-link { display: flex; align-items: center; justify-content: center; min-width: 2.5rem; height: 2.5rem; border-radius: 0.5rem; font-weight: 600; color: #4b5563; padding: 0 0.5rem; transition: all 0.2s; }
-        .pagination-wrap .page-item:not(.active) .page-link:hover { background: #f3f4f6; color: #111827; }
-        .pagination-wrap .page-item.active .page-link { background: #2563eb; color: white; border-color: #2563eb; }
+        /* Animasi Accordion Kategori */
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .accordion-content.open { max-height: 400px; /* Angka besar agar muat */ }
     </style>
 </head>
-<body class="text-gray-800 antialiased pt-[80px]"> {{-- Padding Top yang FIX untuk menahan Navbar Fixed --}}
+<body class="text-zinc-900 antialiased pt-[80px]">
 
     {{-- Navbar --}}
     @include('partials.navbar')
 
-    {{-- BREADCRUMB (Full Width, Bagian Paling Atas Sendiri) --}}
-    <div class="bg-white border-b border-gray-200 shadow-sm relative z-10 hidden lg:block">
-        <div class="max-w-[1250px] mx-auto px-4 lg:px-8 py-3">
-            <nav class="flex text-sm text-gray-500 font-medium items-center gap-2">
-                <a href="{{ url('/') }}" class="hover:text-brand-600 transition-colors">Beranda</a>
-                <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
-                <a href="{{ route('produk.index') }}" class="text-brand-600 font-semibold">Katalog Material</a>
-
+    {{-- BREADCRUMB --}}
+    <div class="bg-white border-b border-zinc-100 hidden md:block">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-4">
+            <nav class="flex text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 items-center gap-3">
+                <a href="{{ url('/') }}" class="hover:text-blue-600 transition-colors">Beranda</a>
+                <i class="fas fa-chevron-right text-[8px] opacity-30"></i>
+                <span class="text-zinc-900">Katalog Material</span>
                 @if(request()->has('query') && request('query') != '')
-                <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
-                <span class="text-gray-800 font-semibold">Pencarian: "{{ request('query') }}"</span>
+                    <i class="fas fa-chevron-right text-[8px] opacity-30"></i>
+                    <span class="text-blue-600">Pencarian: "{{ request('query') }}"</span>
                 @endif
             </nav>
         </div>
     </div>
 
-    {{-- KONTEN UTAMA (Wrapper Layout Flex Row) --}}
-    <div class="max-w-[1250px] mx-auto px-4 lg:px-8 py-6 flex flex-col lg:flex-row items-start gap-6">
+    {{-- KONTEN UTAMA --}}
+    <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-8 flex flex-col lg:flex-row items-start gap-8">
 
-        {{-- ========================================================= --}}
         {{-- MOBILE OVERLAY --}}
-        {{-- ========================================================= --}}
-        <div id="filter-overlay" class="fixed inset-0 bg-black/60 z-[60] hidden lg:hidden backdrop-blur-sm"></div>
+        <div id="filter-overlay" class="fixed inset-0 bg-zinc-950/60 z-[60] hidden lg:hidden backdrop-blur-sm transition-opacity"></div>
 
-        {{-- ========================================================= --}}
         {{-- SIDEBAR FILTER (KIRI) --}}
-        {{-- ========================================================= --}}
-        <aside id="sidebar-filters" class="fixed inset-y-0 left-0 z-[70] w-[280px] bg-white transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-mobile-drawer lg:relative lg:translate-x-0 lg:w-[250px] lg:shadow-none lg:bg-transparent lg:z-0 lg:shrink-0">
+        <aside id="sidebar-filters" class="fixed inset-y-0 left-0 z-[70] w-[280px] bg-white transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-mobile-drawer lg:relative lg:translate-x-0 lg:w-[280px] lg:shadow-none lg:bg-transparent lg:z-0 lg:shrink-0 lg:sticky lg:top-28">
 
             {{-- Header Mobile Filter --}}
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 lg:hidden bg-white shrink-0">
-                <h3 class="text-lg font-bold text-gray-800">Filter Pencarian</h3>
-                <button type="button" id="close-filter-btn" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-full">
-                    <i class="fas fa-times text-lg"></i>
+            <div class="flex items-center justify-between p-5 border-b border-zinc-100 lg:hidden bg-white shrink-0">
+                <h3 class="text-sm font-black text-zinc-900 uppercase tracking-widest">Filter Pencarian</h3>
+                <button type="button" id="close-filter-btn" class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-red-500 bg-zinc-50 hover:bg-red-50 rounded-full transition-colors">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            {{-- Form Wrapper (Sticky on Desktop) --}}
-            <div class="lg:sticky lg:top-28 w-full h-full lg:h-auto flex flex-col bg-white lg:rounded-xl lg:shadow-card lg:border lg:border-gray-200 overflow-hidden">
-
+            {{-- Form Wrapper --}}
+            <div class="w-full h-full lg:h-auto flex flex-col bg-white lg:rounded-[2rem] lg:border lg:border-zinc-100 lg:shadow-soft overflow-hidden">
+                
                 {{-- Header Desktop Filter --}}
-                <div class="hidden lg:flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wide">Filter</h3>
+                <div class="hidden lg:flex items-center justify-between px-6 py-5 border-b border-zinc-100 bg-zinc-50/50">
+                    <h3 class="text-xs font-black text-zinc-900 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-sliders-h text-blue-600"></i> Filter
+                    </h3>
                     @if(request()->except('page'))
-                        <a href="{{ route('produk.index') }}" class="text-xs font-bold text-red-500 hover:text-red-700">Reset Filter</a>
+                        <a href="{{ route('produk.index') }}" class="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest transition-colors">Reset</a>
                     @endif
                 </div>
 
                 {{-- Form Element --}}
-                <form action="{{ route('produk.index') }}" method="GET" id="filterForm" class="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col gap-6">
+                <form action="{{ route('produk.index') }}" method="GET" id="filterForm" class="flex-1 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-8">
                     @if(request()->has('query'))
                         <input type="hidden" name="query" value="{{ request('query') }}">
                     @endif
 
+                    {{-- FILTER: KATEGORI (ACCORDION) --}}
+                    <div class="space-y-3" id="category-accordion">
+                            
+                            {{-- 1. BAHAN BANGUNAN DASAR --}}
+                            <div class="accordion-item border border-zinc-100 rounded-2xl bg-zinc-50/50 overflow-hidden">
+                                <button type="button" class="accordion-header w-full px-4 py-3 flex items-center justify-between text-sm font-bold text-zinc-700 hover:text-blue-600 transition-colors">
+                                    <span class="flex items-center gap-2"><i class="fas fa-warehouse text-zinc-300 text-xs w-4"></i> Bahan Bangunan Dasar</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-zinc-400 transition-transform duration-300 icon-arrow"></i>
+                                </button>
+                                <div class="accordion-content bg-white">
+                                    <div class="px-4 pb-4 pt-1 space-y-3 border-t border-zinc-100 mt-1">
+                                        @foreach(['Semen', 'Pasir', 'Batu'] as $sub)
+                                            <label class="flex items-start gap-3 cursor-pointer group">
+                                                <input type="checkbox" name="kategori_text[]" value="{{ $sub }}" class="custom-checkbox mt-0.5" {{ in_array($sub, request('kategori_text', [])) ? 'checked' : '' }} onchange="showApplyButton()">
+                                                <span class="text-xs font-semibold text-zinc-600 group-hover:text-zinc-900 select-none">{{ $sub }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- 2. BESI & BAJA --}}
+                            <div class="accordion-item border border-zinc-100 rounded-2xl bg-zinc-50/50 overflow-hidden">
+                                <button type="button" class="accordion-header w-full px-4 py-3 flex items-center justify-between text-sm font-bold text-zinc-700 hover:text-blue-600 transition-colors">
+                                    <span class="flex items-center gap-2"><i class="fas fa-bars text-zinc-300 text-xs w-4"></i> Besi & Baja</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-zinc-400 transition-transform duration-300 icon-arrow"></i>
+                                </button>
+                                <div class="accordion-content bg-white">
+                                    <div class="px-4 pb-4 pt-1 space-y-3 border-t border-zinc-100 mt-1">
+                                        @foreach(['Besi Beton', 'Baja Ringan'] as $sub)
+                                            <label class="flex items-start gap-3 cursor-pointer group">
+                                                <input type="checkbox" name="kategori_text[]" value="{{ $sub }}" class="custom-checkbox mt-0.5" {{ in_array($sub, request('kategori_text', [])) ? 'checked' : '' }} onchange="showApplyButton()">
+                                                <span class="text-xs font-semibold text-zinc-600 group-hover:text-zinc-900 select-none">{{ $sub }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- 3. CAT & PELAPIS --}}
+                            <div class="accordion-item border border-zinc-100 rounded-2xl bg-zinc-50/50 overflow-hidden">
+                                <button type="button" class="accordion-header w-full px-4 py-3 flex items-center justify-between text-sm font-bold text-zinc-700 hover:text-blue-600 transition-colors">
+                                    <span class="flex items-center gap-2"><i class="fas fa-paint-roller text-zinc-300 text-xs w-4"></i> Cat & Pelapis</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-zinc-400 transition-transform duration-300 icon-arrow"></i>
+                                </button>
+                                <div class="accordion-content bg-white">
+                                    <div class="px-4 pb-4 pt-1 space-y-3 border-t border-zinc-100 mt-1">
+                                        @foreach(['Cat Tembok', 'Cat Kayu & Besi'] as $sub)
+                                            <label class="flex items-start gap-3 cursor-pointer group">
+                                                <input type="checkbox" name="kategori_text[]" value="{{ $sub }}" class="custom-checkbox mt-0.5" {{ in_array($sub, request('kategori_text', [])) ? 'checked' : '' }} onchange="showApplyButton()">
+                                                <span class="text-xs font-semibold text-zinc-600 group-hover:text-zinc-900 select-none">{{ $sub }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- 4. KERAMIK & GRANIT --}}
+                            <div class="accordion-item border border-zinc-100 rounded-2xl bg-zinc-50/50 overflow-hidden">
+                                <button type="button" class="accordion-header w-full px-4 py-3 flex items-center justify-between text-sm font-bold text-zinc-700 hover:text-blue-600 transition-colors">
+                                    <span class="flex items-center gap-2"><i class="fas fa-th-large text-zinc-300 text-xs w-4"></i> Keramik & Granit</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-zinc-400 transition-transform duration-300 icon-arrow"></i>
+                                </button>
+                                <div class="accordion-content bg-white">
+                                    <div class="px-4 pb-4 pt-1 space-y-3 border-t border-zinc-100 mt-1">
+                                        @foreach(['Keramik Lantai', 'Keramik Dinding', 'Granit'] as $sub)
+                                            <label class="flex items-start gap-3 cursor-pointer group">
+                                                <input type="checkbox" name="kategori_text[]" value="{{ $sub }}" class="custom-checkbox mt-0.5" {{ in_array($sub, request('kategori_text', [])) ? 'checked' : '' }} onchange="showApplyButton()">
+                                                <span class="text-xs font-semibold text-zinc-600 group-hover:text-zinc-900 select-none">{{ $sub }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- 5. PIPA & PERLENGKAPAN AIR --}}
+                            <div class="accordion-item border border-zinc-100 rounded-2xl bg-zinc-50/50 overflow-hidden">
+                                <button type="button" class="accordion-header w-full px-4 py-3 flex items-center justify-between text-sm font-bold text-zinc-700 hover:text-blue-600 transition-colors">
+                                    <span class="flex items-center gap-2"><i class="fas fa-faucet text-zinc-300 text-xs w-4"></i> Pipa & Air</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-zinc-400 transition-transform duration-300 icon-arrow"></i>
+                                </button>
+                                <div class="accordion-content bg-white">
+                                    <div class="px-4 pb-4 pt-1 space-y-3 border-t border-zinc-100 mt-1">
+                                        @foreach(['Pipa PVC', 'Pipa Besi', 'Perlengkapan Sanitasi'] as $sub)
+                                            <label class="flex items-start gap-3 cursor-pointer group">
+                                                <input type="checkbox" name="kategori_text[]" value="{{ $sub }}" class="custom-checkbox mt-0.5" {{ in_array($sub, request('kategori_text', [])) ? 'checked' : '' }} onchange="showApplyButton()">
+                                                <span class="text-xs font-semibold text-zinc-600 group-hover:text-zinc-900 select-none">{{ $sub }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- 6. KELISTRIKAN --}}
+                            <div class="accordion-item border border-zinc-100 rounded-2xl bg-zinc-50/50 overflow-hidden">
+                                <button type="button" class="accordion-header w-full px-4 py-3 flex items-center justify-between text-sm font-bold text-zinc-700 hover:text-blue-600 transition-colors">
+                                    <span class="flex items-center gap-2"><i class="fas fa-bolt text-zinc-300 text-xs w-4"></i> Kelistrikan</span>
+                                    <i class="fas fa-chevron-down text-[10px] text-zinc-400 transition-transform duration-300 icon-arrow"></i>
+                                </button>
+                                <div class="accordion-content bg-white">
+                                    <div class="px-4 pb-4 pt-1 space-y-3 border-t border-zinc-100 mt-1">
+                                        @foreach(['Kabel Listrik', 'Saklar & Stop Kontak', 'Lampu & Penerangan', 'Panel & Box MCB'] as $sub)
+                                            <label class="flex items-start gap-3 cursor-pointer group">
+                                                <input type="checkbox" name="kategori_text[]" value="{{ $sub }}" class="custom-checkbox mt-0.5" {{ in_array($sub, request('kategori_text', [])) ? 'checked' : '' }} onchange="showApplyButton()">
+                                                <span class="text-xs font-semibold text-zinc-600 group-hover:text-zinc-900 select-none">{{ $sub }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     {{-- FILTER: JENIS TOKO --}}
                     <div>
-                        <h4 class="font-bold text-gray-800 mb-3 text-sm">Jenis Toko</h4>
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Jenis Mitra</h4>
                         <div class="space-y-3">
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" class="custom-checkbox" onchange="showApplyButton()">
-                                <span class="text-sm text-gray-600 group-hover:text-gray-900 select-none flex items-center gap-2">
-                                    <i class="fas fa-crown text-purple-600 w-4"></i> Official Store
+                                <span class="text-sm font-semibold text-zinc-600 group-hover:text-zinc-900 select-none flex items-center gap-2">
+                                    <i class="fas fa-crown text-purple-500 w-4"></i> Official Store
                                 </span>
                             </label>
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" class="custom-checkbox" onchange="showApplyButton()">
-                                <span class="text-sm text-gray-600 group-hover:text-gray-900 select-none flex items-center gap-2">
-                                    <i class="fas fa-check-circle text-green-500 w-4"></i> Pro Merchant
+                                <span class="text-sm font-semibold text-zinc-600 group-hover:text-zinc-900 select-none flex items-center gap-2">
+                                    <i class="fas fa-check-circle text-emerald-500 w-4"></i> Pro Merchant
                                 </span>
                             </label>
                         </div>
                     </div>
 
-                    <div class="w-full h-px bg-gray-200"></div>
-
-                    {{-- FILTER: KATEGORI --}}
-                    <div>
-                        <h4 class="font-bold text-gray-800 mb-3 text-sm">Kategori</h4>
-                        <div id="filter-kategori" class="space-y-3">
-                            @php $limit = 5; $counter = 0; @endphp
-                            @foreach($categories as $k)
-                                @php
-                                    $counter++;
-                                    $isChecked = in_array($k->id, $filter_kategori ?? []) ? 'checked' : '';
-                                    $isHidden = ($counter > $limit && empty($isChecked)) ? 'hidden' : '';
-                                @endphp
-                                <label class="flex items-start gap-3 cursor-pointer group cat-item {{ $isHidden }}">
-                                    <input type="checkbox" name="kategori[]" value="{{ $k->id }}" class="custom-checkbox mt-0.5" {{ $isChecked }} onchange="showApplyButton()">
-                                    <span class="text-sm text-gray-600 group-hover:text-gray-900 select-none line-clamp-2 leading-snug">{{ $k->nama_kategori }}</span>
-                                </label>
-                            @endforeach
-
-                            @if($categories->count() > $limit)
-                                <button type="button" id="btn-more-cat" class="text-xs font-bold text-brand-600 hover:text-brand-700 w-full text-left mt-2 flex items-center gap-1">
-                                    Lihat Selengkapnya <i class="fas fa-chevron-down"></i>
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="w-full h-px bg-gray-200"></div>
-
                     {{-- FILTER: LOKASI --}}
                     <div>
-                        <h4 class="font-bold text-gray-800 mb-3 text-sm">Lokasi</h4>
-                        <div class="max-h-[180px] overflow-y-auto custom-scrollbar pr-2 space-y-3">
-                            @foreach($locations as $l)
-                                <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="lokasi[]" value="{{ $l->city_id }}" class="custom-checkbox" {{ ($filter_lokasi ?? '') == $l->city_id ? 'checked' : '' }} onchange="showApplyButton()">
-                                    <span class="text-sm text-gray-600 group-hover:text-gray-900 select-none">{{ $l->nama_kota }}</span>
-                                </label>
-                            @endforeach
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Lokasi Pengiriman</h4>
+                        <div class="relative">
+                            <select name="lokasi" onchange="showApplyButton()" class="w-full bg-zinc-50 border border-zinc-200 text-zinc-700 text-sm font-bold rounded-xl px-4 py-3 appearance-none outline-none focus:border-blue-600 transition-colors cursor-pointer">
+                                <option value="">Seluruh Indonesia</option>
+                                @foreach($locations as $l)
+                                    <option value="{{ $l->city_id }}" {{ request('lokasi') == $l->city_id ? 'selected' : '' }}>
+                                        {{ $l->nama_kota }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-[10px] text-zinc-400"></i>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="w-full h-px bg-gray-200"></div>
 
                     {{-- FILTER: HARGA --}}
                     <div>
-                        <h4 class="font-bold text-gray-800 mb-3 text-sm">Rentang Harga</h4>
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="flex items-center bg-white border border-gray-300 rounded-md px-2 py-1.5 focus-within:border-brand-500 flex-1">
-                                <span class="text-gray-400 text-xs font-bold mr-1">Rp</span>
-                                <input type="number" name="harga_min" placeholder="MIN" value="{{ $filter_harga_min ?? '' }}" class="w-full border-none outline-none text-xs p-0" oninput="showApplyButton()">
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Rentang Harga</h4>
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center bg-white border border-zinc-200 rounded-xl px-3 py-2.5 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10 flex-1 transition-all">
+                                <span class="text-zinc-400 text-[10px] font-black mr-1">Rp</span>
+                                <input type="number" name="harga_min" placeholder="Min" value="{{ request('harga_min') }}" class="w-full border-none outline-none text-xs font-bold text-zinc-900 p-0 bg-transparent" oninput="showApplyButton()">
                             </div>
-                            <span class="text-gray-400 font-bold">-</span>
-                            <div class="flex items-center bg-white border border-gray-300 rounded-md px-2 py-1.5 focus-within:border-brand-500 flex-1">
-                                <span class="text-gray-400 text-xs font-bold mr-1">Rp</span>
-                                <input type="number" name="harga_max" placeholder="MAX" value="{{ $filter_harga_max ?? '' }}" class="w-full border-none outline-none text-xs p-0" oninput="showApplyButton()">
+                            <span class="text-zinc-300 font-black">-</span>
+                            <div class="flex items-center bg-white border border-zinc-200 rounded-xl px-3 py-2.5 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10 flex-1 transition-all">
+                                <span class="text-zinc-400 text-[10px] font-black mr-1">Rp</span>
+                                <input type="number" name="harga_max" placeholder="Max" value="{{ request('harga_max') }}" class="w-full border-none outline-none text-xs font-bold text-zinc-900 p-0 bg-transparent" oninput="showApplyButton()">
                             </div>
                         </div>
                     </div>
 
-                    {{-- Button Apply (Melayang di bawah) --}}
-                    <div id="btn-apply-wrapper" class="hidden lg:sticky bottom-0 left-0 w-full bg-white pt-3 pb-1 border-t border-gray-100 z-10 mt-auto">
-                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-md transition-colors text-sm">
-                            Terapkan
+                    {{-- Button Apply (Muncul dinamis) --}}
+                    <div id="btn-apply-wrapper" class="hidden lg:sticky bottom-0 left-0 w-full bg-white pt-4 pb-2 z-10 mt-auto">
+                        <button type="submit" class="w-full bg-zinc-950 hover:bg-blue-600 text-white font-black text-xs uppercase tracking-widest py-4 rounded-xl shadow-md transition-all hover:-translate-y-0.5">
+                            Terapkan Filter
                         </button>
                     </div>
 
-                    {{-- Button Apply khusus Mobile (Selalu muncul) --}}
-                    <div class="lg:hidden mt-auto pt-4">
-                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-4 rounded-lg shadow-md">
-                            Tampilkan Produk
+                    {{-- Button Apply Mobile --}}
+                    <div class="lg:hidden mt-auto pt-6">
+                        <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg">
+                            Tampilkan Hasil
                         </button>
                     </div>
-
                 </form>
             </div>
         </aside>
@@ -220,91 +295,97 @@
         {{-- ========================================================= --}}
         <main class="flex-1 w-full min-w-0">
 
-            {{-- HEADER HASIL PENCARIAN (Sorting & Info Box) --}}
-            <div class="bg-white rounded-xl shadow-card border border-gray-200 p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
-
-                {{-- Text Kiri --}}
-                <div class="text-sm text-gray-700">
-                    Menampilkan <span class="font-bold text-brand-600">{{ $products->count() }}</span> produk dari total <span class="font-bold">{{ $products->total() }}</span>
+            {{-- HEADER HASIL PENCARIAN (Sorting) --}}
+            <div class="bg-white rounded-[1.5rem] shadow-sm border border-zinc-100 p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                <div class="text-sm font-medium text-zinc-500 px-2">
+                    Menampilkan <span class="font-black text-zinc-900">{{ $products->count() }}</span> produk dari total <span class="font-black text-zinc-900">{{ $products->total() }}</span>
                 </div>
 
-                {{-- Aksi Kanan --}}
                 <div class="flex items-center gap-3 w-full sm:w-auto">
                     {{-- Button Filter HP --}}
-                    <button id="mobile-filter-btn" class="lg:hidden flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 shadow-sm">
-                        <i class="fas fa-filter text-sm"></i> Filter
+                    <button id="mobile-filter-btn" class="lg:hidden flex-1 flex items-center justify-center gap-2 bg-zinc-50 border border-zinc-200 text-zinc-800 font-bold text-xs uppercase tracking-widest py-3 px-4 rounded-xl hover:bg-zinc-100 shadow-sm transition-colors">
+                        <i class="fas fa-filter"></i> Filter
                     </button>
 
-                    {{-- Dropdown Sort (Tokped Style) --}}
-                    <div class="flex items-center gap-3 flex-1 sm:flex-none justify-end">
-                        <span class="text-sm font-semibold text-gray-700 hidden sm:block">Urutkan:</span>
-                        <div class="relative w-full sm:w-[180px]">
-                            <select class="appearance-none bg-white border border-gray-300 text-gray-700 py-2 pl-3 pr-8 rounded-lg text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 cursor-pointer w-full shadow-sm">
-                                <option>Paling Sesuai</option>
-                                <option>Terbaru</option>
-                                <option>Harga Terendah</option>
-                                <option>Harga Tertinggi</option>
+                    {{-- Dropdown Sort Standar Ikon --}}
+                    <div class="flex-1 sm:flex-none relative">
+                        <form action="{{ route('produk.index') }}" method="GET" id="sort-form">
+                            {{-- Bawa filter yang sudah ada --}}
+                            @foreach(request()->except('sort', 'page') as $key => $value)
+                                @if(is_array($value))
+                                    @foreach($value as $v) <input type="hidden" name="{{ $key }}[]" value="{{ $v }}"> @endforeach
+                                @else
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
+                            @endforeach
+
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-sort-amount-down text-zinc-400"></i>
+                            </div>
+                            <select name="sort" onchange="document.getElementById('sort-form').submit()" class="w-full bg-white border border-zinc-200 text-zinc-700 py-3 pl-11 pr-10 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer shadow-sm">
+                                <option value="terbaru" {{ request('sort') == 'terbaru' ? 'selected' : '' }}>Paling Baru</option>
+                                <option value="termurah" {{ request('sort') == 'termurah' ? 'selected' : '' }}>Harga Terendah</option>
+                                <option value="termahal" {{ request('sort') == 'termahal' ? 'selected' : '' }}>Harga Tertinggi</option>
                             </select>
-                            <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
-                        </div>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-[10px] text-zinc-400"></i>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            {{-- GRID PRODUK (Absolute Square Grid) --}}
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 relative z-0">
-
+            {{-- GRID PRODUK (1:1 Sempurna) --}}
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 relative z-0 mb-10">
                 @forelse($products as $b)
                     @php
                         $img = !empty($b->gambar_utama) ? 'assets/uploads/products/'.$b->gambar_utama : 'assets/uploads/products/default.jpg';
                     @endphp
-                    <a href="{{ route('produk.detail', $b->id) }}" class="bg-white rounded-lg shadow-card hover:shadow-card-hover transition-shadow duration-200 overflow-hidden flex flex-col group border border-transparent hover:border-brand-500 relative">
+                    <a href="{{ route('produk.detail', $b->id) }}" class="bg-white rounded-[1.5rem] shadow-sm hover:shadow-hover transition-all duration-300 overflow-hidden flex flex-col group border border-zinc-100 hover:border-blue-200 hover:-translate-y-1 relative">
 
-                        {{-- Gambar (Memaksa rasio 1:1 Sempurna) --}}
-                        <div class="w-full pt-[100%] relative bg-white border-b border-gray-100 overflow-hidden">
-                            <img src="{{ asset($img) }}" onerror="this.src='https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=400&auto=format&fit=crop'" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500 ease-in-out" alt="{{ $b->nama_barang }}">
+                        {{-- Gambar (Rasio 1:1) --}}
+                        <div class="w-full pt-[100%] relative bg-zinc-50 border-b border-zinc-50 overflow-hidden">
+                            <img src="{{ asset($img) }}" onerror="this.src='{{ asset('assets/uploads/products/default.jpg') }}'" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500 ease-out mix-blend-multiply p-2" alt="{{ $b->nama_barang }}">
                         </div>
 
                         {{-- Detail Informasi --}}
-                        <div class="p-3 flex flex-col flex-1">
-                            <h3 class="text-[13px] sm:text-sm font-normal text-gray-800 line-clamp-2 leading-[1.3] mb-1.5">{{ $b->nama_barang }}</h3>
+                        <div class="p-4 sm:p-5 flex flex-col flex-1">
+                            <h3 class="text-xs sm:text-sm font-bold text-zinc-800 line-clamp-2 leading-snug mb-2 group-hover:text-blue-600 transition-colors">{{ $b->nama_barang }}</h3>
 
                             <div class="mt-auto">
-                                <div class="text-[15px] sm:text-[17px] font-bold text-gray-900 leading-none mb-1.5">Rp{{ number_format($b->harga, 0, ',', '.') }}</div>
+                                <div class="text-base sm:text-lg font-black text-zinc-900 tracking-tight mb-2.5">Rp{{ number_format($b->harga, 0, ',', '.') }}</div>
 
-                                {{-- Lokasi --}}
-                                <div class="flex items-center text-[11px] text-gray-500 mt-1">
-                                    <i class="fas fa-crown text-purple-600 w-4 text-[10px]"></i>
-                                    <span class="truncate">{{ $b->nama_kota ?? 'Jakarta Pusat' }}</span>
-                                </div>
-
-                                {{-- Rating --}}
-                                <div class="flex items-center text-[10px] sm:text-[11px] text-gray-500 mt-2 pt-2 border-t border-gray-100">
-                                    <i class="fas fa-star text-yellow-400 mr-1 text-[10px]"></i>
-                                    <span class="font-semibold text-gray-700 mr-1">4.9</span>
-                                    <span class="mx-1 text-gray-300">|</span>
-                                    <span>100+ terjual</span>
+                                <div class="pt-3 border-t border-zinc-100/80 space-y-1.5">
+                                    <div class="flex items-center text-[10px] sm:text-xs font-semibold text-zinc-500">
+                                        <i class="fas fa-store text-blue-500 w-4"></i>
+                                        <span class="truncate">{{ $b->nama_toko }}</span>
+                                    </div>
+                                    <div class="flex items-center text-[10px] sm:text-xs font-semibold text-zinc-400">
+                                        <i class="fas fa-map-marker-alt text-red-400 w-4"></i>
+                                        <span class="truncate">{{ $b->nama_kota ?? 'Nasional' }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </a>
                 @empty
                     {{-- EMPTY STATE --}}
-                    <div class="col-span-full flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-200 shadow-sm mt-2">
-                        <img src="https://assets.tokopedia.net/assets-tokopedia-lite/v2/zeus/kratos/60454a86.png" alt="Empty" class="w-40 sm:w-48 mb-4 opacity-80">
-                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Pencarian Tidak Ditemukan</h3>
-                        <p class="text-gray-500 text-sm text-center max-w-sm mb-6 px-4">Coba gunakan kata kunci yang lebih umum atau kurangi filter untuk menemukan apa yang Anda cari.</p>
-                        <a href="{{ route('produk.index') }}" class="bg-white border-2 border-brand-600 text-brand-600 hover:bg-brand-50 font-bold py-2.5 px-6 rounded-lg transition-colors">
-                            Hapus Semua Filter
+                    <div class="col-span-full flex flex-col items-center justify-center py-24 bg-white rounded-[2rem] border border-zinc-100 shadow-sm mt-2">
+                        <div class="w-24 h-24 bg-zinc-50 rounded-[2rem] flex items-center justify-center text-4xl text-zinc-300 mb-6">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black text-zinc-900 mb-2">Material Tidak Ditemukan</h3>
+                        <p class="text-zinc-500 text-sm font-medium text-center max-w-sm mb-8 px-4">Maaf, material dengan kriteria filter tersebut tidak tersedia. Coba gunakan filter lain.</p>
+                        <a href="{{ route('produk.index') }}" class="bg-zinc-950 hover:bg-blue-600 text-white font-black py-3.5 px-8 rounded-xl transition-all shadow-md">
+                            Tampilkan Semua Material
                         </a>
                     </div>
                 @endforelse
-
             </div>
 
             {{-- PAGINASI --}}
             <div class="pagination-wrap">
-                {{ $products->links() }}
+                {{ $products->appends(request()->query())->links('pagination::tailwind') }}
             </div>
 
         </main>
@@ -313,9 +394,9 @@
     @include('partials.footer')
     <script src="{{ asset('assets/js/navbar.js') }}"></script>
 
-    {{-- LOGIKA INTERAKSI --}}
+    {{-- LOGIKA INTERAKSI (Termasuk Accordion & Mobile Sidebar) --}}
     <script>
-        // Memunculkan tombol terapkan jika filter disentuh
+        // 1. Munculkan Tombol "Terapkan" saat ada interaksi filter
         function showApplyButton() {
             const btnWrapper = document.getElementById('btn-apply-wrapper');
             if(btnWrapper) {
@@ -325,7 +406,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Sidebar Drawer Mobile
+            
+            // 2. Mobile Sidebar Logic
             const mobileFilterBtn = document.getElementById('mobile-filter-btn');
             const sidebarFilters = document.getElementById('sidebar-filters');
             const closeFilterBtn = document.getElementById('close-filter-btn');
@@ -349,28 +431,36 @@
             if (closeFilterBtn) closeFilterBtn.addEventListener('click', closeFilter);
             if (filterOverlay) filterOverlay.addEventListener('click', closeFilter);
 
-            // Tampilkan Kategori Lebih Banyak
-            const btnMoreCat = document.getElementById('btn-more-cat');
-            if(btnMoreCat) {
-                btnMoreCat.addEventListener('click', function() {
-                    const hiddenItems = document.querySelectorAll('.cat-item.hidden');
-                    const isExpanded = this.classList.contains('expanded');
+            // 3. LOGIKA ACCORDION KATEGORI (Hanya buka satu)
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            
+            // Auto-open accordion yang punya checkbox tercentang saat loading
+            document.querySelectorAll('.accordion-item').forEach(item => {
+                if (item.querySelector('input[type="checkbox"]:checked')) {
+                    item.querySelector('.accordion-content').classList.add('open');
+                    item.querySelector('.icon-arrow').classList.add('rotate-180');
+                }
+            });
 
-                    if (!isExpanded) {
-                        hiddenItems.forEach(item => { item.classList.remove('hidden'); item.classList.add('shown-by-btn'); });
-                        this.innerHTML = 'Sembunyikan <i class="fas fa-chevron-up ml-1"></i>';
-                        this.classList.add('expanded');
-                    } else {
-                        const shownItems = document.querySelectorAll('.cat-item.shown-by-btn');
-                        shownItems.forEach(item => {
-                            const checkbox = item.querySelector('input[type="checkbox"]');
-                            if(!checkbox.checked) { item.classList.add('hidden'); item.classList.remove('shown-by-btn'); }
-                        });
-                        this.innerHTML = 'Lihat Selengkapnya <i class="fas fa-chevron-down ml-1"></i>';
-                        this.classList.remove('expanded');
+            // Logika Klik
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const currentContent = this.nextElementSibling;
+                    const currentIcon = this.querySelector('.icon-arrow');
+                    const isOpen = currentContent.classList.contains('open');
+
+                    // Tutup SEMUA accordion dulu
+                    document.querySelectorAll('.accordion-content').forEach(content => content.classList.remove('open'));
+                    document.querySelectorAll('.icon-arrow').forEach(icon => icon.classList.remove('rotate-180'));
+
+                    // Jika yang diklik tadinya tertutup, buka dia
+                    if (!isOpen) {
+                        currentContent.classList.add('open');
+                        currentIcon.classList.add('rotate-180');
                     }
                 });
-            }
+            });
+
         });
     </script>
 </body>
