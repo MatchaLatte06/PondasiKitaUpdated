@@ -16,19 +16,19 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        
-        // 1. Ambil Data Toko
+
+        // 1. Ambil Data Toko (Aman)
         $toko = DB::table('tb_toko')->where('user_id', $user->id)->first();
 
         if (!$toko) {
-            return redirect()->route('seller.dashboard')->with('error', 'Data Toko tidak ditemukan.');
+            return redirect()->route('seller.dashboard')->with('error', 'Data Toko tidak ditemukan. Silakan lengkapi profil toko Anda terlebih dahulu.');
         }
 
         // 2. Query Produk
         $query = DB::table('tb_barang')->where('toko_id', $toko->id);
 
         // 3. Filter Pencarian
-        if ($request->has('search')) {
+        if ($request->has('search') && $request->search != '') {
             $query->where('nama_barang', 'like', '%' . $request->search . '%');
         }
 
@@ -46,10 +46,10 @@ class ProductController extends Controller
             }
         }
 
-        // 5. Pagination
-        $products = $query->orderByDesc('created_at')->paginate(10);
+        // 5. Pagination (Tetap pertahankan query string agar pencarian tidak reset)
+        $products = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
 
-        return view('seller.products.index', compact('products'));
+        return view('seller.products.index', compact('products', 'toko'));
     }
 
     /**
@@ -57,78 +57,97 @@ class ProductController extends Controller
      */
     public function create()
     {
-        // FIX: Ambil data kategori agar tidak error di view
         $categories = DB::table('tb_kategori')->orderBy('nama_kategori', 'ASC')->get();
-        
-        // Kirim 'product' sebagai null karena ini mode Tambah (bukan Edit)
+
         return view('seller.products.create', [
             'categories' => $categories,
-            'product' => null 
+            'product' => null
         ]);
     }
 
     /**
-     * Menyimpan Produk Baru
+     * Menyimpan Produk Baru (INTEGRASI AUTO-APPROVE ADMIN & VALIDASI KETAT)
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input yang sudah diperbaiki
+        // 1. Validasi Input Super Aman
         $request->validate([
-            'nama_barang' => 'required|string|min:5|max:255', // Diubah min 5
+            'nama_barang' => 'required|string|min:5|max:255',
             'kategori_id' => 'required|exists:tb_kategori,id',
             'harga'       => 'required|numeric|min:0',
             'stok'        => 'required|integer|min:0',
             'berat_kg'    => 'required|numeric|min:0.01',
-            // 'satuan_unit' dihapus dari required karena tidak ada di form
-            'deskripsi'   => 'required|string|min:20', // Diubah min 20
-            
-            // Perbaikan Validasi Array Gambar
-            'gambar'      => 'required|array', 
-            'gambar.*'    => 'image|mimes:jpeg,png,jpg|max:2048', 
-            
+            'deskripsi'   => 'required|string|min:20',
+            'gambar'      => 'required',
             'merk_barang' => 'nullable|string|max:100',
             'kode_barang' => 'nullable|string|max:50',
-            'tipe_diskon' => 'nullable|in:NOMINAL,PERSEN',
-            'nilai_diskon'=> 'nullable|numeric|min:0',
-            'diskon_mulai'=> 'nullable|date',
+
+            // PERBAIKAN: Jika ada tipe_diskon, nilai_diskon WAJIB diisi
+            'tipe_diskon'     => 'nullable|in:NOMINAL,PERSEN',
+            'nilai_diskon'    => 'required_with:tipe_diskon|nullable|numeric|min:0',
+            'diskon_mulai'    => 'nullable|date',
             'diskon_berakhir' => 'nullable|date|after_or_equal:diskon_mulai',
         ]);
 
-        // 2. Proses Upload Gambar (Ambil gambar pertama dari array)
+        // Proteksi Logika Diskon Persen (Maks 100%)
+        if ($request->tipe_diskon == 'PERSEN' && $request->nilai_diskon > 100) {
+            return back()->withInput()->with('error', 'Diskon persen tidak boleh lebih dari 100%.');
+        }
+
+        // PERBAIKAN: Pembersihan data diskon jika Seller tidak memilih tipe diskon
+        $tipeDiskon = $request->tipe_diskon;
+        $nilaiDiskon = $tipeDiskon ? $request->nilai_diskon : null;
+        $diskonMulai = $tipeDiskon ? $request->diskon_mulai : null;
+        $diskonBerakhir = $tipeDiskon ? $request->diskon_berakhir : null;
+
+        // 2. Proses Upload Gambar Fleksibel (Single/Array Filepond)
         $gambarName = 'default.jpg';
         if ($request->hasFile('gambar')) {
-            $file = $request->file('gambar')[0]; // Ambil file index ke-0
-            $gambarName = time() . '.' . $file->extension();
+            $fileData = $request->file('gambar');
+            $file = is_array($fileData) ? $fileData[0] : $fileData;
+
+            $gambarName = time() . '_' . uniqid() . '.' . $file->extension();
             $file->move(public_path('assets/uploads/products'), $gambarName);
         }
 
         // 3. Ambil ID Toko
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
 
-        // 4. Simpan ke Database
+        // 4. CEK REGULASI ADMIN (Auto Approve Product)
+        $autoApprove = DB::table('tb_pengaturan')->where('setting_nama', 'auto_approve_products')->value('setting_nilai');
+        $statusModerasi = ($autoApprove == '1') ? 'approved' : 'pending';
+
+        // 5. Simpan ke Database
         DB::table('tb_barang')->insert([
             'toko_id'         => $toko->id,
             'kategori_id'     => $request->kategori_id,
             'nama_barang'     => $request->nama_barang,
-            'merk_barang'     => $request->merk_barang, 
-            'kode_barang'     => $request->kode_barang, 
+            'merk_barang'     => $request->merk_barang,
+            'kode_barang'     => $request->kode_barang,
             'harga'           => $request->harga,
             'stok'            => $request->stok,
             'berat_kg'        => $request->berat_kg,
-            'satuan_unit'     => $request->satuan_unit ?? 'pcs', // Beri default pcs
+            'satuan_unit'     => $request->satuan_unit ?? 'pcs',
             'deskripsi'       => $request->deskripsi,
-            'tipe_diskon'     => $request->tipe_diskon,
-            'nilai_diskon'    => $request->nilai_diskon,
-            'diskon_mulai'    => $request->diskon_mulai,
-            'diskon_berakhir' => $request->diskon_berakhir,
+
+            // Masukkan diskon yang sudah divalidasi
+            'tipe_diskon'     => $tipeDiskon,
+            'nilai_diskon'    => $nilaiDiskon,
+            'diskon_mulai'    => $diskonMulai,
+            'diskon_berakhir' => $diskonBerakhir,
+
             'gambar_utama'    => $gambarName,
-            'status_moderasi' => 'pending',
+            'status_moderasi' => $statusModerasi,
             'is_active'       => 1,
             'created_at'      => now(),
             'updated_at'      => now()
         ]);
 
-        return redirect()->route('seller.products.index')->with('success', 'Produk berhasil ditambahkan.');
+        $pesan = ($statusModerasi == 'approved')
+                 ? 'Produk berhasil ditambahkan dan langsung tayang!'
+                 : 'Produk berhasil ditambahkan. Menunggu persetujuan Admin.';
+
+        return redirect()->route('seller.products.index')->with('success', $pesan);
     }
 
     /**
@@ -138,60 +157,70 @@ class ProductController extends Controller
     {
         $product = DB::table('tb_barang')->where('id', $id)->first();
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
-        
-        // Security Check: Pastikan produk milik toko user yang login
+
         if (!$product || $product->toko_id !== $toko->id) {
             abort(403, 'Anda tidak memiliki izin untuk mengedit produk ini.');
         }
 
         $categories = DB::table('tb_kategori')->orderBy('nama_kategori', 'ASC')->get();
 
-        // Gunakan view yang sama dengan create, tapi kirim data product
         return view('seller.products.create', compact('product', 'categories'));
     }
 
     /**
-     * Update Produk
+     * Update Produk (Aman & Tidak Merusak Gambar Lama)
      */
     public function update(Request $request, $id)
     {
-        // 1. Validasi (Gambar nullable/opsional saat update)
+        // 1. Validasi
         $request->validate([
-            'nama_barang' => 'required|string|min:25|max:255',
+            'nama_barang' => 'required|string|min:5|max:255',
             'kategori_id' => 'required|exists:tb_kategori,id',
             'harga'       => 'required|numeric|min:0',
             'stok'        => 'required|integer|min:0',
             'berat_kg'    => 'required|numeric|min:0.01',
-            'satuan_unit' => 'required|string',
-            'deskripsi'   => 'required|string|min:100',
-            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            
+            'satuan_unit' => 'nullable|string',
+            'deskripsi'   => 'required|string|min:20',
+            'gambar'      => 'nullable',
             'merk_barang' => 'nullable|string|max:100',
             'kode_barang' => 'nullable|string|max:50',
-            'tipe_diskon' => 'nullable|in:NOMINAL,PERSEN',
-            'nilai_diskon'=> 'nullable|numeric|min:0',
-            'diskon_mulai'=> 'nullable|date',
+
+            // PERBAIKAN: Jika ada tipe_diskon, nilai_diskon WAJIB diisi
+            'tipe_diskon'     => 'nullable|in:NOMINAL,PERSEN',
+            'nilai_diskon'    => 'required_with:tipe_diskon|nullable|numeric|min:0',
+            'diskon_mulai'    => 'nullable|date',
             'diskon_berakhir' => 'nullable|date|after_or_equal:diskon_mulai',
         ]);
+
+        if ($request->tipe_diskon == 'PERSEN' && $request->nilai_diskon > 100) {
+            return back()->withInput()->with('error', 'Diskon persen tidak boleh lebih dari 100%.');
+        }
 
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
         $existingProduct = DB::table('tb_barang')->where('id', $id)->where('toko_id', $toko->id)->first();
 
-        // Pastikan produk ada dan milik user
         if (!$existingProduct) { abort(404); }
+
+        // PERBAIKAN BUG GHOST DISCOUNT
+        $tipeDiskon = $request->tipe_diskon;
+        $nilaiDiskon = $tipeDiskon ? $request->nilai_diskon : null;
+        $diskonMulai = $tipeDiskon ? $request->diskon_mulai : null;
+        $diskonBerakhir = $tipeDiskon ? $request->diskon_berakhir : null;
 
         $gambarName = $existingProduct->gambar_utama;
 
-        // 2. Cek Upload Gambar Baru
+        // 2. Cek Upload Gambar Baru (Penghapusan File Aman)
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika bukan default
-            if ($gambarName && $gambarName != 'default.jpg' && file_exists(public_path('assets/uploads/products/' . $gambarName))) {
-                unlink(public_path('assets/uploads/products/' . $gambarName));
+            $oldImagePath = public_path('assets/uploads/products/' . $gambarName);
+            if ($gambarName && $gambarName != 'default.jpg' && File::exists($oldImagePath)) {
+                File::delete($oldImagePath);
             }
-            
-            // Upload gambar baru
-            $gambarName = time() . '.' . $request->gambar->extension();
-            $request->gambar->move(public_path('assets/uploads/products'), $gambarName);
+
+            $fileData = $request->file('gambar');
+            $file = is_array($fileData) ? $fileData[0] : $fileData;
+
+            $gambarName = time() . '_' . uniqid() . '.' . $file->extension();
+            $file->move(public_path('assets/uploads/products'), $gambarName);
         }
 
         // 3. Update Database
@@ -203,56 +232,61 @@ class ProductController extends Controller
             'harga'           => $request->harga,
             'stok'            => $request->stok,
             'berat_kg'        => $request->berat_kg,
-            'satuan_unit'     => $request->satuan_unit,
+            'satuan_unit'     => $request->satuan_unit ?? 'pcs',
             'deskripsi'       => $request->deskripsi,
-            
-            'tipe_diskon'     => $request->tipe_diskon,
-            'nilai_diskon'    => $request->nilai_diskon,
-            'diskon_mulai'    => $request->diskon_mulai,
-            'diskon_berakhir' => $request->diskon_berakhir,
-            
+
+            // Update dengan data diskon yang sudah bersih
+            'tipe_diskon'     => $tipeDiskon,
+            'nilai_diskon'    => $nilaiDiskon,
+            'diskon_mulai'    => $diskonMulai,
+            'diskon_berakhir' => $diskonBerakhir,
+
             'gambar_utama'    => $gambarName,
             'updated_at'      => now()
         ]);
 
-        return redirect()->route('seller.products.index')->with('success', 'Produk berhasil diperbarui.');
+        return redirect()->route('seller.products.index')->with('success', 'Informasi produk berhasil diperbarui.');
     }
 
     /**
-     * Hapus Produk
+     * Hapus Produk secara Aman (Mencegah Ghost Data)
      */
     public function destroy($id)
     {
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
-        
         $product = DB::table('tb_barang')->where('id', $id)->where('toko_id', $toko->id)->first();
-        
+
         if ($product) {
-            // Hapus file gambar fisik
-            if ($product->gambar_utama && $product->gambar_utama != 'default.jpg' && file_exists(public_path('assets/uploads/products/' . $product->gambar_utama))) {
-                unlink(public_path('assets/uploads/products/' . $product->gambar_utama));
+            $imagePath = public_path('assets/uploads/products/' . $product->gambar_utama);
+            if ($product->gambar_utama && $product->gambar_utama != 'default.jpg' && File::exists($imagePath)) {
+                File::delete($imagePath);
             }
 
-            // Hapus record database
             DB::table('tb_barang')->where('id', $id)->delete();
-            return redirect()->route('seller.products.index')->with('success', 'Produk berhasil dihapus.');
+            return redirect()->route('seller.products.index')->with('success', 'Produk berhasil dihapus permanen.');
         }
 
-        return redirect()->route('seller.products.index')->with('error', 'Produk tidak ditemukan.');
+        return redirect()->route('seller.products.index')->with('error', 'Produk gagal dihapus atau tidak ditemukan.');
     }
-    
+
     /**
-     * Toggle Status (Aktif/Nonaktif) via AJAX
+     * Toggle Status (Aktif/Nonaktif) via AJAX Switch
      */
     public function toggleStatus(Request $request)
     {
+        // PERBAIKAN: Tambah Validasi AJAX agar aman dari manipulasi inspect element
+        $request->validate([
+            'product_id' => 'required|integer',
+            'is_active'  => 'required|boolean',
+        ]);
+
         $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
-        
+
         $updated = DB::table('tb_barang')
             ->where('id', $request->product_id)
-            ->where('toko_id', $toko->id)
-            ->update(['is_active' => $request->is_active]);
+            ->where('toko_id', $toko->id) // Memastikan hanya produk toko dia yang bisa diubah
+            ->update(['is_active' => $request->is_active, 'updated_at' => now()]);
 
-        return response()->json(['success' => $updated]);
+        return response()->json(['success' => (bool)$updated]);
     }
 }

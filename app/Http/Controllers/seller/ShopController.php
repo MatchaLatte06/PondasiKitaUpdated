@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -12,19 +13,31 @@ use Illuminate\Support\Str;
 class ShopController extends Controller
 {
     /**
+     * Helper untuk selalu mendapatkan toko yang valid
+     */
+    private function getToko()
+    {
+        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
+        if (!$toko) {
+            abort(403, 'Akses Ditolak: Anda belum memiliki data Toko.');
+        }
+        return $toko;
+    }
+
+    /**
      * ==========================================
      * 1. MANAJEMEN PROFIL TOKO
      * ==========================================
      */
     public function profile()
     {
-        $toko = Auth::user()->toko;
+        $toko = $this->getToko();
         return view('seller.shop.profile', compact('toko'));
     }
 
     public function updateProfile(Request $request)
     {
-        $toko = Auth::user()->toko;
+        $toko = $this->getToko();
 
         // Validasi Super Ketat
         $request->validate([
@@ -39,37 +52,49 @@ class ShopController extends Controller
             'banner_toko'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
-        $data = $request->except(['logo_toko', 'banner_toko']);
+        // Siapkan data dasar untuk diupdate
+        $dataUpdate = [
+            'nama_toko'      => $request->nama_toko,
+            'slogan'         => $request->slogan,
+            'deskripsi'      => $request->deskripsi,
+            'no_telepon'     => $request->no_telepon,
+            'alamat_lengkap' => $request->alamat_lengkap,
+            'kota'           => $request->kota,
+            'kode_pos'       => $request->kode_pos,
+            'updated_at'     => now()
+        ];
 
-        // Handle Logo Baru + Hapus yang Lama
+        // Handle Logo Baru + Hapus yang Lama (Secure Delete)
         if ($request->hasFile('logo_toko')) {
             $logo = $request->file('logo_toko');
             $logoName = 'logo_' . Str::random(10) . '.' . $logo->getClientOriginalExtension();
 
-            if ($toko->logo_toko) {
+            if (!empty($toko->logo_toko)) {
                 $oldPath = public_path('assets/uploads/logos/' . $toko->logo_toko);
-                if (File::exists($oldPath)) File::delete($oldPath);
+                if (File::exists($oldPath)) { File::delete($oldPath); }
             }
 
             $logo->move(public_path('assets/uploads/logos'), $logoName);
-            $data['logo_toko'] = $logoName;
+            $dataUpdate['logo_toko'] = $logoName;
         }
 
-        // Handle Banner Baru + Hapus yang Lama
+        // Handle Banner Baru + Hapus yang Lama (Secure Delete)
         if ($request->hasFile('banner_toko')) {
             $banner = $request->file('banner_toko');
             $bannerName = 'banner_' . Str::random(10) . '.' . $banner->getClientOriginalExtension();
 
-            if ($toko->banner_toko) {
+            if (!empty($toko->banner_toko)) {
                 $oldBannerPath = public_path('assets/uploads/banners/' . $toko->banner_toko);
-                if (File::exists($oldBannerPath)) File::delete($oldBannerPath);
+                if (File::exists($oldBannerPath)) { File::delete($oldBannerPath); }
             }
 
             $banner->move(public_path('assets/uploads/banners'), $bannerName);
-            $data['banner_toko'] = $bannerName;
+            $dataUpdate['banner_toko'] = $bannerName;
         }
 
-        $toko->update($data);
+        // Update menggunakan Query Builder
+        DB::table('tb_toko')->where('id', $toko->id)->update($dataUpdate);
+
         return redirect()->back()->with('success', 'Profil Toko berhasil diperbarui!');
     }
 
@@ -81,7 +106,7 @@ class ShopController extends Controller
     public function settings()
     {
         $user = Auth::user();
-        $toko = $user->toko;
+        $toko = $this->getToko();
 
         $notif = json_decode($toko->notifikasi_settings ?? '{}', true) ?: [
             'email_pesanan' => true,
@@ -95,24 +120,29 @@ class ShopController extends Controller
     public function updateSettings(Request $request)
     {
         $user = Auth::user();
-        $toko = $user->toko;
+        $toko = $this->getToko();
 
-        // Tab Keamanan (Ganti Password)
+        // TAB KEAMANAN: Ganti Password
         if ($request->has('form_type') && $request->form_type == 'security') {
             $request->validate([
                 'current_password' => 'required',
                 'new_password'     => 'required|min:8|confirmed',
             ]);
 
+            // Cek Password Lama
             if (!Hash::check($request->current_password, $user->password)) {
                 return redirect()->back()->with('error', 'Password saat ini salah!');
             }
 
-            $user->update(['password' => Hash::make($request->new_password)]);
+            // Update Password Baru
+            DB::table('tb_user')
+                ->where('id', $user->id)
+                ->update(['password' => Hash::make($request->new_password)]);
+
             return redirect()->back()->with('success', 'Password berhasil diperbarui!');
         }
 
-        // Tab Pengaturan Umum & Notifikasi
+        // TAB PENGATURAN UMUM: Status Libur & Notifikasi
         if ($request->has('form_type') && $request->form_type == 'general') {
             $isVacation = $request->has('status_libur') ? 1 : 0;
 
@@ -122,10 +152,11 @@ class ShopController extends Controller
                 'push_chat'     => $request->has('notif_push_chat'),
             ]);
 
-            $toko->update([
+            DB::table('tb_toko')->where('id', $toko->id)->update([
                 'status_libur'        => $isVacation,
                 'pesan_otomatis'      => $request->pesan_otomatis,
                 'notifikasi_settings' => $notifSettings,
+                'updated_at'          => now()
             ]);
 
             return redirect()->back()->with('success', 'Pengaturan toko berhasil disimpan!');
@@ -143,7 +174,7 @@ class ShopController extends Controller
     // Halaman Landing Dekorasi (Pilih Mobile/Desktop)
     public function decoration()
     {
-        $toko = Auth::user()->toko;
+        $toko = $this->getToko();
 
         $defaultLayout = [
             ['id' => 'banner_promo', 'type' => 'banner', 'title' => 'Banner Promo Utama', 'image' => null],
@@ -151,7 +182,8 @@ class ShopController extends Controller
             ['id' => 'produk_terlaris', 'type' => 'produk', 'title' => 'Produk Terlaris', 'items' => []]
         ];
 
-        $layoutData = empty($toko->layout_data) ? $defaultLayout : $toko->layout_data;
+        // Mencegah error null pointer jika layout belum ada
+        $layoutData = empty($toko->layout_data) ? $defaultLayout : json_decode($toko->layout_data, true);
 
         return view('seller.shop.decoration', compact('toko', 'layoutData'));
     }
@@ -159,26 +191,26 @@ class ShopController extends Controller
     // Halaman Pemilihan Template
     public function templateSelection()
     {
-        $toko = Auth::user()->toko;
+        $toko = $this->getToko();
         return view('seller.shop.template-selection', compact('toko'));
     }
 
-    // Halaman Editor Drag & Drop
+    // Halaman Editor Drag & Drop (Mobile)
     public function editor()
     {
-        $toko = Auth::user()->toko;
+        $toko = $this->getToko();
         return view('seller.shop.editor', compact('toko'));
     }
 
-    // HALAMAN EDITOR DESKTOP KITA
+    // Halaman Editor Desktop KITA
     public function editorDesktop()
     {
-        $toko = auth()->user()->toko; 
+        $toko = $this->getToko();
         return view('seller.shop.editor-desktop', compact('toko'));
     }
 
     /**
-     * Update susunan dekorasi via AJAX (VERSI LAMA)
+     * Update susunan dekorasi via AJAX (Mobile / Versi Lama)
      */
     public function updateDecoration(Request $request)
     {
@@ -186,33 +218,35 @@ class ShopController extends Controller
             'layout_data' => 'required|array'
         ]);
 
-        $toko = Auth::user()->toko;
-        $toko->update([
-            'layout_data' => $request->layout_data
+        $toko = $this->getToko();
+
+        DB::table('tb_toko')->where('id', $toko->id)->update([
+            'layout_data' => json_encode($request->layout_data),
+            'updated_at'  => now()
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Dekorasi toko berhasil disimpan!'
         ]);
     }
 
     /**
-     * ==========================================
      * FUNGSI SAKTI PENYIMPANAN DESKTOP EDITOR
-     * ==========================================
      */
     public function saveDecoration(Request $request)
     {
-        $toko = Auth::user()->toko;
-        
+        $toko = DB::table('tb_toko')->where('user_id', Auth::id())->first();
+
         if (!$toko) {
             return response()->json(['success' => false, 'message' => 'Toko tidak ditemukan.']);
         }
 
-        // Simpan JSON payload mentah-mentah ke kolom dekorasi_desktop
-        $toko->dekorasi_desktop = json_encode($request->all());
-        $toko->save();
+        // Pastikan menyimpan sebagai raw string (karena JSON Payload)
+        DB::table('tb_toko')->where('id', $toko->id)->update([
+            'dekorasi_desktop' => json_encode($request->all()),
+            'updated_at'       => now()
+        ]);
 
         return response()->json(['success' => true, 'message' => 'Dekorasi berhasil ditayangkan!']);
     }
