@@ -89,9 +89,9 @@
     <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
         <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 p-1.5 rounded-xl shadow-inner dark:shadow-none w-full sm:w-auto">
             <i class="mdi mdi-calendar-range text-slate-400 dark:text-slate-500 ml-2 text-lg"></i>
-            <input type="date" name="start_date" value="{{ $start_date }}" required class="bg-transparent border-none text-xs font-black text-slate-700 dark:text-slate-200 outline-none cursor-pointer focus:ring-0 p-1">
+            <input type="date" name="start_date" value="{{ $start_date ?? \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d') }}" required class="bg-transparent border-none text-xs font-black text-slate-700 dark:text-slate-200 outline-none cursor-pointer focus:ring-0 p-1">
             <span class="text-[10px] font-bold text-slate-400 uppercase">s/d</span>
-            <input type="date" name="end_date" value="{{ $end_date }}" required class="bg-transparent border-none text-xs font-black text-slate-700 dark:text-slate-200 outline-none cursor-pointer focus:ring-0 p-1">
+            <input type="date" name="end_date" value="{{ $end_date ?? \Carbon\Carbon::now()->format('Y-m-d') }}" required class="bg-transparent border-none text-xs font-black text-slate-700 dark:text-slate-200 outline-none cursor-pointer focus:ring-0 p-1">
         </div>
         <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md shadow-blue-600/20 transition-all outline-none w-full sm:w-auto flex items-center justify-center gap-2">
             <i class="mdi mdi-filter-variant text-base"></i> Terapkan
@@ -118,7 +118,7 @@
         </div>
         <div class="relative z-10">
             <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 mt-1">Gross Merchandise Value</div>
-            <div class="text-3xl font-black text-slate-800 dark:text-white leading-none mb-4 font-mono tracking-tight transition-colors duration-300">Rp {{ number_format($stats['gmv'], 0, ',', '.') }}</div>
+            <div class="text-3xl font-black text-slate-800 dark:text-white leading-none mb-4 font-mono tracking-tight transition-colors duration-300">Rp {{ number_format($stats['gmv'] ?? 0, 0, ',', '.') }}</div>
             <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 rounded-lg text-[10px] font-bold text-blue-600 dark:text-blue-400 transition-colors">
                 <i class="mdi mdi-trending-up"></i> Total omzet kotor
             </div>
@@ -132,7 +132,7 @@
         </div>
         <div class="relative z-10">
             <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 mt-1">Biaya Midtrans (Gateway)</div>
-            <div class="text-3xl font-black text-rose-600 dark:text-rose-400 leading-none mb-4 font-mono tracking-tight transition-colors duration-300">- Rp {{ number_format($stats['midtrans_costs'], 0, ',', '.') }}</div>
+            <div class="text-3xl font-black text-rose-600 dark:text-rose-400 leading-none mb-4 font-mono tracking-tight transition-colors duration-300">- Rp {{ number_format($stats['midtrans_costs'] ?? 0, 0, ',', '.') }}</div>
             <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 rounded-lg text-[10px] font-bold text-rose-600 dark:text-rose-400 transition-colors">
                 <i class="mdi mdi-alert-circle-outline"></i> Potongan otomatis
             </div>
@@ -147,7 +147,7 @@
         </div>
         <div class="relative z-10">
             <div class="text-[10px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-1 mt-1">Laba Bersih Platform</div>
-            <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400 leading-none mb-4 font-mono tracking-tight transition-colors duration-300">Rp {{ number_format($stats['revenue'], 0, ',', '.') }}</div>
+            <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400 leading-none mb-4 font-mono tracking-tight transition-colors duration-300">Rp {{ number_format($stats['revenue'] ?? 0, 0, ',', '.') }}</div>
             <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm shadow-emerald-500/20 transition-colors">
                 <i class="mdi mdi-shield-check"></i> Pendapatan Admin
             </div>
@@ -161,7 +161,7 @@
         </div>
         <div class="relative z-10">
             <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 mt-1">Avg. Order Value</div>
-            <div class="text-3xl font-black text-slate-800 dark:text-white leading-none mb-4 font-mono tracking-tight transition-colors duration-300">Rp {{ number_format($stats['aov'], 0, ',', '.') }}</div>
+            <div class="text-3xl font-black text-slate-800 dark:text-white leading-none mb-4 font-mono tracking-tight transition-colors duration-300">Rp {{ number_format($stats['aov'] ?? 0, 0, ',', '.') }}</div>
             <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 rounded-lg text-[10px] font-bold text-slate-500 dark:text-slate-400 transition-colors">
                 <i class="mdi mdi-chart-bubble"></i> Rata-rata per transaksi
             </div>
@@ -180,6 +180,7 @@
         </button>
     </div>
     <div class="w-full h-[380px] relative">
+        {{-- ID INI HARUS SAMA DENGAN SCRIPT (salesChart) --}}
         <canvas id="salesChart"></canvas>
     </div>
 </div>
@@ -220,11 +221,22 @@
                     </td>
                     <td class="px-6 py-5 align-middle">
                         @php
-                            $st = strtolower($trx->status_pembayaran);
-                            $badgeCls = ($st == 'paid' || $st == 'dp_paid') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' :
-                                      'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20';
-                            $icon = ($st == 'paid' || $st == 'dp_paid') ? 'mdi-check-circle' : 'mdi-clock-outline';
-                            $label = $st == 'paid' ? 'LUNAS' : ($st == 'dp_paid' ? 'DP LUNAS' : strtoupper($st));
+                            // PERBAIKAN BUG LOGIKA BADGE: Merah untuk batal/gagal, Hijau untuk Lunas
+                            $st = strtolower($trx->status_pembayaran ?? 'pending');
+
+                            if ($st == 'paid' || $st == 'dp_paid') {
+                                $badgeCls = 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20';
+                                $icon = 'mdi-check-circle';
+                                $label = $st == 'paid' ? 'LUNAS' : 'DP LUNAS';
+                            } elseif (in_array($st, ['failed', 'expired', 'cancelled', 'batal'])) {
+                                $badgeCls = 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20';
+                                $icon = 'mdi-close-circle';
+                                $label = strtoupper($st);
+                            } else {
+                                $badgeCls = 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20';
+                                $icon = 'mdi-clock-outline';
+                                $label = strtoupper($st);
+                            }
                         @endphp
                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border {{ $badgeCls }}">
                             <i class="mdi {{ $icon }} text-sm leading-none"></i> {{ $label }}
@@ -247,7 +259,8 @@
     </div>
     <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-center transition-colors">
         <div class="pagination-wrapper">
-            {{ $recent_transactions->links('pagination::bootstrap-5') }}
+            {{-- PERBAIKAN BUG: Appends agar filter tanggal dan pencarian tidak hilang saat klik halaman 2, 3 dst --}}
+            {{ $recent_transactions->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>
@@ -257,15 +270,16 @@
 @push('scripts')
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const canvas = document.getElementById('mainChart');
-    if(!canvas) return; // Fallback jika ID canvas diganti di framework
+    // PERBAIKAN BUG ID: Gunakan ID canvas yang benar (salesChart)
+    const canvas = document.getElementById('salesChart');
+    if(!canvas) return;
 
-    const ctx = document.getElementById('salesChart').getContext('2d');
+    const ctx = canvas.getContext('2d');
     let chartInstance = null;
 
-    // Data Placeholder dari Controller
-    const labels = {!! json_encode($chart_labels) !!};
-    const values = {!! json_encode($chart_values) !!};
+    // Pastikan variabel memiliki fallback array kosong jika tidak ada
+    const labels = {!! json_encode($chart_labels ?? []) !!};
+    const values = {!! json_encode($chart_values ?? []) !!};
 
     function renderChart() {
         const isDark = document.documentElement.classList.contains('dark');
@@ -278,7 +292,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const tooltipBorder = isDark ? 'rgba(51, 65, 85, 0.5)' : '#e2e8f0';
 
         let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, isDark ? 'rgba(99, 102, 241, 0.4)' : 'rgba(79, 70, 229, 0.2)'); // Indigo
+        gradient.addColorStop(0, isDark ? 'rgba(99, 102, 241, 0.4)' : 'rgba(79, 70, 229, 0.2)');
         gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
 
         if(chartInstance) chartInstance.destroy();
@@ -290,7 +304,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 datasets: [{
                     label: 'Total GMV',
                     data: values,
-                    borderColor: isDark ? '#6366f1' : '#4f46e5', // Indigo-500 / Indigo-600
+                    borderColor: isDark ? '#6366f1' : '#4f46e5',
                     backgroundColor: gradient,
                     borderWidth: 3,
                     pointBackgroundColor: isDark ? '#0f172a' : '#ffffff',

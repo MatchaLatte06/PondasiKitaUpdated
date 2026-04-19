@@ -34,7 +34,7 @@
     .img-preview-box { position: relative; width: 100%; border: 2px dashed #cbd5e1; border-radius: 1rem; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #f8fafc; cursor: pointer; transition: all 0.3s; }
     .img-preview-box:hover { border-color: #3b82f6; background: #eff6ff; }
     .img-preview-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; display: none; }
-    
+
     /* Custom Tab Styles */
     .tab-content > .tab-pane { display: none; }
     .tab-content > .active { display: block; animation: fade-in 0.4s ease-out; }
@@ -135,7 +135,6 @@
                         ['id' => 'general', 'icon' => 'mdi-store-cog-outline', 'label' => 'Identitas & Umum'],
                         ['id' => 'frontend', 'icon' => 'mdi-monitor-dashboard', 'label' => 'Tampilan Website'],
                         ['id' => 'finance', 'icon' => 'mdi-cash-multiple', 'label' => 'Keuangan & Biaya'],
-                        ['id' => 'logistic', 'icon' => 'mdi-truck-delivery-outline', 'label' => 'Logistik & Wilayah'],
                         ['id' => 'api', 'icon' => 'mdi-code-json', 'label' => 'API & Integrasi'],
                         ['id' => 'catalog', 'icon' => 'mdi-shape-outline', 'label' => 'Aturan Katalog']
                     ];
@@ -225,7 +224,7 @@
                                 $imgKey = 'hero_image_' . $i;
                                 $titleKey = 'hero_title_' . $i;
                                 $descKey = 'hero_subtitle_' . $i;
-                                
+
                                 // LOGIKA BARU ANTI-ERROR: Siapkan URL gambar jika ada
                                 $imgSrc = !empty($settings[$imgKey]) ? asset('storage/' . $settings[$imgKey]) : '';
                             @endphp
@@ -238,19 +237,19 @@
 
                                 {{-- Preview Box yang Menghilangkan Gambar Rusak Menggunakan onerror HTML --}}
                                 <label for="{{ $imgKey }}Input" class="img-preview-box aspect-[21/9] md:aspect-[3/1] mb-4 border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-400 rounded-xl overflow-hidden relative flex items-center justify-center cursor-pointer bg-white dark:bg-slate-900 transition-colors">
-                                    
+
                                     {{-- Elemen Upload Standby (Akan disembunyikan jika gambar berhasil dimuat) --}}
                                     <div id="{{ $imgKey }}Placeholder" class="text-center z-20 p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-colors" style="{{ $imgSrc ? 'display: none;' : 'display: block;' }}">
                                         <i class="mdi mdi-cloud-upload-outline text-2xl text-blue-500 mb-1"></i>
                                         <p class="text-[10px] font-black text-slate-700 dark:text-slate-300 m-0 uppercase tracking-widest">Upload Slide {{ $i }}</p>
                                     </div>
-                                    
+
                                     {{-- Tag Image dengan fallback onerror yang kebal error --}}
-                                    <img id="{{ $imgKey }}Preview" src="{{ $imgSrc }}" 
-                                         style="{{ $imgSrc ? 'display: block;' : 'display: none;' }}" 
+                                    <img id="{{ $imgKey }}Preview" src="{{ $imgSrc }}"
+                                         style="{{ $imgSrc ? 'display: block;' : 'display: none;' }}"
                                          onerror="this.style.display='none'; document.getElementById('{{ $imgKey }}Placeholder').style.display='block';"
                                          class="absolute inset-0 w-full h-full object-cover z-10">
-                                         
+
                                 </label>
 
                                 <div class="space-y-3">
@@ -295,15 +294,15 @@
                                 $popupSrc = !empty($settings['popup_image']) ? asset('storage/' . $settings['popup_image']) : '';
                             @endphp
                             <label for="popupImageInput" class="img-preview-box aspect-[3/4] max-w-xs mx-auto md:mx-0 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 rounded-xl overflow-hidden relative flex items-center justify-center cursor-pointer bg-white dark:bg-slate-900 transition-colors">
-                                
+
                                 <div id="popupPlaceholder" class="text-center z-20 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm m-4 transition-colors" style="{{ $popupSrc ? 'display: none;' : 'display: block;' }}">
                                     <i class="mdi mdi-image-plus text-3xl text-amber-500 mb-1"></i>
                                     <p class="text-xs font-black text-slate-700 dark:text-slate-300 m-0">Upload Poster</p>
                                     <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 m-0 mt-1">Potret (600x800px)</p>
                                 </div>
-                                
-                                <img id="popupPreview" src="{{ $popupSrc }}" 
-                                     style="{{ $popupSrc ? 'display: block;' : 'display: none;' }}" 
+
+                                <img id="popupPreview" src="{{ $popupSrc }}"
+                                     style="{{ $popupSrc ? 'display: block;' : 'display: none;' }}"
                                      onerror="this.style.display='none'; document.getElementById('popupPlaceholder').style.display='block';"
                                      class="absolute inset-0 w-full h-full object-cover z-10">
                             </label>
@@ -361,7 +360,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             {{-- 3. PANEL: KEUANGAN & BIAYA --}}
@@ -507,65 +505,7 @@
 
             </div>
 
-            {{-- 4. PANEL: LOGISTIK --}}
-            <div class="tab-pane fade" id="panel-logistic" role="tabpanel">
-                {{-- SINKRONISASI KOMERCE --}}
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-500/30 rounded-3xl p-6 lg:p-8 shadow-sm transition-colors duration-300 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div>
-                        <h3 class="text-xl font-black text-blue-800 dark:text-blue-300 m-0 flex items-center gap-2"><i class="mdi mdi-database-sync text-blue-600 dark:text-blue-400"></i> Sinkronisasi Geografi Logistik</h3>
-                        <p class="text-xs font-bold text-blue-600/70 dark:text-blue-300/70 mt-2 mb-0 leading-relaxed max-w-xl">
-                            Tarik dan perbarui data master Wilayah, Provinsi, Kabupaten, dan Kecamatan terbaru dari database ekspedisi Komerce/RajaOngkir.
-                        </p>
-                        <div class="mt-4 flex items-center gap-2">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/60 dark:bg-slate-900/50 rounded-lg text-[10px] font-black text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30">
-                                <i class="mdi mdi-history"></i> Terakhir ditarik: {{ $settings['rajaongkir_last_sync'] ?? 'Belum pernah' }}
-                            </span>
-                        </div>
-                    </div>
-                    <button type="submit" form="syncForm" class="w-full md:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-black rounded-xl shadow-lg shadow-blue-600/30 transition-all outline-none flex items-center justify-center gap-2 flex-shrink-0">
-                        <i class="mdi mdi-sync"></i> SINKRONKAN
-                    </button>
-                </div>
-
-                {{-- KURIR AKTIF --}}
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
-                    <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-truck-check-outline text-emerald-500"></i> Kurir Aktif Platform (API)</h3>
-                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Centang ekspedisi pengiriman nasional yang diizinkan beroperasi di platform ini.</p>
-                    </div>
-
-                    @php
-                        $active_couriers = json_decode($settings['rajaongkir_active_couriers'] ?? '[]', true);
-                        if (!is_array($active_couriers)) $active_couriers = [];
-                    @endphp
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        @if(isset($couriers))
-                            @foreach($couriers as $code => $name)
-                                <label class="relative flex items-center justify-center p-4 border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 rounded-xl cursor-pointer transition-colors w-full m-0" style="--checked-border: #3b82f6; --checked-bg: #eff6ff; --checked-text: #1d4ed8;">
-                                    <input type="checkbox" name="couriers[]" value="{{ $code }}" class="tier-radio hidden" {{ in_array($code, $active_couriers) ? 'checked' : '' }}>
-                                    <div class="flex items-center gap-3 w-full">
-                                        <div class="w-5 h-5 rounded border border-slate-300 dark:border-slate-600 flex items-center justify-center check-icon-wrapper transition-colors">
-                                            <i class="mdi mdi-check text-white text-sm opacity-0 transition-opacity check-mark"></i>
-                                        </div>
-                                        <span class="text-sm font-black text-slate-700 dark:text-slate-300">{{ $name }}</span>
-                                    </div>
-                                </label>
-                            @endforeach
-                            <style>
-                                .tier-radio:checked + div .check-icon-wrapper { background-color: #3b82f6; border-color: #3b82f6; }
-                                .tier-radio:checked + div .check-mark { opacity: 1; }
-                                .dark .tier-radio:checked + div { background-color: transparent !important; }
-                                .dark .tier-radio:checked[name="couriers[]"] + div .text-slate-700 { color: #60a5fa !important; }
-                            </style>
-                        @else
-                            <div class="col-span-full text-slate-500 dark:text-slate-400 text-sm">Data Kurir Belum Tersedia.</div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            {{-- 5. PANEL: API & INTEGRASI --}}
+            {{-- 4. PANEL: API & INTEGRASI --}}
             <div class="tab-pane fade" id="panel-api" role="tabpanel">
 
                 {{-- MIDTRANS --}}
@@ -616,12 +556,12 @@
 
             </div>
 
-            {{-- 6. PANEL: ATURAN KATALOG --}}
+            {{-- 5. PANEL: ATURAN KATALOG --}}
             <div class="tab-pane fade" id="panel-catalog" role="tabpanel">
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-8 shadow-sm transition-colors duration-300">
                     <div class="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
                         <h3 class="text-xl font-black text-slate-800 dark:text-white m-0 flex items-center gap-2"><i class="mdi mdi-security text-emerald-500"></i> Aturan Toko & Moderasi</h3>
-                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Tetapkan tingkat keketatan filter platform.</p>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 mb-0">Tetapkan tingkat keketatan filter platform. Apakah seller dapat langsung berjualan atau harus menunggu izin Anda.</p>
                     </div>
 
                     <div class="flex justify-between items-center p-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl mb-4 transition-colors duration-300">
@@ -653,11 +593,6 @@
     </div>
 </form>
 
-{{-- FORM TERPISAH UNTUK SYNC KOMERCE --}}
-<form id="syncForm" action="{{ route('admin.settings.syncKomerce') }}" method="POST" class="hidden">
-    @csrf
-</form>
-
 {{-- STICKY BOTTOM ACTION BAR --}}
 <div class="save-bar bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 lg:p-5 flex justify-end shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] transition-colors duration-300">
     <button type="submit" form="mainSettingsForm" class="flex items-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-black rounded-xl shadow-lg shadow-blue-600/30 hover:-translate-y-1 transition-all outline-none w-full sm:w-auto justify-center">
@@ -665,9 +600,7 @@
     </button>
 </div>
 
-{{-- ============================================================================== --}}
-{{-- MODAL INFO KLIK (MENDUKUNG DARK MODE BOOTSTRAP)                                --}}
-{{-- ============================================================================== --}}
+{{-- MODAL INFO KLIK --}}
 <div class="modal fade" id="infoTierModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-[2rem] border-0 shadow-2xl overflow-hidden transition-colors duration-300">
@@ -695,23 +628,23 @@
     function previewImage(input, previewElementId, placeholderId) {
         const previewEl = document.getElementById(previewElementId);
         const placeholderEl = document.getElementById(placeholderId);
-        
+
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 if(previewEl) {
                     previewEl.src = e.target.result;
-                    previewEl.style.display = 'block'; 
+                    previewEl.style.display = 'block';
                 }
                 if(placeholderEl) {
-                    placeholderEl.style.display = 'none'; 
+                    placeholderEl.style.display = 'none';
                 }
             }
             reader.readAsDataURL(input.files[0]);
         } else {
             if(previewEl) {
                 previewEl.src = '';
-                previewEl.style.display = 'none'; 
+                previewEl.style.display = 'none';
             }
             if(placeholderEl) {
                 placeholderEl.style.display = 'block';
@@ -720,38 +653,33 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // PERBAIKAN BUG: Pindahkan Modal ke Body SETELAH DOM selesai dimuat
         document.querySelectorAll('.modal').forEach(modal => {
             document.body.appendChild(modal);
         });
 
-        // Logika Modal Info (Bisa dipencet icon tanda tanya)
         const modalTitle = document.getElementById('infoModalTitle');
         const modalDesc = document.getElementById('infoModalDesc');
-        
+
         document.querySelectorAll('.btn-show-info').forEach(btn => {
             btn.addEventListener('click', function() {
                 const title = this.getAttribute('data-title');
                 const desc = this.getAttribute('data-desc');
-                
+
                 modalTitle.innerHTML = `<i class="mdi mdi-lightbulb-on-outline me-1"></i> Strategi ${title}`;
                 modalDesc.innerHTML = desc;
-                
+
                 new bootstrap.Modal(document.getElementById('infoTierModal')).show();
             });
         });
 
-        // Logika Navbar Active State (untuk custom tab)
         const tabLinks = document.querySelectorAll('[data-bs-toggle="pill"]');
         tabLinks.forEach(link => {
             link.addEventListener('shown.bs.tab', function(e) {
-                // Hapus gaya aktif dari semua link
                 tabLinks.forEach(l => {
                     l.classList.remove('bg-blue-50', 'dark:bg-blue-500/10', 'text-blue-600', 'dark:text-blue-400', 'shadow-inner', 'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]');
                     l.classList.add('text-slate-500', 'dark:text-slate-400');
                 });
-                
-                // Tambahkan gaya aktif ke link yang baru diklik
+
                 e.target.classList.add('bg-blue-50', 'dark:bg-blue-500/10', 'text-blue-600', 'dark:text-blue-400', 'shadow-inner', 'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]');
                 e.target.classList.remove('text-slate-500', 'dark:text-slate-400');
             });
