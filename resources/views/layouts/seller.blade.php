@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - Pondasikita Seller</title>
+     <style>
+        /* Custom Scrollbar Global (Elegan & Tipis) */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+        /* Cegah scroll horizontal yang tidak sengaja */
+        body { overflow-x: hidden; }
+    </style>
     {{-- Font Inter untuk kesan UI Premium --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -27,17 +36,6 @@
             }
         }
     </script>
-
-    <style>
-        /* Custom Scrollbar Global (Elegan & Tipis) */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Cegah scroll horizontal yang tidak sengaja */
-        body { overflow-x: hidden; }
-    </style>
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased selection:bg-blue-500 selection:text-white">
 

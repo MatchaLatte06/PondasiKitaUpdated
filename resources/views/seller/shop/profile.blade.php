@@ -83,7 +83,7 @@
                     <h3 class="text-sm font-black text-slate-800 mb-4"><i class="mdi mdi-panorama-variant-outline text-indigo-500 me-1"></i> Banner Toko</h3>
 
                     <div class="relative w-full h-32 rounded-2xl border-2 border-dashed border-slate-300 overflow-hidden group upload-hover cursor-pointer bg-slate-50 flex flex-col items-center justify-center" onclick="document.getElementById('bannerInput').click()">
-                        @if($toko->banner_toko)
+                        @if(!empty($toko->banner_toko))
                             <img id="bannerPreview" src="{{ asset('assets/uploads/shop/'.$toko->banner_toko) }}" class="absolute inset-0 w-full h-full object-cover z-0" alt="Banner">
                         @else
                             <img id="bannerPreview" src="" class="absolute inset-0 w-full h-full object-cover z-0 hidden" alt="Banner">
@@ -124,7 +124,7 @@
                                 <label class="text-sm font-bold text-slate-700">Nama Toko <span class="text-red-500">*</span></label>
                                 <span class="text-[10px] font-bold text-slate-400" id="countNama">0/50</span>
                             </div>
-                            <input type="text" name="nama_toko" id="inputNama" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all" value="{{ old('nama_toko', $toko->nama_toko) }}" maxlength="50" required>
+                            <input type="text" name="nama_toko" id="inputNama" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all" value="{{ old('nama_toko', $toko->nama_toko ?? '') }}" maxlength="50" required>
                         </div>
 
                         <div>
@@ -132,12 +132,12 @@
                                 <label class="text-sm font-bold text-slate-700">Slogan / Tagline</label>
                                 <span class="text-[10px] font-bold text-slate-400" id="countSlogan">0/100</span>
                             </div>
-                            <input type="text" name="slogan" id="inputSlogan" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-semibold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all" value="{{ old('slogan', $toko->slogan) }}" placeholder="Cth: Material Berkualitas, Harga Pantas" maxlength="100">
+                            <input type="text" name="slogan" id="inputSlogan" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-semibold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all" value="{{ old('slogan', $toko->slogan ?? '') }}" placeholder="Cth: Material Berkualitas, Harga Pantas" maxlength="100">
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi Toko</label>
-                            <textarea name="deskripsi" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all min-h-[120px] resize-none" placeholder="Ceritakan tentang toko, spesialisasi material, atau keunggulan Anda...">{{ old('deskripsi', $toko->deskripsi) }}</textarea>
+                            <textarea name="deskripsi" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all min-h-[120px] resize-none" placeholder="Ceritakan tentang toko, spesialisasi material, atau keunggulan Anda...">{{ old('deskripsi', $toko->deskripsi ?? $toko->deskripsi_toko ?? '') }}</textarea>
                         </div>
 
                     </div>
@@ -156,24 +156,33 @@
                                 <label class="block text-sm font-bold text-slate-700 mb-2">Nomor WhatsApp/Telepon <span class="text-red-500">*</span></label>
                                 <div class="flex border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500 transition-all">
                                     <span class="bg-slate-100 px-4 py-3 text-slate-500 font-black border-r border-slate-200">+62</span>
-                                    <input type="text" name="no_telepon" class="w-full bg-slate-50 px-4 py-3 text-sm font-bold outline-none" value="{{ old('no_telepon', ltrim($toko->no_telepon, '0')) }}" placeholder="8123456789" pattern="[0-9]+" required>
+                                    <input type="text" name="no_telepon" class="w-full bg-slate-50 px-4 py-3 text-sm font-bold outline-none" value="{{ old('no_telepon', ltrim($toko->no_telepon ?? $toko->telepon_toko ?? '', '0')) }}" placeholder="8123456789" pattern="[0-9]+" required>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-2">Kota / Kabupaten <span class="text-red-500">*</span></label>
-                                <input type="text" name="kota" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all" value="{{ old('kota', $toko->kota) }}" required>
+                                <input type="text" name="kota" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all" value="{{ old('kota', $toko->kota ?? '') }}" required>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Alamat Lengkap Toko/Gudang <span class="text-red-500">*</span></label>
-                            <textarea name="alamat_lengkap" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all min-h-[80px] resize-none" placeholder="Nama Jalan, RT/RW, Patokan..." required>{{ old('alamat_lengkap', $toko->alamat_lengkap) }}</textarea>
-                            <p class="text-[10px] font-bold text-slate-400 mt-1">Alamat ini akan digunakan sebagai titik penjemputan oleh kurir ekspedisi.</p>
+                            {{-- PENAMBAHAN ID id="inputAlamatLengkap" --}}
+                            <textarea name="alamat_lengkap" id="inputAlamatLengkap" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all min-h-[80px] resize-none" placeholder="Nama Jalan, RT/RW, Patokan..." required>{{ old('alamat_lengkap', $toko->alamat_lengkap ?? $toko->alamat_toko ?? '') }}</textarea>
+                            
+                            {{-- TOMBOL & HIDDEN INPUT UNTUK MAPS --}}
+                            <input type="hidden" name="latitude" id="inputLatitude" value="{{ old('latitude', $toko->latitude ?? '') }}">
+                            <input type="hidden" name="longitude" id="inputLongitude" value="{{ old('longitude', $toko->longitude ?? '') }}">
+                            
+                            <button type="button" onclick="openMapModal()" class="mt-4 w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold rounded-xl transition-colors border border-emerald-200 border-dashed shadow-sm">
+                                <i class="mdi mdi-map-search text-lg"></i> Atur Titik Lokasi Peta
+                            </button>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2">Alamat & Titik Peta akan digunakan sebagai acuan jarak penjemputan oleh kurir ekspedisi.</p>
                         </div>
 
                         <div class="w-full md:w-1/2">
                             <label class="block text-sm font-bold text-slate-700 mb-2">Kode Pos <span class="text-red-500">*</span></label>
-                            <input type="text" name="kode_pos" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all" value="{{ old('kode_pos', $toko->kode_pos) }}" pattern="[0-9]{5,6}" required>
+                            <input type="text" name="kode_pos" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all" value="{{ old('kode_pos', $toko->kode_pos ?? '') }}" pattern="[0-9]{5,6}" required>
                         </div>
 
                     </div>
@@ -196,9 +205,69 @@
         </div>
     </form>
 </div>
+
+
+{{-- ======================================================== --}}
+{{-- JALUR BYPASS: TARUH CSS DISINI AGAR PASTI TERBACA BROWSER --}}
+{{-- ======================================================== --}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    /* Paksa ukuran map container */
+    #mapContainer { height: 100%; width: 100%; min-height: 350px; }
+    
+    /* Lawan reset image bawaan Tailwind CSS */
+    .leaflet-container img {
+        max-width: none !important;
+        max-height: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Amankan Z-Index agar tidak tertutup elemen lain */
+    .leaflet-container { z-index: 10 !important; }
+    .leaflet-control-container .leaflet-control { z-index: 40 !important; }
+</style>
+
+{{-- MODAL PETA LEAFLET (DENGAN SCROLLABLE FIX) --}}
+<div id="mapModal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden flex-col items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2rem] shadow-2xl flex flex-col transform transition-all">
+        
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-xl font-black text-slate-800 tracking-tight">Pilih Titik Lokasi</h3>
+            <p class="text-xs font-bold text-slate-500 mt-1">Geser pin merah ke lokasi paling akurat sesuai gudang/toko Anda.</p>
+        </div>
+        
+        <!-- Modal Search Box -->
+        <div class="px-6 py-4 bg-slate-50 flex gap-2">
+            <input type="text" id="mapSearchInput" class="flex-1 bg-white border border-slate-200 text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Cari kecamatan, kota, jalan...">
+            <button type="button" onclick="searchLocation()" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors shadow-md">Cari</button>
+        </div>
+        
+        <!-- Modal Map Container -->
+        <div class="relative w-full h-[350px] z-0 bg-slate-100 shrink-0">
+            <div id="mapContainer" class="w-full h-full"></div>
+        </div>
+        
+        <!-- Modal Footer & Result -->
+        <div class="p-6 bg-white border-t border-slate-100">
+            <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl mb-6">
+                <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Hasil Geocoding API</p>
+                <p id="mapAddressResult" class="text-xs font-semibold text-slate-700 leading-relaxed">Pilih lokasi di peta terlebih dahulu...</p>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeMapModal()" class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Batal</button>
+                <button type="button" onclick="saveLocation()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all">Simpan Lokasi Ini</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
+{{-- Library JS Leaflet --}}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
     // 1. LIVE PREVIEW IMAGE (Logo & Banner)
     function previewImage(input, previewId, placeholderId = null) {
@@ -207,7 +276,7 @@
             reader.onload = function(e) {
                 const previewImg = document.getElementById(previewId);
                 previewImg.src = e.target.result;
-                previewImg.classList.remove('hidden'); // Jika sebelumnya hidden (kasus banner kosong)
+                previewImg.classList.remove('hidden');
 
                 if(placeholderId) {
                     document.getElementById(placeholderId).classList.add('hidden');
@@ -222,6 +291,8 @@
         const input = document.getElementById(inputId);
         const counter = document.getElementById(counterId);
 
+        if(!input || !counter) return;
+
         const updateCount = () => {
             let len = input.value.length;
             counter.textContent = `${len}/${maxLen}`;
@@ -230,7 +301,7 @@
         };
 
         input.addEventListener('input', updateCount);
-        updateCount(); // Run on load
+        updateCount(); 
     }
 
     initCounter('inputNama', 'countNama', 50);
@@ -243,5 +314,130 @@
         btn.disabled = true;
         btn.classList.add('opacity-70', 'cursor-not-allowed');
     });
+
+    // ==========================================
+    // 4. LOGIK PETA LEAFLET & GEOCODING
+    // ==========================================
+    let map = null;
+    let marker = null;
+
+    function openMapModal() {
+        const modal = document.getElementById('mapModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        // JURUS RAHASIA: Tunggu 400ms agar DOM Modal benar-benar selesai merender ukuran
+        setTimeout(() => {
+            if (!map) {
+                initMap(); 
+            } else {
+                map.invalidateSize(); 
+            }
+        }, 400); 
+    }
+
+    function closeMapModal() {
+        const modal = document.getElementById('mapModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function initMap() {
+        // Ambil value dari Hidden Input (Jika sudah ada di DB), jika kosong pakai koordinat Default Subang
+        let startLat = parseFloat(document.getElementById('inputLatitude').value) || -6.5644;
+        let startLng = parseFloat(document.getElementById('inputLongitude').value) || 107.7648;
+
+        map = L.map('mapContainer').setView([startLat, startLng], 14);
+
+        // Load Tile dari OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // Pasang Marker yang bisa di-drag
+        marker = L.marker([startLat, startLng], { draggable: true }).addTo(map);
+
+        // Fetch alamat pertama kali load
+        reverseGeocode(startLat, startLng);
+
+        // Event saat Pin Peta digeser
+        marker.on('dragend', function (e) {
+            let latlng = marker.getLatLng();
+            reverseGeocode(latlng.lat, latlng.lng);
+        });
+
+        // Event saat Peta di-klik (Pin pindah)
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            reverseGeocode(e.latlng.lat, e.latlng.lng);
+        });
+    }
+
+    // Fungsi Reverse Geocoding (Koordinat -> Nama Jalan/Kota)
+    function reverseGeocode(lat, lng) {
+        document.getElementById('mapAddressResult').innerText = "Sedang mengambil data lokasi...";
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data && data.display_name) {
+                    document.getElementById('mapAddressResult').innerText = data.display_name;
+                } else {
+                    document.getElementById('mapAddressResult').innerText = "Detail lokasi tidak ditemukan.";
+                }
+            }).catch(error => {
+                document.getElementById('mapAddressResult').innerText = "Gagal mengambil data koneksi API.";
+            });
+    }
+
+    // Fungsi Geocoding Search (Input Teks -> Titik Koordinat)
+    function searchLocation() {
+        let query = document.getElementById('mapSearchInput').value;
+        if(query.trim() === '') return;
+        
+        let btnSearch = event.target;
+        btnSearch.innerText = '...';
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+            .then(res => res.json())
+            .then(data => {
+                btnSearch.innerText = 'Cari';
+                if(data.length > 0) {
+                    let lat = parseFloat(data[0].lat);
+                    let lon = parseFloat(data[0].lon);
+                    
+                    map.setView([lat, lon], 16);
+                    marker.setLatLng([lat, lon]);
+                    reverseGeocode(lat, lon);
+                } else {
+                    Toast.fire({icon: 'error', title: 'Lokasi tidak ditemukan.'});
+                }
+            }).catch(() => {
+                btnSearch.innerText = 'Cari';
+            });
+    }
+
+    // Fungsi Simpan ke Hidden Input Form & Auto Fill Alamat
+    function saveLocation() {
+        // 1. Simpan Koordinat
+        let latlng = marker.getLatLng();
+        document.getElementById('inputLatitude').value = latlng.lat;
+        document.getElementById('inputLongitude').value = latlng.lng;
+        
+        // 2. AUTO-FILL ALAMAT
+        let alamatDariMap = document.getElementById('mapAddressResult').innerText;
+        
+        // Pastikan yang di-copy bukan teks loading/error
+        if(alamatDariMap !== "Sedang mengambil data lokasi..." && 
+           alamatDariMap !== "Detail lokasi tidak ditemukan." && 
+           alamatDariMap !== "Gagal mengambil data koneksi API.") {
+            
+            // Masukkan teks ke Textarea Alamat Lengkap
+            document.getElementById('inputAlamatLengkap').value = alamatDariMap;
+        }
+
+        // 3. Tutup Modal & Beri Notifikasi
+        closeMapModal();
+        Toast.fire({icon: 'success', title: 'Lokasi & Alamat berhasil diisi otomatis! Jangan lupa klik Simpan Profil.'});
+    }
 </script>
 @endpush
